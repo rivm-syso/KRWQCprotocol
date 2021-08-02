@@ -309,10 +309,15 @@ QC4b wordt regulier uitgevoerd met het aanroepen van QC4b() met het metingen
 bestand als invoer.
 
 ### QC5 - QC Status
-In de functie voor QC5 worden de attributes met resultaten uit de verschillende
-tests uit het metingen gehaald en elkaar toegevoegd als één dataframe. Deze wordt 
-vervolgens gebruikt om het eind oordeel te bepalen volgens de regels uit het Protocol. 
+In de functie voor QC5 worden de attributes met resultaten van de verschillende
+tests uit het metingen gehaald en elkaar gevoegd als één dataframe met 
+`collect_result()`. Het is hierbij belangrijk dat alle QC-stappen zijn doorlopen
+en dat voor iedere functie hetzelfde metingen bestand als invoer is gebruikt. 
+In dit geval zijn de resultaten uit de verschillende QC tests als attribute aan
+één bestand gekoppeld. Met het verkregen dataframe uit `collect_result()` kan 
+vervolgens per meting het eindoordeel bepaald worden volgens de regels uit het 
+QC Protocol. Het geautomatiseerd toepassen van deze regels is nog niet beschikbaar
+binnen deze functie en zal later toegevoegd worden. 
 
-... verder aanvullen, deze test was nog niet beschikbaar.
 
 
