@@ -1,0 +1,17 @@
+# builds 
+inst/doc
+
+# Rproj files
+.Rproj.user
+.Rhistory
+
+# vi files
+*.swp
+
+# prototype / test code
+prototype.R
+
+
+/doc/
+/Meta/
+..Rcheck

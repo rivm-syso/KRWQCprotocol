@@ -1,0 +1,318 @@
+---
+title: "KRW QC Protocol"
+author: "RIVM"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{KRW QC Protocol}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(KRWQCprotocol)
+```
+
+## Inleiding
+Deze handleiding beschrijft de validatie werkwijze volgens het QC protocol 
+(REF RIVM/PMB) voor zowel de grondwaterdata uit het Landelijk Meetnet Grondwaterkwaliteit 
+(LMG) als uit de Provinciale/KRW Monitoringprogramma's (PMG/KMG). Met dit protocol 
+wordt de dataverwerking en validatie geharmoniseerd en vastgesteld waardoor de 
+datakwaliteit verbeterd. In dit kader is een R-pakket opgesteld om zoveel mogelijk 
+te automatiseren. De hieruit voortkomende betrouwbare dataset is uiteindelijk van 
+belang voor de vastlegging in de Basis Registratie Ondergrond (BRO).
+
+## QC Protocol
+Het protocol voor datakwaliteitscontrole (QC) beschrijft de werkwijze om 
+grondwaterkwaliteitsgegevens te controleren en beoordelen. Dit protocol wordt door 
+provincies en het RIVM gebruikt als bronhouders van de landelijke en provinciale 
+grondwaterkwaliteitsdata. De bestaande werkwijze voor controle en beoordeling staat 
+beschreven in het `Handboek Monitoring Grondwaterkwaliteit KRW (2013)`. 
+
+Deze werkwijze is ontwikkeld door het RIVM en vanaf de inrichting van het LMG 
+gebruikt voor de kwaliteitscontrole. De kwaliteitscontrole (QC)-onderdelen in deze 
+bestaande werkwijze zijn uitgebreid en in een aantal gevallen verder gespecifieerd. 
+De verschillende QC-onderdelen in deze vernieuwde versie van het protocol zijn 
+opgesteld volgens de structuur van het `Protocol voor datakwaliteitscontrole: `
+`kwaliteitsborging grondwaterstands- en stijghoogtegegevens`. Bij het opstellen 
+van de nieuwe QC-onderdelen is samengewerkt tussen het RIVM en de provincies. 
+
+## Samenstelling en beschrijving dataformat voor validatie
+In het QC protocol worden controles uitgevoerd m.b.t. parameters, meettechnieken, 
+observaties en meetwaardes uit zowel het veld als uit het lab. Door de veelvoud 
+aan controles is het complex om de vele gegevens in één bestand te vatten. Om 
+deze reden is gekozen om de datastromen in 5 datasets op te knippen zodat het 
+automatiseren van de controles eenvoudiger wordt. Alle records en kolomnamen zijn
+in lowercase. De datasets zijn als volgt:
+
+1) Veldbestand: databestand met veldobservaties betreffende locatie en toestand van de put;
+2) Putbestand: databestand met referentie putlocatie gegevens;
+3) Filterbestand: databestand met referentie putfilter gegevens;
+4) Parameterbestand: opzoekbestand voor parameter kenmerken;
+5) Metingenbestand: bestand met gemeten parameters uit monsteranalyses en veldmetingen.
+
+
+Tabel 1 veldbestand (`d_veld`) bestaat uit:
+
+kolomnaam       | inhoud                      | type
+---------------|-----------------------------|--------
+qcid | rijnummer | numeriek
+putcode | identificatie putlocatie volgens RGD/BRO? | karakter
+filter | filternummer | numeriek
+jaar | jaar van veldbezoek | numeriek
+maand | maand van veldbezoek | numeriek
+dag | dag van veldbezoek | numeriek
+xcoord | x-coördinaat gemeten in het veld, in meters volgens RD | numeriek
+ycoord | y-coördinaat gemeten in het veld, in meters volgens RD | numeriek
+landgebruik | veldobservatie van dominant landgebruik putomgeving | karakter
+okf | diepte onderkant filter t.o.v. maaiveld, in meters | numeriek
+gws_voor | gemeten grondwaterstand voor bepomping filter t.o.v. maaiveld, in meters | numeriek
+gws_na | gemeten grondwaterstand na bepomping filter t.o.v. maaiveld, in meters | numeriek
+bem_app | gebruikt bemonsteringsapparaat | karakter
+
+Tabel 2 putbestand (`d_put`) bestaat uit:
+
+kolomnaam       | inhoud                      | type
+---------------|-----------------------------|--------
+qcid | rijnummer | numeriek
+putcode | identificatie putlocatie volgens BRO | karakter
+rgdputnummer | identificatie putlocatie volgens RGD | karakter
+xcoord | x-coördinaat zoals opgegeven in BRO, in meters volgens RD | numeriek
+ycoord | y-coördinaat zoals opgegeven in BRO, in meters volgens RD | numeriek
+landgebruik | (historisch) bepaald dominant landgebruik putomgeving | karakter
+maaiveld | maaiveldhoogte bij de put, in meters NAP | numeriek
+provincie | provincie aanduiding of code van beheerder | karakter
+
+Tabel 3 filterbestand (`d_filter`) bestaat uit:
+
+kolomnaam       | inhoud                      | type
+---------------|-----------------------------|--------
+qcid | rijnummer | numeriek
+putcode | identificatie putlocatie volgens BRO | karakter
+filter | filternummer | numeriek
+bro_id | identificatie putfilter zoals opgenomen in BRO | karakter
+diepte_onder | diepte onderkant filter t.o.v. maaiveld in meters | numeriek
+diepte_boven | diepte bovenkant filter t.o.v. maaiveld in meters | numeriek
+watertype | geeft aan of het grondwater zoet (<300 mg/l Cl) of brak/zout is (>= 300 mg/l Cl) | 
+redoxklasse | geeft aan welke redoxcondities in het putfilter gelden | karakter 
+
+Tabel 4 parameterbestand (`d_parameter`) bestaat uit:
+
+kolomnaam       | inhoud                      | type
+---------------|-----------------------------|--------
+qcid | rijnummer | numeriek
+naam | stofnaam | karakter 
+aquocode | aquocode van de betreffende stof | karakter 
+cas | CAS-nummer van de betreffende stof | karakter 
+eenheid | eenheid van de betroffende stof | karakter
+hoedanigheid | hoedanigheid waarin een stof is uitgedrukt | karakter
+omschrijving | volledig uitgeschreven stofnaam. Kan overeenkomen met kolom naam | karakter
+bem_apparaat | bemonsteringsapparaat waarmee een stof volgens de BRO dient te worden bemonsterd | karakter
+bem_procedure | bemonsteringsprocedure procedure gehanteerd bij uitvoering grondwaterbemonstering | karakter
+waarde_techniek | waardebepalingstechniek laboratoriumtechniek gebruikt bij bepaling chemische parameter | karakter
+waarde_procedure | waardebepalingsprocedure voorschriften uitvoering laboratoriumonderzoek | karakter
+
+Tabel 5 metingenbestand (`d_metingen`) bestaat uit: 
+
+kolomnaam       | inhoud                      | type
+---------------|-----------------------------|--------
+qcid | rijnummer | numeriek
+monsterID | unieke identificatiecode voor het genomen grondwatermonster | numeriek
+jaar | jaar van laboratorium of veldanalyse | numeriek
+maand | maand van laboratorium of veldanalyse | numeriek
+dag | dag van laboratorium of veldanalyse | numeriek
+putcode | identificatie putlocatie volgens BRO | karakter
+filter | filternummer | numeriek
+parameter | naam van de gemeten parameter | karakter
+detectieteken | geeft aan of een waarde onder de rapportagegrens ligt (<) of erboven | karakter 
+rapportagegrens | geeft de waarde van de rapportagegrens voor de betreffende paramter en monster | numeriek
+waarde | de gemeten waarde, waarbij alle waardes positief dienen te zijn | numeriek 
+
+### Overzicht van de data
+Voorbeeld bestanden inladen:
+
+```{r}
+data(veld)
+data(put)
+data(metingen)
+data(filter)
+```
+
+Overzicht tabel 1 met veldgegevens
+```{r}
+str(veld)
+head(veld)
+```
+
+Overzicht tabel 2 met put informatie
+```{r}
+str(put)
+head(put)
+```
+
+Overzicht tabel 3 met putfilter informatie
+```{r}
+str(filter)
+head(filter)
+```
+
+Overzicht tabel 4 met parameter informatie
+```{r}
+str(parameter)
+head(parameter)
+```
+
+Overzicht tabel 5 met meetwaardes
+```{r}
+str(metingen)
+head(metingen)
+```
+
+## Werking QC R-pakket
+De verschillende QC stappen uit het Protocol kunnen eenvoudig uitgevoerd worden
+door het aanroepen van de relevante functie (QC0a-QC5). Als invoer van de functie 
+worden de relevante datatabellen meegegeven benodigd voor de testen. In de functie 
+kan met het verbose argument opgegeven worden of de print van tussentijdse output 
+gewenst is door deze op `TRUE` te zetten. In een aantal gevallen dienen extra 
+invoervariabelen opgegeven te worden. Zie hiervoor de documentatie bij de functies, 
+bijvoorbeeld `?KRWQCprotocol::QC0a`.
+
+In de verschillende QC functies worden de testen uitgevoerd beschreven in het
+QC Protocol. Als bij deze stappen een afwijking geconstateerd wordt dan krijgt
+het monster, de parameter of de waarde een concept oordeel toegekend. Deze 
+afwijkingen worden aan het eind van de functie als attribuut meegegeven aan 
+het metingen bestand (`d_metingen`) en kunnen dus na het runnen van elke test
+bekeken worden. 
+
+*BELANGRIJK:* alle resultaten en concept oordelen worden per QC-test als attribuut 
+aan het metingenbestand gehangen. Het is daarom noodzakelijk om voor elke test 
+hetzelfde bestand als invoer te gebruiken, zodat alle test resultaten uiteindelijk 
+als attribuut beschikbaar zijn onder eenzelfde bestand. 
+
+
+## Toepassing functies
+Hieronder zullen de QC stappen 0-5 kort doorlopen worden om te laten zien hoe
+de functies toegepast worden en of aanvullende acties benodigd zijn. 
+
+Bij een viertal QC stappen moet de validatie door de grondwaterbeheerder zelf
+worden uitgevoerd. Het gaat om de stappen QC0c, QC0d, QC2b en QC2c. Om deze 
+stappen in het R-pakket op te kunnen nemen moet voor deze functies eerst een 
+invoerbestand gegenereerd worden met `QC0c_create_file`, idem voor de overige
+3 functies. Na het invullen van deze bestanden dient het bestand onder dezelfde
+naam opgeslagen te worden zodat deze meegenomen kan worden in de functies
+QC0c, QC0d, QC2b en QC2c uit dit pakket. De resultaten worden net als bij de 
+andere functies vervolgens als attribute toegekend aan het metingen bestand.
+
+### QC0 - Meetopstelling
+De stappen en functies onder QC0 worden op reguliere wijze uitgevoerd door
+het aanroepen van de betreffende functie en benodigde datasets, met uitzondering
+van QC0c en QC0d zie bovenstaande.
+
+Voorbeeld voor uitvoeren van QC0a:
+```{r}
+QC0a(d_veld = veld, d_put = put, d_metingen = metingen, verbose = TRUE)
+
+```
+
+### QC1 - Data-integriteit
+In QC1a wordt de informatie uit de parameter tabel (d_parameter) vergeleken met
+informatie uit de BRO. Binnen het pakket is de meest recente versie van deze
+BRO parameterlijst opgenomen en deze wordt binnen de functie aangeroepen. 
+In QC1b worden de bemonsteringsapparatuur en -procedure en de analysetechniek en 
+-procedure getoetst aan de gegevens uit de BRO. 
+Indien het vermoeden bestaat dat de BRO gegevens in dit pakket achterhaald zijn 
+wordt verzocht een issue aan te maken op de Github pagina van dit QC pakket zodat 
+de meest actuele gegevens beschikbaar kunnen worden gesteld. 
+
+QC1d (controle conformiteit BRO format) uit het Protocol wordt niet in dit 
+R-pakket als afzonderlijke functie getoetst. In iedere functie wordt namelijk
+al getest of de benodigde datakolommen aanwezig zijn. 
+
+De andere testen uit QC1 worden op reguliere wijze uitgevoerd, zie voorbeeld
+van QC0a.
+
+### QC2 - Bemonstering
+De stappen en functies onder QC2 worden op reguliere wijze uitgevoerd door
+het aanroepen van de betreffende functie en benodigde datasets, met uitzondering
+van QC2b en QC2c, zie eerder.
+
+### QC3 - Plausibiliteit
+In QC3b wordt getoetst of de putten in de BRO puttenlijst voorkomen. De bedoeling
+is om d.m.v. een API de puttenlijst uit de BRO automatisch in te laden. Door 
+technische probleme is dit momenteel nog niet mogelijk. Hierdoor is voor QC3b 
+nu een tijdelijke functie opgenomen. Bij deze functie is het op het moment
+noodzakelijk om handmatig de putten uit het metingen bestand te 
+selecteren welke niet in de BRO voorkomen en de subselectie uit het metingen 
+bestand in te voeren in de functie. 
+
+In QC3c wordt de ionenbalans opgesteld. Het is hierdoor belangrijk om de benodigde parameters de juiste naam te geven. Daarnaast wordt van het volgende uitgegaan:
+
+- In de meeste gevallen is in de provinciale set hco3 in het lab bepaald, dus
+de lab waarde gebruiken. Hierdoor ook pH uit het lab gebruiken;
+- pH wordt hernoemd naar h;
+- no3 en nh4 zijn uitgedrukt in no3_n en nh4_n;
+- po4 is uitgedruk in po4_p. Met functie argument `add_phosphate` kan
+aangegeven worden of het gewenst is dat po4 uit ptot wordt berekend indien
+po4 niet bekend is;
+
+In QC3d worden de ec lab en ec veld vergeleken. Benodigde parameternamen zijn 
+ec en ecv. Dit moet voor de functie aangepast worden in de dataset.
+
+In QC3e wordt de ec berekend aan de hand van de gemeten concentraties. Hiervoor
+gelden de volgende uitgangspunten:
+- hco3 lab hernoemd naar hco3, hco3 veld hernoemd naar hco3v;
+- pH wordt hernoemd naar h en pH veld naar hv;
+- ec veld hernoemd naar ecv;
+- no3 en nh4 zijn uitgedrukt in no3_n en nh4_n;
+- po4 is uitgedruk in po4_p. Met functie argument `add_phosphate` kan
+aangegeven worden of het gewenst is dat po4 uit ptot wordt berekend indien
+po4 niet bekend is;
+Binnen deze functie wordt de ionenbalans opnieuw opgesteld zodat hco3 geschat 
+kan worden als deze ontbreekt. Vervolgens wordt aan de hand van bepaalde 
+condities bepaald welke methode gebruikt wordt om de ec te berekenen om deze
+uiteindelijk toe te passen (Stuyfzand 1987b).
+
+In QC3f wordt de pH lab met pH veld vergeleken. Benodigde parameternamen zijn 
+h en hv. Dit moet voor de functie aangepast worden in de dataset.
+
+In QC3g wordt de pH met hco3 vergeleken. Aangezien in de meeste gevallen hco3
+niet in het veld is bepaald voor de provinciale gegevens, worden nu de lab
+metingen van beiden vergeleken. Benodigde paramternamen zijn h en hco3.
+
+In QC3h wordt no3 met nh4 vergeleken. Aangenomen wordt dat beiden uitgedrukt
+zijn in no3_n en nh4_n. 
+
+### QC4 - Consistentie
+In QC4a worden de metingen uit de te valideren meetronde gecontroleerd of deze
+consistent zijn met de historische meetreeks. Metingen welke >3.5 sd afwijken 
+worden als afwijkend en twijfelachtig bestempeld. Wanneer een reeks minder dan
+3 metingen heeft is de test niet uitvoerbaar. Vervolgens worden op 2 manieren
+figuren gegenereerd en weggeschreven als attribute aan het metingen bestand 
+om de validatie te kunnen uitvoeren:
+
+- Voor elke parameter worden de metingen log-getransformeerd weergegeven waar
+afijkende metingen uit de te valideren meetronde gekleurd zijn afgebeeld. Hiermee 
+wordt in één opslag duidelijk hoeveel metingen per parameter afwijken en of er 
+eventueel sprake is van eenheidsfouten of structurele afwijkingen in een meetronde.
+- Per twijfelactige meting wordt de gehele reeks geplot tegelijkertijd met 
+eventuele andere putfilters op die locatie. Zou kunnen mogelijke filterwisselingen
+geidentificeerd worden. 
+
+QC4b wordt regulier uitgevoerd met het aanroepen van QC4b() met het metingen
+bestand als invoer.
+
+### QC5 - QC Status
+In de functie voor QC5 worden de attributes met resultaten uit de verschillende
+tests uit het metingen gehaald en elkaar toegevoegd als één dataframe. Deze wordt 
+vervolgens gebruikt om het eind oordeel te bepalen volgens de regels uit het Protocol. 
+
+... verder aanvullen, deze test was nog niet beschikbaar.
+
+

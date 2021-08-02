@@ -1,0 +1,32 @@
+Package: KRWQCprotocol
+Title: Standardised test for Dutch Groundwater Monitoring Networks
+Version: 0.0.1
+Authors@R: 
+ person(given = "Mike",
+           family = "Wit",
+           role = c("aut"))
+ person(given = "Job",
+           family = "Spijker",
+           role = c("aut", "cre"),
+           email = "job.spijker@rivm.nl")
+Author: Mike Wit [aut],
+    Job Spijker [aut, cre]
+Maintainer: Job Spijker <job.spijker@rivm.nl>
+Description: This package contains standardised tests for Dutch Groundwater Monitoring Networks. Data must comply to these tests before they can be registred in the 'Basisregistratie Ondergrond'.
+License: GPL-3
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.1
+Suggests: 
+    knitr,
+    rmarkdown,
+    testthat (>= 3.0.0)
+VignetteBuilder: knitr
+Config/testthat/edition: 3
+Depends: 
+    R (>= 2.10), 
+    dplyr, 
+    tidyr,
+    lubridate,
+    ggplot2
