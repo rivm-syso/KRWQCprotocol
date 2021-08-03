@@ -26,6 +26,12 @@ grondwaterkwaliteitsgegevens, leidt op een efficiente manier tot een
 uniforme en eenduidige dataset tussen de verschillende bronhouders. Dit
 R package bevat een groot aantal tests volgens het QC prototol
 
+# Documentatie & help pagina's
+
+De documentatie en help pagina's van dit pakket kan je [hier](https://jspijker.github.io/KRWQCprotocol/index.html) vinden.
+
+
+
 # Brongegevens / invoerbestand
 
 In het QC protocol worden controles uitgevoerd m.b.t. parameters, meettechnieken, 
