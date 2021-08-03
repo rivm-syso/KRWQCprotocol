@@ -4,6 +4,7 @@ inst/doc
 # Rproj files
 .Rproj.user
 .Rhistory
+*.Rproj
 
 # vi files
 *.swp
@@ -15,3 +16,4 @@ prototype.R
 /doc/
 /Meta/
 ..Rcheck
+docs
