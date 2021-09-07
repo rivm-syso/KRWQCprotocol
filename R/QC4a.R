@@ -19,10 +19,14 @@
 #' @param d_parameter dataframe met parameter informatie
 #' @param meetronde meetjaar welke gevalideerd dient te worden. Staat standaard
 #' op de laatste meetjaar uit het databestand.
+#' @param plt_per_stof Voeg tijdserie plots per stof toe aan resultaat
+#' @param plt_per_reeks Voeg tijdserie plots per reeks toe aan resultaat
 #' @param verbose of tekstuele output uit script gewenst is (T) of niet (F). 
 #' Staat standaard op F.
 #'
 #' @return metingen bestand met verdachte locaties/monsters. 
+#'
+#' @importFrom stringr str_detect
 #'
 #' @export
 #'
@@ -30,8 +34,12 @@
 
 QC4a <- function(d_metingen, d_parameter, 
                  meetronde = max(d_metingen$jaar), 
-                 plt.per.stof = T, plt.per.reeks = T, 
+                 plt_per_stof = T, plt_per_reeks = T, 
                  verbose = F) {
+
+    # arguments changed to something more in line with common style
+    plt.per.stof <- plt_per_stof
+    plt.per.reeks <- plt_per_reeks
   
   # Check datasets op kolommen en unieke informatie
   testKolommenMetingen(d_metingen)
