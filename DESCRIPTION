@@ -30,4 +30,5 @@ Depends:
     dplyr, 
     tidyr,
     lubridate,
-    ggplot2
+    ggplot2,
+    stringr

@@ -14,6 +14,7 @@
 #' wordt hiermee uitgebreid wanneer het een legitieme, nieuwe parameter betreft.
 #'
 #' @param d_parameter dataframe met putcode, watertype en redoxklasses
+#' @param d_metingen dataframe met metingen
 #' @param verbose of tekstuele output uit script gewenst is (T) of niet (F).
 #' Staat standaard op F.
 #'

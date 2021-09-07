@@ -8,8 +8,8 @@ QC4a(
   d_metingen,
   d_parameter,
   meetronde = max(d_metingen$jaar),
-  plt.per.stof = T,
-  plt.per.reeks = T,
+  plt_per_stof = T,
+  plt_per_reeks = T,
   verbose = F
 )
 }
@@ -20,6 +20,10 @@ QC4a(
 
 \item{meetronde}{meetjaar welke gevalideerd dient te worden. Staat standaard
 op de laatste meetjaar uit het databestand.}
+
+\item{plt_per_stof}{Voeg tijdserie plots per stof toe aan resultaat}
+
+\item{plt_per_reeks}{Voeg tijdserie plots per reeks toe aan resultaat}
 
 \item{verbose}{of tekstuele output uit script gewenst is (T) of niet (F).
 Staat standaard op F.}

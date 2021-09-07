@@ -112,8 +112,6 @@ QC0c <- function(dir, d_metingen, verbose = F) {
 #' handmatige controle van de representativiteit van de put en filter.
 #'
 #' @param dir directory waarin het bestand aangemaakt moet worden
-#' @param verbose of tekstuele output uit script gewenst is (T) of niet (F). Staat
-#' standaard op F.
 #'
 #' Deze functie maakt een csv bestand aan genaamd
 #' 'QC0c_beschadiging_put.csv'. Dit bestand wordt aangemaakt in de

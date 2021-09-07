@@ -9,6 +9,8 @@ QC1a(d_parameter, d_metingen, verbose = F)
 \arguments{
 \item{d_parameter}{dataframe met putcode, watertype en redoxklasses}
 
+\item{d_metingen}{dataframe met metingen}
+
 \item{verbose}{of tekstuele output uit script gewenst is (T) of niet (F).
 Staat standaard op F.}
 }

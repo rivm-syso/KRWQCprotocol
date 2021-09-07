@@ -15,8 +15,7 @@
 #' @param verbose of tekstuele output uit script gewenst is (T) of niet (F). 
 #' Staat standaard op F.
 #'
-#' @return metingen bestand met verdachte locaties/monsters. 
-#' 
+#' @return metingen bestand met verdachte locaties/monsters.
 #'
 #' @export
 #'

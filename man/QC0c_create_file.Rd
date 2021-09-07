@@ -7,10 +7,7 @@
 QC0c_create_file(dir)
 }
 \arguments{
-\item{dir}{directory waarin het bestand aangemaakt moet worden}
-
-\item{verbose}{of tekstuele output uit script gewenst is (T) of niet (F). Staat
-standaard op F.
+\item{dir}{directory waarin het bestand aangemaakt moet worden
 
 Deze functie maakt een csv bestand aan genaamd
 'QC0c_beschadiging_put.csv'. Dit bestand wordt aangemaakt in de
