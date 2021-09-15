@@ -152,8 +152,8 @@ de consistentie van meetwaarden.</p>
   <span class='va'>d_metingen</span>,
   <span class='va'>d_parameter</span>,
   meetronde <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/Extremes.html'>max</a></span><span class='op'>(</span><span class='va'>d_metingen</span><span class='op'>$</span><span class='va'>jaar</span><span class='op'>)</span>,
-  plt.per.stof <span class='op'>=</span> <span class='cn'>T</span>,
-  plt.per.reeks <span class='op'>=</span> <span class='cn'>T</span>,
+  plt_per_stof <span class='op'>=</span> <span class='cn'>T</span>,
+  plt_per_reeks <span class='op'>=</span> <span class='cn'>T</span>,
   verbose <span class='op'>=</span> <span class='cn'>F</span>
 <span class='op'>)</span></pre>
 
@@ -172,6 +172,14 @@ de consistentie van meetwaarden.</p>
       <th>meetronde</th>
       <td><p>meetjaar welke gevalideerd dient te worden. Staat standaard
 op de laatste meetjaar uit het databestand.</p></td>
+    </tr>
+    <tr>
+      <th>plt_per_stof</th>
+      <td><p>Voeg tijdserie plots per stof toe aan resultaat</p></td>
+    </tr>
+    <tr>
+      <th>plt_per_reeks</th>
+      <td><p>Voeg tijdserie plots per reeks toe aan resultaat</p></td>
     </tr>
     <tr>
       <th>verbose</th>

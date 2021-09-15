@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>QC1a. Controle parameterlijst BRO — QC1a • KRWQCprotocol</title>
+<title>Filter gegevens — filter • KRWQCprotocol</title>
 
 
 <!-- jquery -->
@@ -39,9 +39,11 @@
 
 
 
-<meta property="og:title" content="QC1a. Controle parameterlijst BRO — QC1a" />
-<meta property="og:description" content="Controle op ID, aquocode, CASnummer, omschrijving,
-eenheid en hoedanigheid." />
+<meta property="og:title" content="Filter gegevens — filter" />
+<meta property="og:description" content="Test dataset op basis van het LMG met daarin informatie over de
+filters. Deze
+dataset kan gebruikt worden voor het testen van de functies uit dit
+pakket." />
 
 
 
@@ -116,48 +118,24 @@ eenheid en hoedanigheid." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>QC1a. Controle parameterlijst BRO</h1>
+    <h1>Filter gegevens</h1>
     
-    <div class="hidden name"><code>QC1a.Rd</code></div>
+    <div class="hidden name"><code>filter.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Controle op ID, aquocode, CASnummer, omschrijving,
-eenheid en hoedanigheid.</p>
+    <p>Test dataset op basis van het LMG met daarin informatie over de
+filters. Deze
+dataset kan gebruikt worden voor het testen van de functies uit dit
+pakket.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>QC1a</span><span class='op'>(</span><span class='va'>d_parameter</span>, <span class='va'>d_metingen</span>, verbose <span class='op'>=</span> <span class='cn'>F</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='va'>filter</span></pre>
 
-    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
-    <table class="ref-arguments">
-    <colgroup><col class="name" /><col class="desc" /></colgroup>
-    <tr>
-      <th>d_parameter</th>
-      <td><p>dataframe met putcode, watertype en redoxklasses</p></td>
-    </tr>
-    <tr>
-      <th>d_metingen</th>
-      <td><p>dataframe met metingen</p></td>
-    </tr>
-    <tr>
-      <th>verbose</th>
-      <td><p>of tekstuele output uit script gewenst is (T) of niet (F).
-Staat standaard op F.</p></td>
-    </tr>
-    </table>
 
-    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+    <h2 class="hasAnchor" id="format"><a class="anchor" href="#format"></a>Format</h2>
 
-    <p>metingen bestand met verdachte locaties/monsters.</p>
-    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
-
-    <p>Controleer of de identificatiekenmerken van de individuele
-metingen overeenkomen met de parameterlijst BRO. In geval van
-afwijken, ken het concept QC oordeel verdacht toe aan de betreffende
-parameters.</p>
-<p>Indien een parameter niet op de parameterlijst BRO aanwezig is, dan
-dient deze te worden aangevraagd via de servicedesk BRO. De parameterlijst
-wordt hiermee uitgebreid wanneer het een legitieme, nieuwe parameter betreft.</p>
+    <p>een data.frame met 8 kolommen en 340 rijen.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
