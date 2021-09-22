@@ -54,7 +54,7 @@ QC0h <- function(d_filter, d_metingen, verbose = F) {
     mutate(no3_waarde = no3_waarde * 4.4268,
            no3_rapportagegrens = no3_rapportagegrens * 4.4268) %>%
     select(monsterid, jaar, maand, dag, putcode, filter,
-           sort(names(.[8:ncol(.)])))
+           sort(colnames(.)))
   
   # Bepaal redoxklasse voor alle jaren
   d <- d %>%
