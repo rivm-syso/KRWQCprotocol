@@ -143,7 +143,7 @@ QC0h <- function(d_filter, d_metingen, verbose = F) {
         row.names = F, col.names = F)
       print(res %>% select(putcode, filter,
                            redoxklasse_VAL,
-                           redoxklasse_BRO,
+                           redoxklasse_HIS,
                            oordeel))
       
     } else {
