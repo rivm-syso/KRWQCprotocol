@@ -5,6 +5,7 @@ inst/doc
 .Rproj.user
 .Rhistory
 *.Rproj
+.RData
 
 # vi files
 *.swp
