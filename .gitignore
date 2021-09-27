@@ -6,6 +6,13 @@ inst/doc
 .Rhistory
 *.Rproj
 
+# Data/history files
+.RData
+
+# Data/history files
+.RData
+.Rhistory
+
 # vi files
 *.swp
 
