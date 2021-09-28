@@ -217,7 +217,26 @@ van QC0c en QC0d zie bovenstaande.
 
 Voorbeeld voor uitvoeren van QC0a:
 ```{r}
-QC0a(d_veld = veld, d_put = put, d_metingen = metingen, verbose = TRUE)
+x <- metingen
+
+x <- QC0a(d_veld = veld, d_put = put, d_metingen = x, verbose = TRUE)
+
+```
+In het voorbeeld veld data van het LMG zit als test het landgebruik heide. Heide
+is niet opgenomen in de validelandgebruiken en moet daardoor niet worden meegenomen
+in test QC0b. In het voorbeeld wordt eenmalig veld vervangen door d.
+
+Voorbeeld voor uitvoeren van QC0b:
+```{r}
+d <- veld %>% dplyr::filter(landgebruik != "heide")
+x <- QC0b(d_veld = d, d_put = put, d_metingen = x, verbose = TRUE)
+
+```
+
+Voorbeeld voor uitvoeren van QC0c
+```{r}
+QC0c_create_file("created_files") # -> handmatig invullen en met dezelfde naam opslaan
+x <- QC0c(dir = "created_files", d_metingen = x, verbose = TRUE)
 
 ```
 
@@ -305,8 +324,14 @@ eventueel sprake is van eenheidsfouten of structurele afwijkingen in een meetron
 eventuele andere putfilters op die locatie. Zou kunnen mogelijke filterwisselingen
 geidentificeerd worden. 
 
-QC4b wordt regulier uitgevoerd met het aanroepen van QC4b() met het metingen
-bestand als invoer.
+QC4b wordt regulier uitgevoerd met het aanroepen van QC4b() met het voorbeeld metingen data uit het LMG als voorbeeld. Bij deze stap word getest of de pH van het veld en de pH van het lab niet buiten het meetbereik liggen. Het is hiervoor belangrijk dat in de naam van de parameters, waarmee de pH wordt aangeduid, "ph" of "zuurgraad" bevatten. In het geval van het voorbeeld metingen data uit het LMG worden de gegevens op de volgende manier aangepast:
+
+```{r}
+x$parameter <- x$parameter %>%
+  dplyr::recode("h" = "ph",
+                "h_1__veld" = "ph_veld",
+                .default = x$parameter) 
+```
 
 ### QC5 - QC Status
 In de functie voor QC5 worden de attributes met resultaten van de verschillende
