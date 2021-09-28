@@ -164,8 +164,8 @@ QC0h <- function(d_filter, d_metingen, verbose = F) {
            redoxklasse_VAL, redoxklasse_HIS, oordeel)
   
   # voeg attribute met uitkomsten tests toe aan relevante dataset (d_metingen)
-  twijfel_id <- resultaat_df %>% filter(oordeel == "twijfelachtig") %>% distinct(qcid)
-  verdacht_id <- resultaat_df %>% filter(oordeel == "verdacht") %>% distinct(qcid)
+  twijfel_id <- resultaat_df %>% filter(oordeel == "twijfelachtig") %>% distinct(qcid) %>% pull(qcid)
+  verdacht_id <- resultaat_df %>% filter(oordeel == "verdacht") %>% distinct(qcid) %>% pull(qcid)
   test <- "QC0h"
   
   d_metingen <- qcout_add_oordeel(obj = d_metingen,
