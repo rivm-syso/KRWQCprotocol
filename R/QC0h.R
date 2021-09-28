@@ -46,15 +46,19 @@ QC0h <- function(d_filter, d_metingen, verbose = F) {
                 values_from = c(detectieteken, rapportagegrens, waarde),
                 names_glue = "{parameter}_{.value}") 
   
+  if(exists("no3_n_waarde", d)){
+    d <- d %>%
+      # reken NO3_N om naar NO3
+      mutate(no3_n_waarde = no3_n_waarde * 4.4268,
+             no3_n_rapportagegrens = no3_n_rapportagegrens * 4.4268)
+  }
+  
   # als no3 als no3_n staat, dan vervangen naar NO3 -> geval voor LMG  
   colnames(d)[grepl("no3_n", colnames(d))] <- paste0("no3_", c("detectieteken", "rapportagegrens", "waarde"))
   
   d <- d %>%
-    # reken NO3_N om naar NO3
-    mutate(no3_waarde = no3_waarde * 4.4268,
-           no3_rapportagegrens = no3_rapportagegrens * 4.4268) %>%
     select(monsterid, jaar, maand, dag, putcode, filter,
-           sort(names(.[8:ncol(.)])))
+           sort(colnames(.)))
   
   # Bepaal redoxklasse voor alle jaren
   d <- d %>%
@@ -139,7 +143,7 @@ QC0h <- function(d_filter, d_metingen, verbose = F) {
         row.names = F, col.names = F)
       print(res %>% select(putcode, filter,
                            redoxklasse_VAL,
-                           redoxklasse_BRO,
+                           redoxklasse_HIS,
                            oordeel))
       
     } else {
