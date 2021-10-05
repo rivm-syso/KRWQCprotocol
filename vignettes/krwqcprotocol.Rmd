@@ -71,7 +71,7 @@ maand | maand van veldbezoek | numeriek
 dag | dag van veldbezoek | numeriek
 xcoord | x-coördinaat gemeten in het veld, in meters volgens RD | numeriek
 ycoord | y-coördinaat gemeten in het veld, in meters volgens RD | numeriek
-landgebruik | veldobservatie van dominant landgebruik putomgeving | karakter
+landgebruik | veldobservatie van dominant landgebruik putomgeving, volgens BRO | karakter
 okf | diepte onderkant filter t.o.v. maaiveld, in meters | numeriek
 gws_voor | gemeten grondwaterstand voor bepomping filter t.o.v. maaiveld, in meters | numeriek
 gws_na | gemeten grondwaterstand na bepomping filter t.o.v. maaiveld, in meters | numeriek
@@ -136,6 +136,7 @@ rapportagegrens | geeft de waarde van de rapportagegrens voor de betreffende par
 waarde | de gemeten waarde, waarbij alle waardes positief dienen te zijn | numeriek 
 
 ### Overzicht van de data
+Dit pakket maakt gebruik van test data van het LMG die op bepaalde punten is aangepast om het gedrag van verschillende functies te controleren.
 Voorbeeld bestanden inladen:
 
 ```{r}
@@ -222,19 +223,24 @@ x <- metingen
 x <- QC0a(d_veld = veld, d_put = put, d_metingen = x, verbose = TRUE)
 
 ```
-In het voorbeeld veld data van het LMG zit als test het landgebruik heide. Heide
-is niet opgenomen in de validelandgebruiken en moet daardoor niet worden meegenomen
-in test QC0b. In het voorbeeld wordt eenmalig veld vervangen door d.
-
+In het voorbeeld veld data van het LMG zit als test het landgebruik heide. 
+Dit zorgt voor een error in QC0b:
+```{r}
+try(
+x <- QC0b(d_veld = veld, d_put = put, d_metingen = x, verbose = TRUE)
+)
+```
+Heide is niet opgenomen in de valide landgebruiken en kan daardoor niet worden
+meegenomen in test QC0b.
 Voorbeeld voor uitvoeren van QC0b:
 ```{r}
-d <- veld %>% dplyr::filter(landgebruik != "heide")
-x <- QC0b(d_veld = d, d_put = put, d_metingen = x, verbose = TRUE)
+veld <- veld %>% dplyr::filter(landgebruik != "heide")
+x <- QC0b(d_veld = veld, d_put = put, d_metingen = x, verbose = TRUE)
 
 ```
 
-Voorbeeld voor uitvoeren van QC0c
-```{r}
+Voorbeeld voor uitvoeren van QC0c:
+```{r eval = FALSE}
 QC0c_create_file("created_files") # -> handmatig invullen en met dezelfde naam opslaan
 x <- QC0c(dir = "created_files", d_metingen = x, verbose = TRUE)
 
@@ -324,7 +330,12 @@ eventueel sprake is van eenheidsfouten of structurele afwijkingen in een meetron
 eventuele andere putfilters op die locatie. Zou kunnen mogelijke filterwisselingen
 geidentificeerd worden. 
 
-QC4b wordt regulier uitgevoerd met het aanroepen van QC4b() met het voorbeeld metingen data uit het LMG als voorbeeld. Bij deze stap word getest of de pH van het veld en de pH van het lab niet buiten het meetbereik liggen. Het is hiervoor belangrijk dat in de naam van de parameters, waarmee de pH wordt aangeduid, "ph" of "zuurgraad" bevatten. In het geval van het voorbeeld metingen data uit het LMG worden de gegevens op de volgende manier aangepast:
+QC4b wordt regulier uitgevoerd met het aanroepen van QC4b() met metingen data uit
+het LMG als voorbeeld. Bij deze stap word getest of de pH van het veld en de pH
+van het lab niet buiten het meetbereik liggen. Het is hiervoor belangrijk dat in
+de naam van de parameters, waarmee de pH wordt aangeduid, "ph" of "zuurgraad"
+bevatten. In het geval van het voorbeeld metingen data uit het LMG worden de
+gegevens op de volgende manier aangepast:
 
 ```{r}
 x$parameter <- x$parameter %>%
