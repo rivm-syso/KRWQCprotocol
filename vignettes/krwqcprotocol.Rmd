@@ -176,7 +176,18 @@ str(metingen)
 head(metingen)
 ```
 
-## Werking QC R-pakket
+## Installatie KRWQCprotocol R-pakket
+
+Het KRWQCprotocol wordt beschikbaar gesteld als R pakket. Gebruikers
+kunnen de functies uit dit pakket gebruiken in hun eigen scripts. Om
+het pakket te installeren moet vanuit R het volgende commando
+uitgevoerd worden:
+
+```{r eval=FALSE}
+remotes::install_github("jspijker/KRWQCprotocol")
+```
+
+## Werking KRWQCprotocol R-pakket
 De verschillende QC stappen uit het Protocol kunnen eenvoudig uitgevoerd worden
 door het aanroepen van de relevante functie (QC0a-QC5). Als invoer van de functie 
 worden de relevante datatabellen meegegeven benodigd voor de testen. In de functie 
