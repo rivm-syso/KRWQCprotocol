@@ -188,7 +188,7 @@ QC4a <- function(d_metingen, d_parameter,
       dplyr::mutate(putfilter = paste(putcode, filter, sep = "-"),
                     reeks = paste(parameter, putcode, sep = "-")) %>%
       # voeg eenheid toe voor plot as
-      dplyr::mutate(eenheid = d_parameter[match(parameter, d_parameter$naam), 5]) %>%
+      dplyr::mutate(eenheid = d_parameter[match(parameter, d_parameter$parameter), 5]) %>%
       # selecteer reeksen met meting >3.5 sd
       dplyr::filter(reeks %in% afwijking$reeks)
       

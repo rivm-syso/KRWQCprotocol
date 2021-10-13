@@ -53,7 +53,7 @@ waardebepaling <- rbind(d_parameter %>%
                         dplyr::mutate(reden = "waardebepalingstechniek wijkt af van BRO"), d_parameter %>%
                         dplyr::filter(!waarde_procedure %in% BRO_waardebepalingsprocedure$waarde) %>%
                         dplyr::mutate(reden = "waardebepalingsprocedure wijkt af van BRO")) %>%
-                        dplyr::select(qcid, naam, cas, waarde_techniek, waarde_procedure, reden)
+                        dplyr::select(qcid, parameter, cas, waarde_techniek, waarde_procedure, reden)
 
   rapportageTekst <- paste("Er zijn in totaal", 
                            nrow(bemonstering %>% dplyr::filter(reden == "bemonsteringsapparatuur wijkt af van BRO")), 
@@ -92,10 +92,10 @@ resultaat_df_meting <- d_metingen %>%
 # voeg concept oordeel van afwijkende bemonstering toe aan parameters op die locaties in betreffende meetronde
 resultaat_df_waarde <- d_metingen %>%
     dplyr::group_by(parameter) %>%
-    dplyr::mutate(oordeel = ifelse(parameter %in% waardebepaling$naam,
+    dplyr::mutate(oordeel = ifelse(parameter %in% waardebepaling$parameter,
                             "verdacht", "onverdacht")) %>%
     dplyr::filter(oordeel == "verdacht") %>%
-    dplyr::left_join(., waardebepaling %>% dplyr::select(naam, reden), by = c("parameter" = "naam"))
+    dplyr::left_join(., waardebepaling %>% dplyr::select(parameter, reden), by = c("parameter" = "parameter"))
 
 # voeg samen om als attribute weg te schrijven
 resultaat_df <- rbind(resultaat_df_meting, resultaat_df_waarde)

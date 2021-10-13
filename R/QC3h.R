@@ -28,7 +28,7 @@ QC3h <- function(d_metingen, verbose = F) {
 
     # Selecteer alleen NO3 en NH4 uit de dataset
     d <- d_metingen %>%
-        dplyr::filter(stringr::str_detect(parameter, "no3|nh4")) 
+        dplyr::filter(stringr::str_detect(parameter, "NO3|NH4")) 
     n_params <- unique(d$parameter)
 
     # Check of er nu maar 2 parameters beschikbaar zijn
@@ -40,20 +40,20 @@ QC3h <- function(d_metingen, verbose = F) {
     }
 
     # als no3 als no3_n staat, dan vervangen naar no3, idem voor nh4 -> geval voor LMG  
-    d$parameter <- d$parameter %>%
-        dplyr::recode("nh4_n" = "nh4",
-                      "no3_n" = "no3")
-
+#     d$parameter <- d$parameter %>%
+#         dplyr::recode("nh4_n" = "nh4",
+#                       "no3_n" = "no3")
+# 
     # Vergelijk NO3 en NH4
     res <- d %>%
         dplyr::select(-c(qcid,detectieteken, rapportagegrens)) %>%
         tidyr::pivot_wider(names_from = parameter,
                            values_from = waarde) %>%
         # NO3 en NH4 staan in stikstof, dus omrekenen
-        dplyr::mutate(nh4 = nh4 * 1.2878,
-                      no3 = no3 * 4.4268) %>%
-        dplyr::mutate(oordeel = ifelse(no3 > 0.5 & nh4 > 2 |
-                                       no3 > 0.5 & nh4 > no3,
+        dplyr::mutate(NH4 = NH4 * 1.2878,
+                      NO3 = NO3 * 4.4268) %>%
+        dplyr::mutate(oordeel = ifelse(NO3 > 0.5 & NH4 > 2 |
+                                       NO3 > 0.5 & NH4 > NO3,
                                    "twijfelachtig", "onverdacht"),
                       iden = paste(putcode, jaar, maand, dag, sep = "-")) %>%
         dplyr::filter(oordeel != "onverdacht")
