@@ -108,7 +108,7 @@ Tabel 4 parameterbestand (`d_parameter`) bestaat uit:
 kolomnaam       | inhoud                      | type
 ---------------|-----------------------------|--------
 qcid | rijnummer | numeriek
-naam | stofnaam | karakter 
+parameter | stofnaam | karakter 
 aquocode | aquocode van de betreffende stof | karakter 
 cas | CAS-nummer van de betreffende stof | karakter 
 eenheid | eenheid van de betroffende stof | karakter

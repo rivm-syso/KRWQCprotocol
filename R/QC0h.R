@@ -39,13 +39,13 @@ QC0h <- function(d_filter, d_metingen, verbose = F) {
   
   # Selecteer alleen redoxparameters
   d <- d_metingen %>%
-    filter(parameter %in% c("no3", "no3_n", "fe", "mn", "so4", "cl")) %>%  #no3_n is in LMG
+    filter(parameter %in% c("NO3", "Fe", "Mn", "SO4", "Cl")) %>%  #no3_n is in LMG
     select(-qcid) %>%
     # zet Redox parameters naar wide format
     pivot_wider(names_from = parameter,
                 values_from = c(detectieteken, rapportagegrens, waarde),
                 names_glue = "{parameter}_{.value}") 
-  
+
   if(exists("no3_n_waarde", d)){
     d <- d %>%
       # reken NO3_N om naar NO3
@@ -54,7 +54,7 @@ QC0h <- function(d_filter, d_metingen, verbose = F) {
   }
   
   # als no3 als no3_n staat, dan vervangen naar NO3 -> geval voor LMG  
-  colnames(d)[grepl("no3_n", colnames(d))] <- paste0("no3_", c("detectieteken", "rapportagegrens", "waarde"))
+  # colnames(d)[grepl("no3_n", colnames(d))] <- paste0("no3_", c("detectieteken", "rapportagegrens", "waarde"))
   
   d <- d %>%
     select(monsterid, jaar, maand, dag, putcode, filter,
@@ -63,13 +63,13 @@ QC0h <- function(d_filter, d_metingen, verbose = F) {
   # Bepaal redoxklasse voor alle jaren
   d <- d %>%
     # bepaal SO4f
-    mutate(so4f = ((so4_waarde * 19000) / (cl_waarde * 2700)) -1 ) %>%
+    mutate(so4f = ((SO4_waarde * 19000) / (Cl_waarde * 2700)) -1 ) %>%
     mutate(redoxklasse = 
-             ifelse(no3_waarde > 2,
+             ifelse(NO3_waarde > 2,
                     # als NO3 > 2 mg/l
-                    ifelse(fe_waarde < 1,
+                    ifelse(Fe_waarde < 1,
                            # als Fe < 1 mg/l
-                           ifelse(mn_waarde < 0.5,
+                           ifelse(Mn_waarde < 0.5,
                                   # als Mn < 0.5 mg/l
                                   "subox",
                                   # als Mn >= 0.5 mg/l

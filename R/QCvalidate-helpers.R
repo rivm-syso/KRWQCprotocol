@@ -65,7 +65,7 @@ testKolommenFilter <- function(d) {
 testKolommenParameter <- function(d) {
   # test of verplichte kolommen aanwezig zijn voor parametertabel
   
-  kolommen <- c("qcid", "naam", "aquocode", "cas", "eenheid",
+  kolommen <- c("qcid", "parameter", "omschrijving", "aquocode", "cas", "eenheid",
                 "bem_apparaat", "bem_procedure", 
                 "waarde_techniek", "waarde_procedure")
 
@@ -144,7 +144,7 @@ valideRedoxklasses <- function(d) {
 # hulp functie om te kijken of parameter informatie uniek is
 valideParamInfo <- function(d) {
   d <- d %>%
-    dplyr::group_by(naam) %>%
+    dplyr::group_by(parameter) %>%
     dplyr::summarise(n.Aquocode = dplyr::n_distinct(aquocode),
               n.cas = dplyr::n_distinct(cas),
               n.eenheid = dplyr::n_distinct(eenheid),
