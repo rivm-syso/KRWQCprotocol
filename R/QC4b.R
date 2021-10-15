@@ -18,7 +18,7 @@
 #'
 
 
-QC4b <- function(d_metingen, verbose = F) {
+QC4b <- function(d_metingen, ph_veld_naam = "h_5__veld", verbose = F) {
   
   # Check datasets op kolommen en unieke informatie
   testKolommenMetingen(d_metingen)
@@ -34,7 +34,8 @@ QC4b <- function(d_metingen, verbose = F) {
   # selecteer pH veld en lab gegevens
   # afhankelijk van de dataset kan dit 'pH' of 'zuurgraad' zijn
   d <- d %>%
-    dplyr::filter(stringr::str_detect(parameter, "ph|zuurgraad")) #%>%
+    dplyr::filter(stringr::str_detect(parameter, 
+                                      paste("pH", ph_veld_naam, sep = "|"))) #%>%
     # NA's verwijderen?
     #filter(!is.na(waarde))
   
