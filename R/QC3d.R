@@ -19,7 +19,7 @@
 #'
 
 
-QC3d <- function(d_metingen, d_parameter, verbose = F) {
+QC3d <- function(d_metingen, d_parameter, geleidendheid_veld_naam, verbose = F) {
     
     # Check datasets op kolommen en unieke informatie
     testKolommenMetingen(d_metingen)
@@ -27,13 +27,13 @@ QC3d <- function(d_metingen, d_parameter, verbose = F) {
     
     # pH en HCO3 naam aanpassen alleen voor LMG
     d <- d_metingen
-    d$parameter <- d$parameter %>%
-        recode("ec_5__veld" = "ecv",
-               .default = d$parameter)
+    d <- d %>%  mutate(
+        parameter = ifelse(parameter == geleidendheid_veld_naam, "GELDHD_VELD", parameter)
+    )
     
     # selecteer EC veld en lab gegevens
     d <- d %>%
-        dplyr::filter(parameter %in% c("ec", "ecv"))
+        dplyr::filter(parameter %in% c("GELDHD", "GELDHD_VELD"))
     
     
     # Check of EC veld en lab gegevens beschikbaar zijn
@@ -47,7 +47,7 @@ QC3d <- function(d_metingen, d_parameter, verbose = F) {
     # Check op zelfde eenheden voor EC ? 
     # dit staat in d_parameter
     d1 <- d_parameter %>%
-        dplyr::filter(naam %in% d$parameter)
+        dplyr::filter(parameter %in% d$parameter)
     if(dplyr::n_distinct(d1$eenheid) > 1) {
         stop("Er zijn meerdere eenheden voor EC opgegeven")
     }
@@ -57,8 +57,8 @@ QC3d <- function(d_metingen, d_parameter, verbose = F) {
         dplyr::select(-c(qcid, detectieteken, rapportagegrens)) %>%
         tidyr::pivot_wider(names_from = parameter,
                            values_from = waarde) %>%
-        dplyr::mutate(oordeel = ifelse(abs(ec - ecv) > 0.1 * ec |
-                                           abs(ec - ecv) > 0.1 * ecv,
+        dplyr::mutate(oordeel = ifelse(abs(GELDHD - GELDHD_VELD) > 0.1 * GELDHD |
+                                           abs(GELDHD - GELDHD_VELD) > 0.1 * GELDHD_VELD,
                                        "twijfelachtig", "onverdacht"),
                       iden = paste(putcode, jaar, maand, dag, sep = "-")) %>%
         dplyr::filter(oordeel != "onverdacht")
@@ -84,7 +84,7 @@ QC3d <- function(d_metingen, d_parameter, verbose = F) {
         dplyr::mutate(oordeel = ifelse(iden %in% res$iden,
                                        "twijfelachtig", "onverdacht")) %>%
         dplyr::filter(oordeel != "onverdacht") %>%
-        dplyr::left_join(., res %>% select(ec, ecv, iden)) 
+        dplyr::left_join(., res %>% select(GELDHD, GELDHD_VELD, iden)) 
     resultaat_df <- resultaat_df[, cols]
     
     twijfel_id <- resultaat_df %>% 
