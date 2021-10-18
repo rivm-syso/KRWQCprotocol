@@ -5,11 +5,7 @@
 #' De signaleringswaarde voor monsters is delta-EC > 10 procent.
 #' Als de delta-EC boven de signaleringswaarde ligt, ken het
 #' concept QC oordeel twijfelachtig toe aan het monster.
-#' 
-#' De benodigde naam voor ec lab is GELDHD.
-#' De benodigde naam voor ec veld staat standaard op "GELDHD_VELD", maar kan worden 
-#' aangepast door een character string in te vullen voor geleidendheid_veld_naam.
-#'         
+#'
 #' @param d_metingen dataframe met metingen
 #' @param d_parameter dataframe met parameter informatie
 #' @param geleidendheid_veld_naam character string om te gebruiken als geleidendheid 
@@ -18,7 +14,11 @@
 #' standaard op F.
 #'
 #' @return metingen bestand met verdachte locaties/monsters. 
-#'
+
+#' De benodigde naam voor ec lab is GELDHD.
+#' De benodigde naam voor ec veld staat standaard op "GELDHD_VELD", maar kan worden 
+#' aangepast door een character string in te vullen voor geleidendheid_veld_naam.
+#' 
 #' @export
 #'
 
