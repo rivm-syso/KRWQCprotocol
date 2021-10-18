@@ -6,10 +6,14 @@
 #' Als de delta-EC boven de signaleringswaarde ligt, ken het
 #' concept QC oordeel twijfelachtig toe aan het monster.
 #' 
-#' De benodigde namen voor ec lab en ec veld zijn ec en ecv.
+#' De benodigde naam voor ec lab is GELDHD.
+#' De benodigde naam voor ec veld staat standaard op "GELDHD_VELD", maar kan worden 
+#' aangepast door een character string in te vullen voor geleidendheid_veld_naam.
 #'         
 #' @param d_metingen dataframe met metingen
 #' @param d_parameter dataframe met parameter informatie
+#' @param geleidendheid_veld_naam character string om te gebruiken als geleidendheid 
+#' veld. Staat standaard op "GELDHD_VELD".
 #' @param verbose of tekstuele output uit script gewenst is (T) of niet (F). Staat
 #' standaard op F.
 #'
@@ -19,7 +23,7 @@
 #'
 
 
-QC3d <- function(d_metingen, d_parameter, geleidendheid_veld_naam, verbose = F) {
+QC3d <- function(d_metingen, d_parameter, geleidendheid_veld_naam = "GELDHD_VELD", verbose = F) {
     
     # Check datasets op kolommen en unieke informatie
     testKolommenMetingen(d_metingen)
