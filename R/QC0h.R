@@ -157,13 +157,9 @@ QC0h <- function(d_filter, d_metingen, verbose = F) {
   resultaat_df <- d_metingen %>%
     group_by(monsterid) %>%
     mutate(iden = paste(putcode, filter, jaar, maand, dag, sep = "-")) %>%
-    mutate(oordeel = ifelse(iden %in% (res %>% filter(oordeel == "twijfelachtig") %>% pull(iden)),
-                            "twijfelachtig", 
-                            ifelse(iden %in% (res %>% filter(oordeel == "verdacht") %>% pull(iden)),
-                                   "verdacht", "onverdacht"))) %>%
-    filter(oordeel != "onverdacht") %>%
+    filter(iden %in% res$iden) %>%
     # voeg resultaten test toe
-    left_join(., res %>% select(iden, redoxklasse_VAL, redoxklasse_HIS)) %>%
+    left_join(., res %>% select(iden, redoxklasse_VAL, redoxklasse_HIS, oordeel), by = "iden") %>%
     select(qcid, monsterid, jaar, maand, dag, putcode, filter,
            redoxklasse_VAL, redoxklasse_HIS, oordeel)
   
