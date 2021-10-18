@@ -1,7 +1,7 @@
 test_that("QC3d T1", {
               # test with 'default' LMG parameter
 
-              data(etingen)
+              data(metingen)
               data(parameter)
               #example data contains multiple EC measurements
               metingen <- metingen %>%
@@ -28,14 +28,13 @@ test_that("QC3d T2", {
 
               data(metingen)
               data(parameter)
-              #example data contains multiple EC measurements
-              metingen <- metingen %>%
-                  dplyr::filter(parameter != "ec_1__veld")
 
-              metingen <- metingen %>% mutate(parameter = if_else(parameter == "ec_5__veld",
-                                                     "GLDHD_VELD", parameter))
+              d <- metingen  %>%
+                  mutate(parameter = if_else(parameter == "ec_5__veld",
+                                                     "GELDHD_VELD", parameter))
+              cat("T3:\n")
 
-              x <- QC3d( d_metingen = metingen,d_parameter=parameter)
+              x <- QC3d( d_metingen = d,d_parameter=parameter)
 
               # test if attributes exist
               expect_true(qcout_attrexists(x))
