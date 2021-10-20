@@ -92,10 +92,16 @@ collect_result_raw <- function(d_metingen) {
 
         for (j in vt) {
             ids <- qcout[[i]][["oordeel"]][[j]]
-            if (length(ids > 0)) {
+            if (length(ids) > 0) {
                 v_sub <- data.frame(qcid = ids, v2 = j)
                 names(v_sub)  <- c("qcid", i)
                 v <- v %>% dplyr::left_join(v_sub, by = "qcid")
+                if (length(v) == 3) {
+                    names(v) <- c("qcid", "x", "y")
+                    v <- v %>% transmute(qcid, xy = ifelse(is.na(y), x, y))
+                    names(v)  <- c("qcid", i)
+                }
+                
             }
 
         }
