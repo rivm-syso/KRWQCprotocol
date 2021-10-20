@@ -170,11 +170,11 @@ QC0h <- function(d_filter, d_metingen, verbose = F) {
   
   d_metingen <- qcout_add_oordeel(obj = d_metingen,
                                   test = test,
-                                  oordeel = sort(unique(resultaat_df$oordeel))[1],
+                                  oordeel = "twijfelachtig",
                                   ids = twijfel_id)
   d_metingen <- qcout_add_oordeel(obj = d_metingen,
                                   test = test,
-                                  oordeel = sort(unique(resultaat_df$oordeel))[2],
+                                  oordeel = "verdacht",
                                   ids = verdacht_id)
   d_metingen <- qcout_add_rapportage(obj = d_metingen,
                                      test = test,
