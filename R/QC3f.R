@@ -8,6 +8,8 @@
 #'         
 #' @param d_veld dataframe met veldobservaties   
 #' @param d_metingen dataframe met metingen
+#' @param ph_veld_naam character string om te gebruiken als pH 
+#' veld. Staat standaard op "pH_veld".
 #' @param verbose of tekstuele output uit script gewenst is (T) of niet (F). Staat
 #' standaard op F.
 #'
@@ -17,7 +19,7 @@
 #'
 
 
-QC3f <- function(d_veld, d_metingen, verbose = F) {
+QC3f <- function(d_veld, d_metingen, ph_veld_naam = "pH_veld", verbose = F) {
   
   # Check datasets op kolommen en unieke informatie
   testKolommenVeld(d_veld)
@@ -25,14 +27,15 @@ QC3f <- function(d_veld, d_metingen, verbose = F) {
   
   # pH naam aanpassen alleen voor LMG
   d <- d_metingen
-  d$parameter <- d$parameter %>%
-    dplyr::recode("h_5__veld" = "hv",
-                  .default = d$parameter)
+  d <- d %>%  mutate(
+    parameter = case_when(parameter == ph_veld_naam ~ "pH_veld",
+                          TRUE ~ parameter)
+  )
   
   # selecteer pH veld en lab gegevens
   # afhankelijk van de dataset kan dit 'pH' of 'zuurgraad' zijn
   d <- d %>%
-    dplyr::filter(parameter %in% c("h", "hv"))
+    dplyr::filter(parameter %in% c("pH", "pH_veld"))
   
   # Check of pH veld en lab gegevens beschikbaar zijn
   if(dplyr::n_distinct(d$parameter) < 2) {
@@ -47,7 +50,7 @@ QC3f <- function(d_veld, d_metingen, verbose = F) {
     dplyr::select(-c(qcid, detectieteken, rapportagegrens)) %>%
     tidyr::pivot_wider(names_from = parameter,
                        values_from = waarde) %>%
-    dplyr::mutate(oordeel = ifelse(abs(h - hv) >= 2,
+    dplyr::mutate(oordeel = ifelse(abs(pH - pH_veld) >= 2,
                                    "twijfelachtig", "onverdacht"),
                   iden = paste(putcode, jaar, maand, dag, sep = "-")) %>%
     dplyr::filter(oordeel != "onverdacht")
@@ -73,12 +76,13 @@ QC3f <- function(d_veld, d_metingen, verbose = F) {
     dplyr::mutate(oordeel = ifelse(iden %in% res$iden,
                                    "twijfelachtig", "onverdacht")) %>%
     dplyr::filter(oordeel != "onverdacht") %>%
-    dplyr::left_join(., res %>% select(h, hv, iden)) 
+    dplyr::left_join(., res %>% select(pH, pH_veld, iden)) 
   resultaat_df <- resultaat_df[, cols]
   
   twijfel_id <- resultaat_df %>% 
     dplyr::filter(oordeel == "twijfelachtig") %>% 
-    dplyr::distinct(qcid)
+    dplyr::distinct(qcid) %>% 
+    dplyr::pull(qcid)
   
   test <- "QC3f"
   
