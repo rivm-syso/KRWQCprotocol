@@ -134,7 +134,8 @@ QC3c <- function(d_metingen, verbose = F) {
   
   twijfel_id <- resultaat_df %>% 
     dplyr::filter(oordeel == "twijfelachtig") %>% 
-    dplyr::distinct(qcid)
+    dplyr::distinct(qcid) %>% 
+    dplyr::pull(qcid)
   
   test <- "QC3c"
   
