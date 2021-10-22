@@ -98,6 +98,9 @@ collect_result_raw <- function(d_metingen) {
                 v <- v %>% dplyr::left_join(v_sub, by = "qcid")
                 if (length(v) == 3) {
                     names(v) <- c("qcid", "x", "y")
+                    if(any(!is.na(v$x) & !is.na(v$y))) {
+                        stop("meer dan 1 oordeel gevonden voor zelfde qcid")
+                    }
                     v <- v %>% transmute(qcid, xy = ifelse(is.na(y), x, y))
                     names(v)  <- c("qcid", i)
                 }
