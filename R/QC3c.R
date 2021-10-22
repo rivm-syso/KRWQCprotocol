@@ -10,8 +10,6 @@
 #' QC oordeel twijfelachtig toe aan het monster.  
 #'      
 #' @param d_metingen dataframe met metingen
-#' @param ph_veld_naam character string om te gebruiken als pH 
-#' veld. Staat standaard op "pH_veld".
 #' @param verbose of tekstuele output uit script gewenst is (T) of niet (F). Staat
 #' standaard op F.
 #'
@@ -21,17 +19,17 @@
 #'
 
 
-QC3c <- function(d_metingen, ph_veld_naam = "pH_veld", verbose = F) {
+QC3c <- function(d_metingen, verbose = F) {
   
   # Check datasets op kolommen en unieke informatie
   testKolommenMetingen(d_metingen)
   
   # pH en HCO3 naam aanpassen alleen voor LMG
   d <- d_metingen
-  d <- d %>%  mutate(
-    parameter = case_when(parameter == ph_veld_naam ~ "pH_veld",
-                          TRUE ~ parameter)
-  )
+  #d <- d %>%  mutate(
+  #  parameter = case_when(parameter == ph_veld_naam ~ "pH_veld",
+  #                        TRUE ~ parameter)
+  #)
   
   #d$parameter <- d$parameter %>%
   #  recode("h_5__veld" = "hv",
@@ -43,22 +41,22 @@ QC3c <- function(d_metingen, ph_veld_naam = "pH_veld", verbose = F) {
   
   # selecteer relevante ionen om mee te nemen
   an <- c("Cl", "HCO3", "NO3", "SO4", "CO3", "PO4")
-  cat <- c("Al", "Ca", "Fe", "K", "Mg", "Mn", "NH4", "Na", "Zn", "pH", "pH_veld")
+  cat <- c("Al", "Ca", "Fe", "K", "Mg", "Mn", "NH4", "Na", "Zn", "pH")
   
   res <- d %>%
     # pH ook meenemen -> omrekenen naar h3o
     dplyr::filter(parameter %in% c(an, cat)) %>%
     # alle NA's op 0 zetten, behalve pH 
-    dplyr::mutate(waarde_ib = ifelse(!parameter %in% c("pH", "pH_veld") & is.na(waarde),
+    dplyr::mutate(waarde_ib = ifelse(parameter != "pH" & is.na(waarde),
                                      0, waarde)) %>%
     # soms staat RG als NA, < of "", eerst NA veranderen in ""
     dplyr::mutate(detectieteken = ifelse(is.na(detectieteken), "", 
                                          detectieteken)) %>%
     # waardes <RG niet meenemen maar op 0 zetten 
-    dplyr::mutate(waarde_ib = ifelse(!parameter %in% c("pH", "pH_veld") & detectieteken != "",
+    dplyr::mutate(waarde_ib = ifelse(parameter != "pH" & detectieteken != "",
                                      0, waarde_ib)) %>%
     # als geen pH bekend is, dan is de pH 7 
-    dplyr::mutate(waarde_ib = ifelse(parameter %in% c("pH", "pH_veld") & is.na(waarde),
+    dplyr::mutate(waarde_ib = ifelse(parameter == "pH" & is.na(waarde),
                                      7, waarde_ib)) %>%
     #  zet kolommen naar wide format
     dplyr::select(-c(qcid, detectieteken, rapportagegrens, waarde)) %>%
