@@ -29,19 +29,20 @@ QC3g <- function(d_metingen, verbose = F) {
   testKolommenMetingen(d_metingen)
   
   # pH naam aanpassen alleen voor LMG
-  d <- d_metingen %>%
-    dplyr::filter(parameter != "hco3")
-  d$parameter <- d$parameter %>%
-    dplyr::recode("h_5__veld" = "hv",
-                  # bij LMG wordt HCO3 in het veld bepaald, 
-                  # maar nu vergelijken met pH lab dus andere naam
-                  "hco3_veld" = "hco3",
-                  .default = d$parameter)
+  # d <- d_metingen %>%
+  #   dplyr::filter(parameter != "hco3")
+  # d$parameter <- d$parameter %>%
+  #   dplyr::recode("h_5__veld" = "hv",
+  #                 # bij LMG wordt HCO3 in het veld bepaald, 
+  #                 # maar nu vergelijken met pH lab dus andere naam
+  #                 "hco3_veld" = "hco3",
+  #                 .default = d$parameter)
   
   # In de meeste gevallen wordt HCO3 niet in het veld bepaald bij provincies, 
   # maar in het lab. Dus HCO3 (lab) vergelijken met pH-lab
+  d <- d_metingen
   d <- d %>%
-    dplyr::filter(parameter %in% c("h", "hco3")) 
+    dplyr::filter(parameter %in% c("pH", "HCO3")) 
   
   # Check of maar 1 voor pH en 1 voor HCO3 beschikbaar zijn
   if(dplyr::n_distinct(d$parameter) < 2) {
@@ -57,8 +58,8 @@ QC3g <- function(d_metingen, verbose = F) {
     dplyr::select(-c(qcid, detectieteken, rapportagegrens)) %>%
     tidyr::pivot_wider(names_from = parameter,
                        values_from = waarde) %>%
-    dplyr::mutate(oordeel = ifelse(h < 5 & hco3 > 15 |
-                                     h < 5.5 & hco3 > 50,
+    dplyr::mutate(oordeel = ifelse(pH < 5 & HCO3 > 15 |
+                                     pH < 5.5 & HCO3 > 50,
                                    "twijfelachtig", "onverdacht"),
                   iden = paste(putcode, jaar, maand, dag, sep = "-")) %>%
     dplyr::filter(oordeel != "onverdacht")
@@ -87,20 +88,21 @@ QC3g <- function(d_metingen, verbose = F) {
     dplyr::mutate(oordeel = ifelse(iden %in% res$iden,
                                    "twijfelachtig", "onverdacht")) %>%
     dplyr::filter(oordeel != "onverdacht") %>%
-    dplyr::left_join(., res %>% dplyr::select(iden, h, hco3)) %>%
+    dplyr::left_join(., res %>% dplyr::select(iden, pH, HCO3)) %>%
     dplyr::select(qcid, monsterid, jaar, maand, dag, putcode, filter, 
-                  h, hco3, oordeel)
+                  pH, HCO3, oordeel)
   
   # voeg attribute met uitkomsten tests toe aan relevante dataset (d_metingen)
   twijfel_id <- resultaat_df %>% 
     dplyr::filter(oordeel == "twijfelachtig") %>% 
-    dplyr::distinct(qcid)
+    dplyr::distinct(qcid) %>% 
+    dplyr::pull(qcid)
   
   test <- "QC3g"
   
   d_metingen <- qcout_add_oordeel(obj = d_metingen,
                                   test = test,
-                                  oordeel = unique(resultaat_df$oordeel),
+                                  oordeel = "twijfelachtig",
                                   ids = twijfel_id)
   d_metingen <- qcout_add_rapportage(obj = d_metingen,
                                      test = test,
