@@ -88,7 +88,7 @@ QC3f <- function(d_veld, d_metingen, ph_veld_naam = "pH_veld", verbose = F) {
   
   d_metingen <- qcout_add_oordeel(obj = d_metingen,
                                   test = test,
-                                  oordeel = unique(resultaat_df$oordeel)[1],
+                                  oordeel = "twijfelachtig",
                                   ids = twijfel_id)
   d_metingen <- qcout_add_rapportage(obj = d_metingen,
                                      test = test,
