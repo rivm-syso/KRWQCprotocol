@@ -10,6 +10,12 @@
 #' QC oordeel twijfelachtig toe aan het monster.  
 #'      
 #' @param d_metingen dataframe met metingen
+#' @param ph_naam character string om te gebruiken als pH. Staat standaard
+#' op "pH". Enkel in het geval dat HCO3 in het veld is gemeten vul hier de naam van 
+#' de ph veld parameter in.
+#' @param hco3_naam character string om te gebruiken als HCO3. Staat standaard
+#' op "HCO3". Enkel in het geval dat HCO3 in het veld is gemeten vul hier de naam van
+#' de hco3 veld parameter in.
 #' @param verbose of tekstuele output uit script gewenst is (T) of niet (F). Staat
 #' standaard op F.
 #'
@@ -19,7 +25,7 @@
 #'
 
 
-QC3c <- function(d_metingen, verbose = F) {
+QC3c <- function(d_metingen, ph_naam = "pH", hco3_naam = "HCO3", verbose = F) {
   
   # Check datasets op kolommen en unieke informatie
   testKolommenMetingen(d_metingen)
@@ -40,12 +46,16 @@ QC3c <- function(d_metingen, verbose = F) {
   #         .default = d$parameter)
   
   # selecteer relevante ionen om mee te nemen
-  an <- c("Cl", "HCO3", "NO3", "SO4", "CO3", "PO4")
-  cat <- c("Al", "Ca", "Fe", "K", "Mg", "Mn", "NH4", "Na", "Zn", "pH")
+  an <- c("Cl", hco3_naam, "NO3", "SO4", "CO3", "PO4")
+  cat <- c("Al", "Ca", "Fe", "K", "Mg", "Mn", "NH4", "Na", "Zn", ph_naam)
   
   res <- d %>%
     # pH ook meenemen -> omrekenen naar h3o
     dplyr::filter(parameter %in% c(an, cat)) %>%
+    # parameter namen naar niet veld variant zodat de rest van de berekeningen niet aangepast hoeft te worden
+    mutate(parameter = case_when(parameter == ph_naam ~ "pH",
+                                 parameter == hco3_naam ~ "HCO3",
+                                 TRUE ~ parameter)) %>% 
     # alle NA's op 0 zetten, behalve pH 
     dplyr::mutate(waarde_ib = ifelse(parameter != "pH" & is.na(waarde),
                                      0, waarde)) %>%
