@@ -25,15 +25,36 @@
 
 QC5 <- function(d_metingen, verbose = F) {
   
-  # Warning om erop te wijzen dat alle QC resultaten als attribute aan
-  # eenzelfde dataset moeten hangen
-  # Als deze check binnen de functie wordt uitgevoerd kan deze weg
-  warning(paste0("Controleer of alle QC functies met hetzelfde ",
-                 "metingen bestand zijn uitgevoerd en dat voor iedere stap ",
-                 "attributes zijn toegevoegd."))
-  
   # Check datasets op kolommen en unieke informatie
   testKolommenMetingen(d_metingen)
+  
+  if(qcout_attrexists(d_metingen)){
+    # Lijst met alle QC namen
+    qcn <- c("QC0a", "QC0b", "QC0c", "QC0d", "QC0e", "QC0f", "QC0g", "QC0h", 
+             "QC1a", "QC1b", "QC1c", "QC1e", "QC1f", 
+             "QC2a", "QC2b", "QC2c",
+             "QC3a", "QC3b", "QC3c", "QC3d", "QC3e", "QC3f", "QC3g", "QC3h", 
+             "QC4a", "QC4b")
+    # Controleer of alle namen voorkomen in d_metingen
+    x_attr <- attr(d_metingen, "qcout")
+    qcn_inx <- qcn %in% names(x_attr)
+    
+    # Stop als een QC test niet aanwezig is
+    if(!all(qcn_inx)){
+      stop(paste0(qcn[!qcn_inx], " niet aanwezig\n"))
+    }
+    
+    # Controle op format resultaten
+    # for(i in qcn){
+    #   if(!is.list(x_attr[[i]][["resultaat"]])){
+    #     stop(paste0(i, " resultaat niet als list"))
+    #   }
+    #   
+    # }
+    
+  } else{
+    stop("qcout bevat geen attributen")
+  }
   
   # Verzamel de testresultaten uit een data.frame met tests. De
   # testresultaten worden per regel in de data.frame aangegeven.
