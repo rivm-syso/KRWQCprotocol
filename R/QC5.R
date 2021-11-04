@@ -60,32 +60,105 @@ QC5 <- function(d_metingen, verbose = F) {
   # testresultaten worden per regel in de data.frame aangegeven.
   d <- collect_result(d_metingen)
   
-  # Check of alle QC stappen zijn uitgevoerd?
-  #
+  # QC eindoordeel
+  # QC namen die voorkomen in d (niet alle namen komen voor in d)
+  qcn_ind <- qcn[qcn %in% names(d)]
   
-  # Hier wordt het QC eindoordeel toegevoegd per meting
-  # Hier moeten de regels uit QC Protocol - QC5 nog geautomatiseerd uitgevoerd
-  # worden
-  #
+  # ids afgekeurd
+  ids_a1 <- if ("QC0a" %in% qcn_ind) {d %>% filter(QC0a == "verdacht") %>% pull(qcid)}
+  ids_a2 <- if ("QC0e" %in% qcn_ind) {d %>% filter(QC0e == "twijfelachtig") %>% pull(qcid)}
+  ids_a3 <- if ("QC1f" %in% qcn_ind) {d %>% filter(QC1f == "verdacht") %>% pull(qcid)}
+  ids_a4 <- if (all(c("QC2a", "QC4a") %in% qcn_ind)) {d %>% filter(QC2a == "verdacht" & QC4a == "twijfelachtig") %>% pull(qcid)}
+  ids_a5 <- if ("QC4b" %in% qcn_ind) {d %>% filter(QC4b == "verdacht") %>% pull(qcid)}
   
-  # goedgekeurd
+  # ids onbeslist
+  if("QC4a" %in% qcn_ind){
+    v <- d %>% filter(QC4a == "twijfelachtig")
+    ids_o1 <- if ("QC0a" %in% qcn_ind) {v %>% filter(QC0a == "niet uitvoerbaar") %>% pull(qcid)}
+    ids_o2 <- if ("QC0c" %in% qcn_ind) {v %>% filter(QC0c == "twijfelachtig" | QC0c == "niet uitvoerbaar") %>% pull(qcid)}
+    ids_o3 <- if ("QC0d" %in% qcn_ind) {v %>% filter(QC0d == "twijfelachtig" | QC0d == "niet uitvoerbaar") %>% pull(qcid)}
+    ids_o4 <- if ("QC0e" %in% qcn_ind) {v %>% filter(QC0e == "niet uitvoerbaar") %>% pull(qcid)}
+    ids_o5 <- if ("QC2a" %in% qcn_ind) {v %>% filter(QC2a == "twijfelachtig" | QC2a == "niet uitvoerbaar") %>% pull(qcid)}
+    ids_o6 <- if ("QC2b" %in% qcn_ind) {v %>% filter(QC2b == "twijfelachtig") %>% pull(qcid)}
+    ids_o7 <- if ("QC2c" %in% qcn_ind) {v %>% filter(QC2c == "twijfelachtig") %>% pull(qcid)}
+    ids_o8 <- if ("QC3c" %in% qcn_ind) {v %>% filter(QC3c == "twijfelachtig" | QC3c == "niet uitvoerbaar") %>% pull(qcid)}
+    ids_o9 <- if ("QC3d" %in% qcn_ind) {v %>% filter(QC3d == "niet uitvoerbaar") %>% pull(qcid)}
+    ids_o10 <- if ("QC3e" %in% qcn_ind) {v %>% filter(QC3e == "niet uitvoerbaar") %>% pull(qcid)}
+    ids_o11 <- if ("QC3f" %in% qcn_ind) {v %>% filter(QC3f == "niet uitvoerbaar") %>% pull(qcid)}
+    ids_o12 <- if ("QC3g" %in% qcn_ind) {v %>% filter(QC3g == "twijfelachtig" | QC3g == "niet uitvoerbaar") %>% pull(qcid)}
+    ids_o13 <- if ("QC3h" %in% qcn_ind) {v %>% filter(QC3h == "twijfelachtig" | QC3h == "niet uitvoerbaar") %>% pull(qcid)}
+  }
   
-  # afgekeurd
+  # Overzicht aantal ids per beoordeling
+  res <- bind_rows(
+    # Afgekeurd
+    tibble(ids = length(ids_a1), oordeel = "afgekeurd", QC0a = "verdacht"),
+    tibble(ids = length(ids_a2), oordeel = "afgekeurd", QC0e = "twijfelachtig"),
+    tibble(ids = length(ids_a3), oordeel = "afgekeurd", QC1f = "verdacht"),
+    tibble(ids = length(ids_a4), oordeel = "afgekeurd", QC2a = "verdacht", QC4a = "twijfelachtig"),
+    tibble(ids = length(ids_a5), oordeel = "afgekeurd", QC4b = "verdacht"),
+    # Onbeslist
+    tibble(ids = length(ids_o1), oordeel = "onbeslist", QC0a = "niet uitvoerbaar", QC4a = "twijfelachtig"),
+    tibble(ids = length(ids_o2), oordeel = "onbeslist", QC0c = "twijfelachtig of niet uitvoerbaar", QC4a = "twijfelachtig"),
+    tibble(ids = length(ids_o3), oordeel = "onbeslist", QC0d = "twijfelachtig of niet uitvoerbaar", QC4a = "twijfelachtig"),
+    tibble(ids = length(ids_o4), oordeel = "onbeslist", QC0e = "niet uitvoerbaar", QC4a = "twijfelachtig"),
+    tibble(ids = length(ids_o5), oordeel = "onbeslist", QC2a = "twijfelachtig of niet uitvoerbaar", QC4a = "twijfelachtig"),
+    tibble(ids = length(ids_o6), oordeel = "onbeslist", QC2b = "twijfelachtig", QC4a = "twijfelachtig"),
+    tibble(ids = length(ids_o7), oordeel = "onbeslist", QC2c = "twijfelachtig", QC4a = "twijfelachtig"),
+    tibble(ids = length(ids_o8), oordeel = "onbeslist", QC3c = "twijfelachtig of niet uitvoerbaar", QC4a = "twijfelachtig"),
+    tibble(ids = length(ids_o9), oordeel = "onbeslist", QC3d = "niet uitvoerbaar", QC4a = "twijfelachtig"),
+    tibble(ids = length(ids_o10), oordeel = "onbeslist", QC3e = "niet uitvoerbaar", QC4a = "twijfelachtig"),
+    tibble(ids = length(ids_o11), oordeel = "onbeslist", QC3f = "niet uitvoerbaar", QC4a = "twijfelachtig"),
+    tibble(ids = length(ids_o12), oordeel = "onbeslist", QC3g = "twijfelachtig of niet uitvoerbaar", QC4a = "twijfelachtig"),
+    tibble(ids = length(ids_o13), oordeel = "onbeslist", QC3h = "twijfelachtig of niet uitvoerbaar", QC4a = "twijfelachtig"),
+  )
   
-  # onbekend
+  res <- res[, order(colnames(res))]
   
-  # onbeslist
+  ids_a <- unique(c(ids_a1, ids_a2, ids_a3, ids_a4, ids_a5))
+  ids_o <- unique(c(ids_o1, ids_o2, ids_o3, ids_o4, ids_o5, 
+                    ids_o6, ids_o7, ids_o8, ids_o9, ids_o10,
+                    ids_o11, ids_o12, ids_o13))
+  
+  # Eindoordeel toekennen
+  d_eindoordeel <- d %>% mutate(oordeel = "goedgekeurd")
+  
+  if(length(ids_o) > 0){
+    d_eindoordeel <- d_eindoordeel %>% 
+      mutate(oordeel = case_when(qcid == ids_o ~ "onbeslist",
+                                 TRUE ~ oordeel))
+  }
+  if(length(ids_a) > 0){
+    d_eindoordeel <- d_eindoordeel %>% 
+      mutate(oordeel = case_when(qcid == ids_a ~ "afgekeurd",
+                                 TRUE ~ oordeel)) 
+  }
+  
+  rapportageTekst <- paste("Er zijn in totaal", d_eindoordeel %>% 
+                             filter(oordeel == "afgekeurd") %>% count() %>% pull(), 
+                           "metingen met het oordeel afgekeurd en", d_eindoordeel %>% 
+                             filter(oordeel == "onbeslist") %>% count() %>% pull(),
+                           "metingen met het oordeel onbeslist. Onderstaand een",
+                           "overzicht met het aantal ids dat per test werd",
+                           "beoordeeld. Een id kan door meerdere tests worden",
+                           "beoordeeld.")
+  
+  # Als printen gewenst is (T)
+  # Print overzicht van het aantal keer dat een oordeel is gegeven bij een bepaalde test
+  if(verbose) {
+    if(sum(res$ids) > 0) {
+      write.table(
+        rapportageTekst,
+        row.names = F, col.names = F)
+      print(res)
+      
+    } else {
+      print("Alle metingen zijn goedgekeurd.")
+    }
+  }
   
   
-  # Tijdelijke warning dat deze functie nog niet compleet is
-  warning(paste0("Deze functie is nog niet compleet. ",
-                 "De QC5 regels voor het bepalen van het eindoordeel zijn ",
-                 "nog niet geautomatiseerd binnen deze functie. ",
-                 "De output dataset kan worden gebruikt om deze ",
-                 "regels verder toe te passen."))
-  
-  
-  return(d)
+  return(d_eindoordeel)
   
 }
 
