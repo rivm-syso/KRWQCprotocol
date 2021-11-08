@@ -19,8 +19,9 @@
 #' @param d_parameter dataframe met parameter informatie
 #' @param meetronde meetjaar welke gevalideerd dient te worden. Staat standaard
 #' op de laatste meetjaar uit het databestand.
-#' @param plt_per_stof Voeg tijdserie plots per stof toe aan resultaat
-#' @param plt_per_reeks Voeg tijdserie plots per reeks toe aan resultaat
+#' @param plt Voeg tijdserie plots per reeks en stof toe aan resultaat
+#' @param plt_put_reeks Maak plots van alle putten waarbij 1 of meer parameters
+#' een sd > 3.5 hebben (vereist plt = T). Staat standaard op F. 
 #' @param verbose of tekstuele output uit script gewenst is (T) of niet (F). 
 #' Staat standaard op F.
 #'
@@ -34,12 +35,8 @@
 
 QC4a <- function(d_metingen, d_parameter, 
                  meetronde = max(d_metingen$jaar), 
-                 plt_per_stof = T, plt_per_reeks = T, 
+                 plt = T, plt_put_reeks = F,
                  verbose = F) {
-
-    # arguments changed to something more in line with common style
-    plt.per.stof <- plt_per_stof
-    plt.per.reeks <- plt_per_reeks
   
   # Check datasets op kolommen en unieke informatie
   testKolommenMetingen(d_metingen)
@@ -93,7 +90,7 @@ QC4a <- function(d_metingen, d_parameter,
   
   ## Visualiseren per stof voor historie ##
   plot_list_param = list()
-  if(plt.per.stof) {
+  if(plt) {
     
     d <- d %>%
       dplyr::group_by(parameter) %>%
@@ -188,9 +185,10 @@ QC4a <- function(d_metingen, d_parameter,
       dplyr::mutate(putfilter = paste(putcode, filter, sep = "-"),
                     reeks = paste(parameter, putcode, sep = "-")) %>%
       # voeg eenheid toe voor plot as
-      dplyr::mutate(eenheid = d_parameter[match(parameter, d_parameter$parameter), 5]) %>%
+      dplyr::mutate(eenheid = d_parameter[match(parameter, d_parameter$parameter), "eenheid"]) %>%
       # selecteer reeksen met meting >3.5 sd
-      dplyr::filter(reeks %in% afwijking$reeks)
+      dplyr::filter(if (plt_put_reeks) putcode %in% afwijking$putcode 
+                    else reeks %in% afwijking$reeks)
       
       # test set voor figuren op reeks niveau voor beide filters
       # res <- d %>%
