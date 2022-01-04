@@ -2,7 +2,7 @@
 # lokaal pad naar de data (dit gaat dus niet werken als we package
 # publiceren
 
-pad <- "***REMOVED***/GitHub/KRWQCprotocol/data"
+pad <- ".../KRWQCprotocol/data"
 
 veld <- readRDS(file.path(pad,"veld.rds"))
 usethis::use_data(veld, overwrite = TRUE)
