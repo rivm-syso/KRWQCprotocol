@@ -221,8 +221,8 @@ MaakKolomMeth<-function(metveldgemiddelden=dataframeuitLeesData,celcius=celcius,
   z$mg=2*zm$xmg/24.31
   # nh4 hier ook als mg nh4 en niet als mg N
   z$nh4=zm$xnh4/18
-  z$fe=2*zm$xfe/55.85
-  z$mn=2*zm$xmn/54.94
+  z$fe=0.002*zm$xfe/55.85        #aangepast door FN. Fe is in microgram ipv milligram zoals aangenomen in het origineel
+  z$mn=0.002*zm$xmn/54.94    #aangepast door FN. Mn is in microgram ipv milligram zoals aangenomen in het origineel
   # al is in microgram
   z$al=0.003 * zm$xal/26.98
   z$zn=0.002*zm$xzn/65.39
@@ -539,9 +539,9 @@ BerekenGeleidbaarheid<-function(metveldgemiddelden=metveldgemiddelden,celcius=25
 
   metallegeleidbaarheid=h
   mycols=c(names(metveldgemiddelden),'cl','so4','no3','na','k','ca','mg','po4','hco3','xhco3e','pos','neg',
-            'ib','percentageverschil_xecv_ec25','ec25','prinslabel','ec25_xecv_sr')
+            'ib','percentageverschil_xecv_ec25','ec25','prinslabel','meth','ec25_xecv_sr')
   metgeleidbaarheid=h[,mycols]
-  save(metgeleidbaarheid,file='metgeleidbaarheid.rda')
+#  save(metgeleidbaarheid,file='metgeleidbaarheid.rda')
   return(metgeleidbaarheid)
 }
 
