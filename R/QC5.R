@@ -35,13 +35,25 @@ QC5 <- function(d_metingen, verbose = F) {
              "QC2a", "QC2b", "QC2c",
              "QC3a", "QC3b", "QC3c", "QC3d", "QC3e", "QC3f", "QC3g", "QC3h", 
              "QC4a", "QC4b")
+    # Lijst met minimaal benodigde QC namen
+    qcn_req <- c("QC0a", "QC0c", "QC0d", "QC0e", 
+                 "QC1f", 
+                 "QC2a", "QC2b", "QC2c",
+                 "QC3c", "QC3d", "QC3e", "QC3f", "QC3g", "QC3h", 
+                 "QC4a", "QC4b")
+    
     # Controleer of alle namen voorkomen in d_metingen
     x_attr <- attr(d_metingen, "qcout")
     qcn_inx <- qcn %in% names(x_attr)
+    qcn_req_inx <- qcn_req %in% names(x_attr)
     
     # Stop als een QC test niet aanwezig is
-    if(!all(qcn_inx)){
-      stop(paste0(qcn[!qcn_inx], " niet aanwezig\n"))
+    if(!all(qcn_req_inx)){
+      stop(paste0(qcn_req[!qcn_req_inx], " niet aanwezig\n"))
+    } else{
+      if(!all(qcn_inx)){
+        warning(paste0(qcn[!qcn_inx], " niet aanwezig\n"))
+      } 
     }
     
     # Controle op format resultaten
