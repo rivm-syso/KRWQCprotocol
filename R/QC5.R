@@ -99,8 +99,9 @@ QC5 <- function(d_metingen, verbose = F) {
     ids_o11 <- if ("QC3f" %in% qcn_ind) {v %>% filter(QC3f == "niet uitvoerbaar") %>% pull(qcid)}
     ids_o12 <- if ("QC3g" %in% qcn_ind) {v %>% filter(QC3g == "twijfelachtig" | QC3g == "niet uitvoerbaar") %>% pull(qcid)}
     ids_o13 <- if ("QC3h" %in% qcn_ind) {v %>% filter(QC3h == "twijfelachtig" | QC3h == "niet uitvoerbaar") %>% pull(qcid)}
+    ids_o14 <- v %>% pull(qcid)
   } else {
-    for(i in 1:13) {
+    for(i in 1:14) {
       temp_name <- NULL
       assign(paste0("ids_o", i), temp_name)
     }
@@ -128,6 +129,7 @@ QC5 <- function(d_metingen, verbose = F) {
     tibble(ids = length(ids_o11), oordeel = "onbeslist", QC3f = "niet uitvoerbaar", QC4a = "twijfelachtig"),
     tibble(ids = length(ids_o12), oordeel = "onbeslist", QC3g = "twijfelachtig of niet uitvoerbaar", QC4a = "twijfelachtig"),
     tibble(ids = length(ids_o13), oordeel = "onbeslist", QC3h = "twijfelachtig of niet uitvoerbaar", QC4a = "twijfelachtig"),
+    tibble(ids = length(ids_o14), oordeel = "onbeslist", QC4a = "twijfelachtig"),
   )
   
   res <- res[, order(colnames(res))]
@@ -135,7 +137,7 @@ QC5 <- function(d_metingen, verbose = F) {
   ids_a <- unique(c(ids_a1, ids_a2, ids_a3, ids_a4, ids_a5))
   ids_o <- unique(c(ids_o1, ids_o2, ids_o3, ids_o4, ids_o5, 
                     ids_o6, ids_o7, ids_o8, ids_o9, ids_o10,
-                    ids_o11, ids_o12, ids_o13))
+                    ids_o11, ids_o12, ids_o13, ids_o14))
   
   # Eindoordeel toekennen
   d_eindoordeel <- d %>% mutate(oordeel = "goedgekeurd")
