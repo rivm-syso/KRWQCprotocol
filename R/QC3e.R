@@ -18,21 +18,28 @@
 #'
 
 
-QC3e <- function(d_metingen, verbose = F) {
+QC3e <- function(d_metingen, verbose = F, ph_naam = "hv", hco3_naam = "hco3" {
   
   # Check datasets op kolommen en unieke informatie
   testKolommenMetingen(d_metingen)
+  d <- d_metingen
   
   # Parameter naam aanpassen alleen voor LMG
-  d <- d_metingen
+  # d$parameter <- d$parameter %>%
+  #   dplyr::recode("ec_5__veld" = "ecv",
+  #                 "h_5__veld" = "hv",
+  #                 "hco3_veld" = "hco3v",
+  #                 "nh4_n" = "nh4",
+  #                 "no3_n" = "no3",
+  #                 "po4_p" = "po4",
+  #                 "ptot_p" = "ptot",
+  #                 .default = d$parameter)
+  
+  # aanpassen van opgegeven namen hco3 en ph naar hco3 en hv. 
+  # Dat zijn de twee die gebruikt worden.
   d$parameter <- d$parameter %>%
-    dplyr::recode("ec_5__veld" = "ecv",
-                  "h_5__veld" = "hv",
-                  "hco3_veld" = "hco3v",
-                  "nh4_n" = "nh4",
-                  "no3_n" = "no3",
-                  "po4_p" = "po4",
-                  "ptot_p" = "ptot",
+    dplyr::recode(ph_naam = "hv",
+                  hco3_naam = "hco3",
                   .default = d$parameter)
   
   # gegevens apart zetten om later qcid weer toe te voegen
