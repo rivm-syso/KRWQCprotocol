@@ -31,4 +31,5 @@ Depends:
     tidyr,
     lubridate,
     ggplot2,
+    gridExtra,
     stringr

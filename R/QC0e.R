@@ -81,7 +81,7 @@ QC0e <- function(d_veld, d_filter, d_metingen, fl = 2, verbose = F) {
   
   d_metingen <- qcout_add_oordeel(obj = d_metingen,
                                   test = test,
-                                  oordeel = unique(resultaat_df$oordeel),
+                                  oordeel = "twijfelachtig",
                                   ids = verdacht_id)
   d_metingen <- qcout_add_rapportage(obj = d_metingen,
                                      test = test,
