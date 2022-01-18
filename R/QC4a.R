@@ -19,9 +19,11 @@
 #' @param d_parameter dataframe met parameter informatie
 #' @param meetronde meetjaar welke gevalideerd dient te worden. Staat standaard
 #' op de laatste meetjaar uit het databestand.
+#' @param zscore z-score waarbij een meeting wordt bestempeld met twijfelachtig.
+#' staat standaard op 3.5. Alle beschrijvingen zijn gebaseerd op z-score 3.5.
 #' @param plt Voeg tijdserie plots per reeks en stof toe aan resultaat
 #' @param plt_put_reeks Maak plots van alle putten waarbij 1 of meer parameters
-#' een sd > 3.5 hebben (vereist plt = T). Staat standaard op F. 
+#' een z-score > 3.5 hebben (vereist plt = T). Staat standaard op F. 
 #' @param verbose of tekstuele output uit script gewenst is (T) of niet (F). 
 #' Staat standaard op F.
 #'
@@ -35,6 +37,7 @@
 
 QC4a <- function(d_metingen, d_parameter, 
                  meetronde = max(d_metingen$jaar), 
+                 zscore = 3.5,
                  plt = T, plt_put_reeks = F,
                  verbose = F) {
   
@@ -65,9 +68,9 @@ QC4a <- function(d_metingen, d_parameter,
                                 (logobs - loggem) / logsdv) ) %>%
     # voeg oordeel toe
     # reeksen met <3 metingen/meetjaren zijn niet uitvoerbaar
-    # zscore >3.5 is twijfelachtig
+    # z-score >3.5 is twijfelachtig
     dplyr::mutate(oordeel = ifelse(n.meetjaar < 3, "test niet uitvoerbaar",
-                            ifelse(n.meetjaar >= 3 & abs(logz) > 3.5, "twijfelachtig",
+                            ifelse(n.meetjaar >= 3 & abs(logz) > zscore, "twijfelachtig",
                                    "onverdacht"))) %>%
     # voeg type toe voor plotjes nieuwe en oude meetrondes
     dplyr::mutate(type = ifelse(jaar == meetronde, "nieuw", "oud")) %>%
@@ -75,7 +78,7 @@ QC4a <- function(d_metingen, d_parameter,
   
   rapportageTekst <- paste("Er zijn in totaal", 
                            nrow(d %>% dplyr::filter(oordeel == "twijfelachtig")), 
-                           "metingen waar de afwijking >3.5 standaarddeviaties",
+                           "metingen waar de afwijking >", zscore, "standaarddeviaties",
                            "is t.o.v. de historische meetreeks.")
   
   if(verbose) {
@@ -83,8 +86,8 @@ QC4a <- function(d_metingen, d_parameter,
       print(rapportageTekst)
       
     } else {
-      print(paste("Er zijn geen metingen waar de afwijking",
-                  ">3.5 standaarddeviaties is."))
+      print(paste("Er zijn geen metingen waar de afwijking >", zscore,
+                  "standaarddeviaties is."))
     }
   }
   
@@ -229,7 +232,7 @@ QC4a <- function(d_metingen, d_parameter,
         ggplot2::scale_shape_manual(values = c(16, 1)) + 
         # assen 
         ggplot2::labs(title = paste(unique(dat$parameter), meetronde),
-                      subtitle = paste("gemarkeerde meting is >3.5 sd en",
+                      subtitle = paste("gemarkeerde meting is >", zscore, "sd en",
                               "metingen <RG = 0,5*RG")) +
         ggplot2::xlab("") +
         ggplot2::ylab(paste0(unique(dat$parameter), " [", unique(dat$eenheid), "]")) +
