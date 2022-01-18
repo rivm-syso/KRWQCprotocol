@@ -18,9 +18,16 @@
 #'
 
 
-QC3e <- function(d_metingen, verbose = F, ph_naam = "pH",
-                 hco3_naam = "HCO3") {
-  
+
+QC3e <- function(d_metingen, 
+                 ph_naam = "pH", 
+                 hco3_naam = "HCO3", 
+                 ec_naam = "GELDHD",
+                 celcius = 25,
+                 add_bicarbonate = F, 
+                 add_phosphate = F, 
+                 verbose = F) {
+
   # Check datasets op kolommen en unieke informatie
   testKolommenMetingen(d_metingen)
   d <- d_metingen
@@ -36,11 +43,12 @@ QC3e <- function(d_metingen, verbose = F, ph_naam = "pH",
   #                 "ptot_p" = "ptot",
   #                 .default = d$parameter)
   
-  # aanpassen van opgegeven namen hco3 en ph naar hco3 en hv. 
-  # Dat zijn de twee die gebruikt worden.
+  # aanpassen van opgegeven namen hco3 & ph & EC naar hco3 & hv & ecv. 
+  # Dat zijn de drie namen die gebruikt worden in de berekengeleidbaarheid functie
   d$parameter <- d$parameter %>%
     dplyr::recode(ph_naam = "hv",
                   hco3_naam = "hco3",
+                  ec_naam = 'ecv',
                   .default = d$parameter)
   
   # gegevens apart zetten om later qcid weer toe te voegen
@@ -99,8 +107,9 @@ QC3e <- function(d_metingen, verbose = F, ph_naam = "pH",
   # berekend gaat worden (functie MaakKolomMeth)
   # - berekend vervolgens de geleidbaarheid (EC25) volgens Stuyfzand (1984/7)
   
-  d <- BerekenGeleidbaarheid(metveldgemiddelden = res, celcius = 25,
-                             add_bicarbonate = F, add_phosphate = F)
+  d <- BerekenGeleidbaarheid(metveldgemiddelden = res, celcius = celcius,
+                             add_bicarbonate = add_bicarbonate, 
+                             add_phosphate = add_phosphate)
   
   # Nu check op afwijking EC berekend en gemeten EC
   resultaat_df <- d %>%
