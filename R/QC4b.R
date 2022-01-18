@@ -9,22 +9,32 @@
 #' de betreffende parameter het concept QC oordeel verdacht toe.         
 #'               
 #' @param d_metingen dataframe met metingen
+#' @param ph_veld_naam character string om te gebruiken als pH 
+#' veld. Staat standaard op "pH_veld".
 #' @param verbose of tekstuele output uit script gewenst is (T) of niet (F). Staat
 #' standaard op F.
 #'
 #' @return metingen bestand met verdachte locaties/monsters. 
 #'
+
+#' De benodigde naam voor pH lab is pH.
+#' De benodigde naam voor pH veld staat standaard op "pH_veld", maar kan worden 
+#' aangepast door een character string in te vullen voor ph_veld_naam.
+#'
 #' @export
 #'
 
 
-QC4b <- function(d_metingen, verbose = F) {
+QC4b <- function(d_metingen, ph_veld_naam = "pH_veld", verbose = F) {
   
   # Check datasets op kolommen en unieke informatie
   testKolommenMetingen(d_metingen)
   
   # pH naam aanpassen alleen voor LMG
   d <- d_metingen
+  d <- d %>%  mutate(
+    parameter = ifelse(parameter == ph_veld_naam, "pH_veld", parameter)
+  )
   # d$parameter <- d$parameter %>%
   #   dplyr::recode("h" = "ph",
   #                 "h_1__veld" = "ph_1__veld",
@@ -34,7 +44,7 @@ QC4b <- function(d_metingen, verbose = F) {
   # selecteer pH veld en lab gegevens
   # afhankelijk van de dataset kan dit 'pH' of 'zuurgraad' zijn
   d <- d %>%
-    dplyr::filter(stringr::str_detect(parameter, "ph|zuurgraad")) #%>%
+    dplyr::filter(parameter %in% c("pH", "pH_veld")) #%>%
     # NA's verwijderen?
     #filter(!is.na(waarde))
   
