@@ -18,7 +18,8 @@
 #'
 
 
-QC3e <- function(d_metingen, verbose = F, ph_naam = "hv", hco3_naam = "hco3" {
+QC3e <- function(d_metingen, verbose = F, ph_naam = "hv",
+                 hco3_naam = "hco3") {
   
   # Check datasets op kolommen en unieke informatie
   testKolommenMetingen(d_metingen)
