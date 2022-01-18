@@ -18,8 +18,8 @@
 #'
 
 
-QC3e <- function(d_metingen, verbose = F, ph_naam = "hv",
-                 hco3_naam = "hco3") {
+QC3e <- function(d_metingen, verbose = F, ph_naam = "pH",
+                 hco3_naam = "HCO3") {
   
   # Check datasets op kolommen en unieke informatie
   testKolommenMetingen(d_metingen)
@@ -79,7 +79,7 @@ QC3e <- function(d_metingen, verbose = F, ph_naam = "hv",
                        names_from = parameter,
                        names_glue = "x{parameter}",
                        values_from = waarde_ib) 
-  
+
   # benodigde kolommen voor Patricks functies voor EC/ionenbalans
   benodigde_col <- 
     c("xal", "xca", "xcl", "xfe", "xhv", "xk", "xmg", "xmn", "xna", 
