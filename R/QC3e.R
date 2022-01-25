@@ -32,25 +32,14 @@ QC3e <- function(d_metingen,
   testKolommenMetingen(d_metingen)
   d <- d_metingen
   
-  # Parameter naam aanpassen alleen voor LMG
-  # d$parameter <- d$parameter %>%
-  #   dplyr::recode("ec_5__veld" = "ecv",
-  #                 "h_5__veld" = "hv",
-  #                 "hco3_veld" = "hco3v",
-  #                 "nh4_n" = "nh4",
-  #                 "no3_n" = "no3",
-  #                 "po4_p" = "po4",
-  #                 "ptot_p" = "ptot",
-  #                 .default = d$parameter)
-  
   # aanpassen van opgegeven namen hco3 & ph & EC naar hco3 & hv & ecv. 
   # Dat zijn de drie namen die gebruikt worden in de berekengeleidbaarheid functie
-  d$parameter <- d$parameter %>%
-    dplyr::recode(ph_naam = "hv",
-                  hco3_naam = "hco3",
-                  ec_naam = 'ecv',
-                  .default = d$parameter)
-  
+d <- d %>%
+    mutate(parameter = str_replace(parameter, ec_naam, "ecv")) %>%
+    mutate(parameter =str_replace(parameter, hco3_naam, "hco3")) %>%
+    mutate(parameter =str_replace(parameter, ph_naam, "hv"))
+
+
   # gegevens apart zetten om later qcid weer toe te voegen
   id <- d %>%
     dplyr::filter(parameter == "ecv") %>%
