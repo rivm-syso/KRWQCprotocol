@@ -128,7 +128,7 @@ d <- d %>%
   }
   
   # voeg attribute met uitkomsten tests toe aan relevante dataset (d_metingen)
-  twijfel_id <- resultaat_df %>% filter(oordeel == "twijfelachtig") %>% distinct(qcid)
+  twijfel_id <- resultaat_df %>% filter(oordeel == "twijfelachtig") %>% distinct(qcid) %>% pull(qcid)
   test <- "QC3e"
   
   d_metingen <- qcout_add_oordeel(obj = d_metingen,
