@@ -444,7 +444,9 @@ Rossum<-function(z=dataframeuitMaakKolomMeth){
   b=z[z$meth=="rossum",]
   # van H+ naar milliequivalent
   # b$h3o=b$h
-  b$al=0
+  if(!any(names(b) == "al")) {
+  b <- cbind(b, al = rep(0, nrow(b)))
+  }
   b$g0an =86*b$co3+44.5*b$hco3+79.8*b$so4+76.3*b$cl+71.4*b$no3
   b$g0kat=59.5*b$ca+53.1*b$mg+50.1*b$na+73.5*b$k+349*b$h3o+73.5*b$nh4+54*b$fe+78*b$al
   b$zan =(4*(b$co3+b$so4)+b$cl+b$hco3+b$no3)  /(2*(b$co3+b$so4)+b$cl+b$hco3+b$no3)
