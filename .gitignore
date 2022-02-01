@@ -1,26 +1,20 @@
-# builds 
+# builds
 inst/doc
-
 # Rproj files
 .Rproj.user
 .Rhistory
 *.Rproj
-
 # Data/history files
 .RData
-
 # Data/history files
 .RData
 .Rhistory
-
 # vi files
 *.swp
-
 # prototype / test code
 prototype.R
-
-
 /doc/
 /Meta/
 ..Rcheck
 docs
+metingen.rda
