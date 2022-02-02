@@ -96,11 +96,10 @@ test_that("QC4b T3, ph_veld default value", {
               ids <- x_attr[["QC4b"]][["oordeel"]][["verdacht"]]
               qcids <- metingen$qcid
               v1 <- intersect(ids, qcids)
-              expect_true(length(v1) > 0)
+              expect_true(length(v1) == 0)
               expect_false(any(v1 != ids))
 
               expect_true(nrow(d) == nrow(x))
-              expect_true(d$qcid[1]%in%ids)
 
 
 })
