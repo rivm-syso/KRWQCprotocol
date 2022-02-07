@@ -17,8 +17,6 @@
 #' @export
 #'
 
-
-
 QC3e <- function(d_metingen, 
                  ph_naam = "pH", 
                  hco3_naam = "HCO3", 
@@ -34,10 +32,10 @@ QC3e <- function(d_metingen,
   
   # aanpassen van opgegeven namen hco3 & ph & EC naar hco3 & hv & ecv. 
   # Dat zijn de drie namen die gebruikt worden in de berekengeleidbaarheid functie
-d <- d %>%
+  d <- d %>%
     mutate(parameter = str_replace(parameter, ec_naam, "ecv")) %>%
-    mutate(parameter =str_replace(parameter, hco3_naam, "hco3")) %>%
-    mutate(parameter =str_replace(parameter, ph_naam, "hv"))
+    mutate(parameter = str_replace(parameter, hco3_naam, "hco3v")) %>%
+    mutate(parameter = str_replace(parameter, ph_naam, "hv"))
 
 
   # gegevens apart zetten om later qcid weer toe te voegen
