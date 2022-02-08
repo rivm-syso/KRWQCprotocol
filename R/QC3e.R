@@ -9,6 +9,10 @@
 #' concept QC oordeel twijfelachtig toe aan het monster.
 #'         
 #' @param d_metingen dataframe met metingen
+#' @param hco3_naam de naam van de HCO3 variable in d_metingen. Edgecase: als 
+#' deze gespecificeerd is en "HCO3" apart nog een keer voorkomt in d_metingen met 
+#' waardes die niet "NA" zijn, dan wordt het gemiddelde gebruikt van de parameters 
+#' "hco3_naam" en "HCO3"
 #' @param verbose of tekstuele output uit script gewenst is (T) of niet (F). Staat
 #' standaard op F.
 #'
@@ -78,7 +82,7 @@ QC3e <- function(d_metingen,
   # benodigde kolommen voor Patricks functies voor EC/ionenbalans
   benodigde_col <- 
     c("xal", "xca", "xcl", "xfe", "xhv", "xk", "xmg", "xmn", "xna", 
-      "xnh4", "xno3", "xpo4", "xso4", "xecv", "xzn", "xhco3", "xco3")
+      "xnh4", "xno3", "xpo4", "xso4", "xecv", "xzn", "xhco3v", "xco3")
   
   namen <- res %>%
     dplyr::select(-c(monsterid, jaar, maand, dag, filter, putcode)) 
