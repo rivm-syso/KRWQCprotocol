@@ -157,13 +157,9 @@ QC0h <- function(d_filter, d_metingen, verbose = F) {
   resultaat_df <- d_metingen %>%
     group_by(monsterid) %>%
     mutate(iden = paste(putcode, filter, jaar, maand, dag, sep = "-")) %>%
-    mutate(oordeel = ifelse(iden %in% (res %>% filter(oordeel == "twijfelachtig") %>% pull(iden)),
-                            "twijfelachtig", 
-                            ifelse(iden %in% (res %>% filter(oordeel == "verdacht") %>% pull(iden)),
-                                   "verdacht", "onverdacht"))) %>%
-    filter(oordeel != "onverdacht") %>%
+    filter(iden %in% res$iden) %>%
     # voeg resultaten test toe
-    left_join(., res %>% select(iden, redoxklasse_VAL, redoxklasse_HIS)) %>%
+    left_join(., res %>% select(iden, redoxklasse_VAL, redoxklasse_HIS, oordeel), by = "iden") %>%
     select(qcid, monsterid, jaar, maand, dag, putcode, filter,
            redoxklasse_VAL, redoxklasse_HIS, oordeel)
   
@@ -174,11 +170,11 @@ QC0h <- function(d_filter, d_metingen, verbose = F) {
   
   d_metingen <- qcout_add_oordeel(obj = d_metingen,
                                   test = test,
-                                  oordeel = sort(unique(resultaat_df$oordeel))[1],
+                                  oordeel = "twijfelachtig",
                                   ids = twijfel_id)
   d_metingen <- qcout_add_oordeel(obj = d_metingen,
                                   test = test,
-                                  oordeel = sort(unique(resultaat_df$oordeel))[2],
+                                  oordeel = "verdacht",
                                   ids = verdacht_id)
   d_metingen <- qcout_add_rapportage(obj = d_metingen,
                                      test = test,
