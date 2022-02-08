@@ -2,7 +2,7 @@
 # lokaal pad naar de data (dit gaat dus niet werken als we package
 # publiceren
 
-pad <- ".../KRWQCprotocol/data"
+pad <- "../KRWQCprotocol-proto/data"
 
 veld <- readRDS(file.path(pad,"veld.rds"))
 usethis::use_data(veld, overwrite = TRUE)
@@ -18,3 +18,8 @@ usethis::use_data(parameter, overwrite = TRUE)
 
 filter <- readRDS(file.path(pad,"filter.rds"))
 usethis::use_data(filter, overwrite = TRUE)
+
+stuyfzandtable31 <- readRDS(file.path(pad, "stuyfzandtable31.rds"))
+usethis::use_data(stuyfzandtable31, overwrite = TRUE, internal = TRUE)
+
+
