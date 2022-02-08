@@ -338,8 +338,21 @@ afijkende metingen uit de te valideren meetronde gekleurd zijn afgebeeld. Hierme
 wordt in één opslag duidelijk hoeveel metingen per parameter afwijken en of er 
 eventueel sprake is van eenheidsfouten of structurele afwijkingen in een meetronde.
 - Per twijfelactige meting wordt de gehele reeks geplot tegelijkertijd met 
-eventuele andere putfilters op die locatie. Zou kunnen mogelijke filterwisselingen
+eventuele andere putfilters op die locatie. Zo kunnen mogelijke filterwisselingen
 geidentificeerd worden. 
+
+Voorbeeld voor het maken van een pdf met de afbeeldingen van de parameters:
+```{r eval = FALSE}
+x <- QC4a(d_metingen = x, d_parameter = parameter)
+
+x_attr <- attr(x, "qcout")
+
+ggsave(
+  filename = paste0(getwd(), "/parameters_", Sys.Date(),".pdf"),
+  plot = gridExtra::marrangeGrob(x_attr$QC4a$resultaat$plot_param, nrow = 1, ncol = 1),
+  width = 15, height = 9
+)
+```
 
 QC4b wordt regulier uitgevoerd met het aanroepen van QC4b() met metingen data uit
 het LMG als voorbeeld. Bij deze stap word getest of de pH van het veld en de pH
