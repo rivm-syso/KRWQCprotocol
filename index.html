@@ -19,6 +19,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-home">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -31,18 +33,12 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">KRWQCprotocol</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.1</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
-<li>
-  <a href="index.html">
-    <span class="fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
 <li>
   <a href="reference/index.html">Reference</a>
 </li>
@@ -72,41 +68,47 @@
       </header><div class="row">
   <div class="contents col-md-9">
 
-<div id="krwqcprotocol---r-package-voor-qc-controle" class="section level1">
-<div class="page-header"><h1 class="hasAnchor">
-<a href="#krwqcprotocol---r-package-voor-qc-controle" class="anchor"></a>KRWQCprotocol - R package voor QC controle</h1></div>
+<div class="section level1">
+<div class="page-header"><h1 id="krwqcprotocol---r-package-voor-qc-controle">KRWQCprotocol - R package voor QC controle<a class="anchor" aria-label="anchor" href="#krwqcprotocol---r-package-voor-qc-controle"></a>
+</h1></div>
 <!-- badges: start -->
 
 <p>Het QC protocol beschrijft de werkwijze om grondwaterkwaliteitsgegevens te controleren en beoordelen en het protocol wordt door provincies en RIVM gebruikt. Het protocol beschrijft een een uniforme aanpak geborgd door de verschillende bronhouders alvorens de kwaliteitsgegevens worden opgenomen in de Basisregistratie Ondergrond (BRO).</p>
 <p>Het QC protocol kan ook worden gehanteerd voor de controle en beoordeling van de historische kwaliteitsgegevens. De bestaande werkwijze voor controle en beoordeling van grondwaterkwaliteitsgegevens wordt beschreven in het Handboek Monitoring Grondwaterkwaliteit KRW. Deze werkwijze is ontwikkeld door het RIVM en vanaf de inrichting van het LMG gebruikt voor de controle en beoordeling van de LMG-gegevens.</p>
 <p>Het QC protocol bestaat uit verschillende tests die deels ook aansluiten op de vereisten vanuit de BRO Het zo veel als mogelijk automatiseren van de werkwijze voor controle en beoordeling van grondwaterkwaliteitsgegevens, leidt op een efficiente manier tot een uniforme en eenduidige dataset tussen de verschillende bronhouders. Dit R package bevat een groot aantal tests volgens het QC prototol</p>
 </div>
-<div id="documentatie--help-paginas" class="section level1">
-<h1 class="hasAnchor">
-<a href="#documentatie--help-paginas" class="anchor"></a>Documentatie &amp; help pagina’s</h1>
-<p>De documentatie en help pagina’s van dit pakket kan je <a href="https://jspijker.github.io/KRWQCprotocol/index.html">hier</a> vinden.</p>
+<div class="section level1">
+<h1 id="documentatie--help-paginas">Documentatie &amp; help pagina’s<a class="anchor" aria-label="anchor" href="#documentatie--help-paginas"></a>
+</h1>
+<p>De documentatie en help pagina’s van dit pakket kan je <a href="https://rivm-syso.github.io/KRWQCprotocol/index.html" class="external-link">hier</a> vinden.</p>
 </div>
-<div id="brongegevens--invoerbestand" class="section level1">
-<h1 class="hasAnchor">
-<a href="#brongegevens--invoerbestand" class="anchor"></a>Brongegevens / invoerbestand</h1>
+<div class="section level1">
+<h1 id="brongegevens--invoerbestand">Brongegevens / invoerbestand<a class="anchor" aria-label="anchor" href="#brongegevens--invoerbestand"></a>
+</h1>
 <p>In het QC protocol worden controles uitgevoerd m.b.t. parameters, meettechnieken, observaties en meetwaardes uit zowel het veld als uit het lab. Door de veelvoud aan controles is het complex om de vele gegevens in één bestand te vatten. Om deze reden is gekozen om de datastromen in 5 datasets op te knippen zodat het automatiseren van de controles eenvoudiger wordt. De datasets zijn als volgt:</p>
-<p>1) Veldbestand: databestand met veldobservaties betreffende locatie en toestand van de put; 2) Putbestand: databestand met referentie putlocatie gegevens; 3) Filterbestand: databestand met referentie putfilter gegevens; 4) Parameterbestand: opzoekbestand voor parameter kenmerken; 5) Metingenbestand: bestand met gemeten parameters uit monsteranalyses en veldmetingen.</p>
+<ol style="list-style-type: decimal">
+<li>Veldbestand: databestand met veldobservaties betreffende locatie en toestand van de put;</li>
+<li>Putbestand: databestand met referentie putlocatie gegevens;</li>
+<li>Filterbestand: databestand met referentie putfilter gegevens;</li>
+<li>Parameterbestand: opzoekbestand voor parameter kenmerken;</li>
+<li>Metingenbestand: bestand met gemeten parameters uit monsteranalyses en veldmetingen.</li>
+</ol>
 <p>Zie de vignette <code>krwqcprotocol</code> voor beschrijving van de tabel inhoud.</p>
 </div>
-<div id="resultaat--uitvoerbestand" class="section level1">
-<h1 class="hasAnchor">
-<a href="#resultaat--uitvoerbestand" class="anchor"></a>Resultaat / uitvoerbestand</h1>
+<div class="section level1">
+<h1 id="resultaat--uitvoerbestand">Resultaat / uitvoerbestand<a class="anchor" aria-label="anchor" href="#resultaat--uitvoerbestand"></a>
+</h1>
 <p>In de verschillende QC functies worden de testen uitgevoerd beschreven in het QC Protocol. Als bij deze stappen een afwijking geconstateerd wordt dan krijgt het monster, de parameter of de waarde een concept oordeel toegekend. Deze afwijkingen worden aan het eind van de functie als attribuut meegegeven aan het metingen bestand (<code>d_metingen</code>) en kunnen dus na het runnen van elke test bekeken worden.</p>
 <p><em>BELANGRIJK:</em> alle resultaten en concept oordelen worden per QC-test als attribuut aan het metingenbestand gehangen. Het is daarom noodzakelijk om voor elke test hetzelfde bestand als invoer te gebruiken, zodat alle test resultaten uiteindelijk als attribuut beschikbaar zijn onder eenzelfde bestand.</p>
 </div>
-<div id="licentie" class="section level1">
-<h1 class="hasAnchor">
-<a href="#licentie" class="anchor"></a>Licentie</h1>
+<div class="section level1">
+<h1 id="licentie">Licentie<a class="anchor" aria-label="anchor" href="#licentie"></a>
+</h1>
 <p>Dit pakket wordt beschikbaar gesteld onder een GPL-3 Open Source licentie, zie LICENCE.md</p>
 </div>
-<div id="contact" class="section level1">
-<h1 class="hasAnchor">
-<a href="#contact" class="anchor"></a>Contact</h1>
+<div class="section level1">
+<h1 id="contact">Contact<a class="anchor" aria-label="anchor" href="#contact"></a>
+</h1>
 <p>Voor vragen en/of opmerkingen kan een <em>issue</em> aagemaakt worden op GitHub.</p>
 </div>
 
@@ -114,35 +116,47 @@
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <div class="license">
-<h2>License</h2>
+<h2 data-toc-skip>License</h2>
 <ul class="list-unstyled">
 <li><a href="LICENSE.html">Full license</a></li>
-<li><small><a href="https://www.r-project.org/Licenses/GPL-3">GPL-3</a></small></li>
+<li><small><a href="https://www.r-project.org/Licenses/GPL-3" class="external-link">GPL-3</a></small></li>
 </ul>
 </div>
+
+
+<div class="citation">
+<h2 data-toc-skip>Citation</h2>
+<ul class="list-unstyled">
+<li><a href="authors.html#citation">Citing KRWQCprotocol</a></li>
+</ul>
+</div>
+
 <div class="developers">
-<h2>Developers</h2>
+<h2 data-toc-skip>Developers</h2>
 <ul class="list-unstyled">
 <li>Job Spijker <br><small class="roles"> Author, maintainer </small>  </li>
 </ul>
 </div>
 
-  <div class="dev-status">
-<h2>Dev status</h2>
+<div class="dev-status">
+<h2 data-toc-skip>Dev status</h2>
 <ul class="list-unstyled">
-<li><a href="https://github.com/jspijker/KRWQCprotocol/actions"><img src="https://github.com/jspijker/KRWQCprotocol/workflows/R-CMD-check/badge.svg" alt="R-CMD-check"></a></li>
+<li><a href="https://github.com/jspijker/KRWQCprotocol/actions" class="external-link"><img src="https://github.com/jspijker/KRWQCprotocol/workflows/R-CMD-check/badge.svg" alt="R-CMD-check"></a></li>
 </ul>
 </div>
-</div>
+
+  </div>
 </div>
 
 
       <footer><div class="copyright">
-  <p>Developed by Job Spijker.</p>
+  <p></p>
+<p>Developed by Job Spijker.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
 </div>
 
       </footer>
@@ -150,6 +164,8 @@
 
   
 
+
+  
 
   </body>
 </html>
