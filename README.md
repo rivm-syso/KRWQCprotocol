@@ -28,7 +28,7 @@ R package bevat een groot aantal tests volgens het QC prototol
 
 # Documentatie & help pagina's
 
-De documentatie en help pagina's van dit pakket kan je [hier](https://jspijker.github.io/KRWQCprotocol/index.html) vinden.
+De documentatie en help pagina's van dit pakket kan je [hier](https://rivm-syso.github.io/KRWQCprotocol/index.html) vinden.
 
 
 
