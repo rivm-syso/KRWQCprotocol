@@ -32,10 +32,7 @@ test_that("QC1f T2 negatieve waarden", {
               x <- QC1f(d_metingen = d)
 
               # test if attributes exist
-              expect_true(qcout_attrexists(x))
               x_attr <- attr(x, "qcout")
-              expect_false(is.null(x_attr[["QC1f"]]))
-              expect_true(is.list(x_attr[["QC1f"]][["resultaat"]]))
               
               ids <- x_attr[["QC1f"]][["oordeel"]][["verdacht"]]
               qcids <- metingen$qcid
