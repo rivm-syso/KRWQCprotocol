@@ -49,9 +49,6 @@ QC3h <- function(d_metingen, verbose = F) {
         dplyr::select(-c(qcid,detectieteken, rapportagegrens)) %>%
         tidyr::pivot_wider(names_from = parameter,
                            values_from = waarde) %>%
-        # NO3 en NH4 staan in stikstof, dus omrekenen
-        dplyr::mutate(NH4 = NH4 * 1.2878,
-                      NO3 = NO3 * 4.4268) %>%
         dplyr::mutate(oordeel = ifelse(NO3 > 0.5 & NH4 > 2 |
                                        NO3 > 0.5 & NH4 > NO3,
                                    "twijfelachtig", "onverdacht"),
