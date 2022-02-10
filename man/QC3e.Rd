@@ -18,10 +18,24 @@ QC3e(
 \arguments{
 \item{d_metingen}{dataframe met metingen}
 
+\item{ph_naam}{de naam van de pH variabelen in d_metingen,
+standaard is "pH"}
+
 \item{hco3_naam}{de naam van de HCO3 variable in d_metingen. Edgecase: als
 deze gespecificeerd is en "HCO3" apart nog een keer voorkomt in d_metingen met
 waardes die niet "NA" zijn, dan wordt het gemiddelde gebruikt van de parameters
 "hco3_naam" en "HCO3"}
+
+\item{ec_naam}{de naam van het EC veld, standaard is GELDHD}
+
+\item{celcius}{temperatuur waarbij de EC geschat moet worden,
+standaard is 25 grad. ceclius}
+
+\item{add_bicarbonate}{als er geen bicabonaat aanwezig is, dan kan
+deze geschat worden uit de ionnenbalans}
+
+\item{add_phosphate}{als er geen phosphate aanwezig is, dan kan
+deze geschat worden uit totaal P.}
 
 \item{verbose}{of tekstuele output uit script gewenst is (T) of niet (F). Staat
 standaard op F.}

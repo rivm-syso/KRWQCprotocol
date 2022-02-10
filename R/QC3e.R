@@ -9,10 +9,19 @@
 #' concept QC oordeel twijfelachtig toe aan het monster.
 #'         
 #' @param d_metingen dataframe met metingen
+#' @param ph_naam de naam van de pH variabelen in d_metingen,
+#' standaard is "pH"
 #' @param hco3_naam de naam van de HCO3 variable in d_metingen. Edgecase: als 
 #' deze gespecificeerd is en "HCO3" apart nog een keer voorkomt in d_metingen met 
 #' waardes die niet "NA" zijn, dan wordt het gemiddelde gebruikt van de parameters 
 #' "hco3_naam" en "HCO3"
+#' @param ec_naam de naam van het EC veld, standaard is GELDHD
+#' @param celcius temperatuur waarbij de EC geschat moet worden,
+#' standaard is 25 grad. ceclius
+#' @param add_bicarbonate als er geen bicabonaat aanwezig is, dan kan
+#' deze geschat worden uit de ionnenbalans
+#' @param add_phosphate als er geen phosphate aanwezig is, dan kan
+#' deze geschat worden uit totaal P.
 #' @param verbose of tekstuele output uit script gewenst is (T) of niet (F). Staat
 #' standaard op F.
 #'
@@ -151,7 +160,7 @@ QC3e <- function(d_metingen,
 # Onderstaande functies zijn methodes voor de EC berekening in QC3e
 # uit Patricks functies 
 MaakKolomMeth<-function(metveldgemiddelden=dataframeuitLeesData,celcius=celcius,add_bicarbonate=add_bicarbonate,add_phosphate=add_phosphate){
-  #' voorbereiding van methoden kolom voor ec25 berekening volgens Stuyfzand 
+  # voorbereiding van methoden kolom voor ec25 berekening volgens Stuyfzand 
   # add_bicarbonate
   #   matrixnamen=c('xal',"xca","xcl","xfe","xhv","xk","xmg","xmn","xna","xnh4","xno3",'xpo4',"xso4",'xecv','xzn','xhco3','xco3')
   
@@ -399,7 +408,7 @@ MaakKolomMeth<-function(metveldgemiddelden=dataframeuitLeesData,celcius=celcius,
 
 
 Blanquet<-function(z=dataframeuitMaakKolomMeth){
-  #' Blanquet routine  voor ec25 berekening
+  # Blanquet routine  voor ec25 berekening
   b=z[z$meth=='blanquet',]
   b$sqgem=sqrt(b$sgem)
   b$rlngem=log(b$sgem)
@@ -417,7 +426,7 @@ Blanquet<-function(z=dataframeuitMaakKolomMeth){
 }
 
 Dunlap<-function(z=dataframeuitMaakKolomMeth){
-  #' Dunlap routine  voor ec25 berekening
+  # Dunlap routine  voor ec25 berekening
   b=z[z$meth=='dunlap',]
   b$A=35.35*b$cl+16.48*b$hco3+24.02*b$so4+75.63*b$co3+(b$na+b$k)*22.99+19.04*b$ca+24.3*b$mg
   b$B=4.3*10^-4*(log(b$A))^7.888
@@ -431,7 +440,7 @@ Dunlap<-function(z=dataframeuitMaakKolomMeth){
 }
 
 Logan<-function(z=dataframeuitMaakKolomMeth){
-  #' logan routine  voor ec25 berekening
+  # logan routine  voor ec25 berekening
   b=z[z$meth=='logan',]
   b$klogan=(222.28*b$sgem)^0.9058
   b$rk20=b$klogan-30
@@ -442,7 +451,7 @@ Logan<-function(z=dataframeuitMaakKolomMeth){
 }
 
 Rossum<-function(z=dataframeuitMaakKolomMeth){
-  #' Rossum volgens Ec_voor_Patrick.docx  voor ec25 berekening
+  # Rossum volgens Ec_voor_Patrick.docx  voor ec25 berekening
   b=z[z$meth=="rossum",]
   # van H+ naar milliequivalent
   # b$h3o=b$h
@@ -470,7 +479,7 @@ Rossum<-function(z=dataframeuitMaakKolomMeth){
 
 
 McNeal<-function(z=dataframeuitMaakKolomMeth){
-  #' McNeal routine voor ec25 berekening
+  # McNeal routine voor ec25 berekening
   #McNeal volgens Ec_voor_Patrick.docx
   b=z[z$meth=="mcneal",]
   b$caT=b$ca/2000
@@ -507,10 +516,10 @@ McNeal<-function(z=dataframeuitMaakKolomMeth){
 }
 
 BerekenGeleidbaarheid<-function(metveldgemiddelden=metveldgemiddelden,celcius=25,add_bicarbonate = TRUE,add_phosphate=FALSE){
-  #' nu de geleidbaarheid ec25 volgens Stuyfzand en de hco3 in mequivalent/liter berekenen
-  #' Stuyfzand, P. (1987). 
-  #' Een zeer nauwkeurige berekening van het elektrischgeleidingsvermogen, ter controle en aanvulling van wateranalyses: 
-  #' 2e versie (SWE 87.006). Retrieved from Rijswijk: 
+# nu de geleidbaarheid ec25 volgens Stuyfzand en de hco3 in mequivalent/liter berekenen
+# Stuyfzand, P. (1987). 
+# Een zeer nauwkeurige berekening van het elektrischgeleidingsvermogen, ter controle en aanvulling van wateranalyses: 
+# 2e versie (SWE 87.006). Retrieved from Rijswijk: 
   
   #   matrixnamen=c('xal',"xca","xcl","xfe","xhv","xk","xmg","xmn","xna","xnh4","xno3",'xpo4',"xso4",'xecv','xzn','xhco3','xco3')
   
