@@ -282,7 +282,7 @@ van QC2b en QC2c, zie eerder.
 ### QC3 - Plausibiliteit
 In QC3b wordt getoetst of de putten in de BRO puttenlijst voorkomen. De bedoeling
 is om d.m.v. een API de puttenlijst uit de BRO automatisch in te laden. Door 
-technische probleme is dit momenteel nog niet mogelijk. Hierdoor is voor QC3b 
+technische problemen is dit momenteel nog niet mogelijk. Hierdoor is voor QC3b 
 nu een tijdelijke functie opgenomen. Bij deze functie is het op het moment
 noodzakelijk om handmatig de putten uit het metingen bestand te 
 selecteren welke niet in de BRO voorkomen en de subselectie uit het metingen 
@@ -290,14 +290,18 @@ bestand in te voeren in de functie.
 
 In QC3c wordt de ionenbalans opgesteld. Het is hierdoor belangrijk om de benodigde 
 parameters de juiste naam te geven. In alle QC's wordt er van uitgegaan dat lab 
-parameters genoteerd zijn als aquoqode (zoals in parameter bestand). Daarnaast 
-wordt van het volgende uitgegaan:
+parameters genoteerd zijn als aquoqode (zoals in het parameter bestand beschreven). 
+Daarnaast wordt van het volgende uitgegaan:
 
-- In de meeste gevallen is in de provinciale set hco3 in het lab bepaald, dus
-de lab waarde gebruiken. Dit betekent dat ook pH uit het lab gebruikt moet worden.
+- In het geval dat de hco3 in het lab is bepaald (zoals in de provinciale set), wordt
+de lab waarde gebruikt. Dit betekent dat ook pH uit het lab gebruikt moet worden. De 
+standaard waardes voor ph_naam en hco3_naam worden dan gebruikt. 
 
-Bij het LMG wordt hco3 in het veld bepaald. In het geval van het voorbeeld metingen 
-bestand uit het LMG wordt QC3c op de volgende manier uitgevoerd:
+- In het geval de hco3 in het veld is bepaald (zoals in de LMG set), worden veld 
+waardes gebruikt. In dit geval moet de ph_naam en hco3_naam wel worden gespecificeerd.
+
+Met het voorbeeld metingen bestand uit het LMG wordt QC3c op de volgende manier 
+uitgevoerd:
 
 ```{r eval = FALSE}
 x <- QC3c(d_metingen = x, ph_naam = "h_5__veld", hco3_naam = "hco3_veld", verbose = TRUE)
@@ -315,12 +319,14 @@ x <- QC3d(d_metingen = x, d_parameter = parameter, geleidendheid_veld_naam = "ec
 ```
 
 In QC3e wordt de ec berekend aan de hand van de gemeten concentraties. De berekende
-ec wordt vergeleken met de gemeten ec. Met functie argument `add_phosphate` kan 
-aangegeven worden of het gewenst is dat po4 uit ptot wordt berekend indien po4 
+EC wordt vergeleken met de gemeten EC. Met functie argument `add_phosphate` kan 
+aangegeven worden of het gewenst is dat PO4 uit ptot wordt berekend indien po4 
 niet bekend is. Binnen deze functie wordt de ionenbalans opnieuw opgesteld zodat 
-hco3 geschat kan worden als deze ontbreekt met `add_bicarbonate`. Vervolgens 
+HCO3 geschat kan worden als deze ontbreekt met `add_bicarbonate`. Vervolgens 
 wordt aan de hand van bepaalde condities bepaald welke methode gebruikt wordt om 
-de ec te berekenen om deze uiteindelijk toe te passen.
+de EC te berekenen om deze uiteindelijk toe te passen. Net zoals bij QC3c hoeven 
+de variabelen ph_naam, hco3_naam en ec_naam alleen te worden gespecificeerd als 
+niet de standaard lab waardes (in aquocodes) worden gebruikt.
 
 In QC3f wordt de pH lab met pH veld vergeleken. Benodigde parameternamen zijn 
 "pH" en `ph_veld_naam`. In alle QC's wordt er van uitgegaan dat lab parameters 
@@ -344,7 +350,7 @@ om de validatie te kunnen uitvoeren:
 afijkende metingen uit de te valideren meetronde gekleurd zijn afgebeeld. Hiermee 
 wordt in één opslag duidelijk hoeveel metingen per parameter afwijken en of er 
 eventueel sprake is van eenheidsfouten of structurele afwijkingen in een meetronde.
-- Per twijfelactige meting wordt de gehele reeks geplot tegelijkertijd met 
+- Per twijfelachtige meting wordt de gehele reeks geplot tegelijkertijd met 
 eventuele andere putfilters op die locatie. Zo kunnen mogelijke filterwisselingen
 geidentificeerd worden. 
 
@@ -385,8 +391,8 @@ In dit geval zijn de resultaten uit de verschillende QC tests als attribute aan
 vervolgens per meting het eindoordeel bepaald volgens de regels uit het 
 QC Protocol.
 
-De overige qc test zijn benodigd voor het controleren van de data maar zijn geen 
-belemering voor het uitvoeren van QC5.
+De overige qc test zijn benodigd voor het volledig doorlopen van het KRWQC protocol,
+maar het ontbreken ervan is geen technische belemmering voor het uitvoeren van QC5.
 
 ```{r eval = FALSE}
 oordeel <- QC5(d_metingen = x, verbose = TRUE)
