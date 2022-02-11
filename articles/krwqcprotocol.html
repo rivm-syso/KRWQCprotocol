@@ -71,7 +71,7 @@
       <h1 data-toc-skip>KRW QC Protocol</h1>
                         <h4 data-toc-skip class="author">RIVM</h4>
             
-            <h4 data-toc-skip class="date">2022-02-08</h4>
+            <h4 data-toc-skip class="date">2022-02-11</h4>
       
       
       <div class="hidden name"><code>krwqcprotocol.Rmd</code></div>
@@ -99,6 +99,12 @@
 <span class="co">#&gt; </span>
 <span class="co">#&gt;     date, intersect, setdiff, union</span>
 <span class="co">#&gt; Loading required package: ggplot2</span>
+<span class="co">#&gt; Loading required package: gridExtra</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Attaching package: 'gridExtra'</span>
+<span class="co">#&gt; The following object is masked from 'package:dplyr':</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt;     combine</span>
 <span class="co">#&gt; Loading required package: stringr</span></code></pre></div>
 <div class="section level2">
 <h2 id="inleiding">Inleiding<a class="anchor" aria-label="anchor" href="#inleiding"></a>
@@ -177,7 +183,7 @@
 </tr>
 <tr class="odd">
 <td>landgebruik</td>
-<td>veldobservatie van dominant landgebruik putomgeving</td>
+<td>veldobservatie van dominant landgebruik putomgeving, volgens BRO</td>
 <td>karakter</td>
 </tr>
 <tr class="even">
@@ -326,7 +332,7 @@
 <td>numeriek</td>
 </tr>
 <tr class="even">
-<td>naam</td>
+<td>parameter</td>
 <td>stofnaam</td>
 <td>karakter</td>
 </tr>
@@ -450,7 +456,7 @@
 <div class="section level3">
 <h3 id="overzicht-van-de-data">Overzicht van de data<a class="anchor" aria-label="anchor" href="#overzicht-van-de-data"></a>
 </h3>
-<p>Voorbeeld bestanden inladen:</p>
+<p>Dit pakket maakt gebruik van test data van het LMG die op bepaalde punten is aangepast om het gedrag van verschillende functies te controleren. Voorbeeld bestanden inladen:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">veld</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">put</span><span class="op">)</span>
@@ -470,10 +476,10 @@
 <span class="co">#&gt;  $ ycoord     : num [1:2025] 467710 467710 467710 467710 467710 ...</span>
 <span class="co">#&gt;  $ landgebruik: chr [1:2025] "bos, natuur en water" "bos, natuur en water" "bos, natuur en water" "bos, natuur en water" ...</span>
 <span class="co">#&gt;  $ okf        : num [1:2025] 10.6 10.6 10.6 10.6 10.6 25 25 10 10 10 ...</span>
-<span class="co">#&gt;  $ gws_voor   : num [1:2025] 1.88 0.95 0.93 1.1 1.88 1.67 1.8 0.85 1.33 1.51 ...</span>
-<span class="co">#&gt;  $ gws_na     : num [1:2025] 1.36 0.91 0.98 1.14 1.72 1.15 1.36 1.34 1.52 0.89 ...</span>
-<span class="co">#&gt;  $ bem_proc   : chr [1:2025] "SIKBProtocol2002vanafV4" "NEN1669" "SIKBProtocol2002vanafV4" "NEN1470" ...</span>
-<span class="co">#&gt;  $ bem_app    : chr [1:2025] "anders" "slurf" "slurf" "rietje" ...</span>
+<span class="co">#&gt;  $ gws_voor   : num [1:2025] 1.73 1.3 0.84 1.81 0.8 1.47 1.5 1.68 0.86 1.05 ...</span>
+<span class="co">#&gt;  $ gws_na     : num [1:2025] 2 0.9 1.97 0.8 1.8 1.9 1.06 1.26 0.82 1.31 ...</span>
+<span class="co">#&gt;  $ bem_proc   : chr [1:2025] "NEN9644" "SIKBProtocol2002vanafV4" "NEN1176" "NEN1176" ...</span>
+<span class="co">#&gt;  $ bem_app    : chr [1:2025] "peristaltischePomp" "" "slurf" "onderwaterpomp" ...</span>
 <span class="co">#&gt;  - attr(*, "problems")= tibble [595 × 5] (S3: tbl_df/tbl/data.frame)</span>
 <span class="co">#&gt;   ..$ row     : int [1:595] 1289 1290 1292 1397 1398 1408 1409 1427 1427 1427 ...</span>
 <span class="co">#&gt;   ..$ col     : chr [1:595] "DETECTIETEKEN_CA" "DETECTIETEKEN_CA" "DETECTIETEKEN_CA" "DETECTIETEKEN_BA" ...</span>
@@ -551,30 +557,28 @@
 <p>Overzicht tabel 4 met parameter informatie</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">parameter</span><span class="op">)</span>
-<span class="co">#&gt; tibble [61 × 11] (S3: tbl_df/tbl/data.frame)</span>
+<span class="co">#&gt; tibble [61 × 10] (S3: tbl_df/tbl/data.frame)</span>
 <span class="co">#&gt;  $ qcid            : int [1:61] 1 2 3 4 5 6 7 8 9 10 ...</span>
-<span class="co">#&gt;  $ naam            : chr [1:61] "al" "as" "ba" "ca" ...</span>
-<span class="co">#&gt;  $ aquocode        : chr [1:61] "Allu" "As" "Ba" "Ca" ...</span>
+<span class="co">#&gt;  $ parameter       : chr [1:61] "Al" "As" "Ba" "Ca" ...</span>
+<span class="co">#&gt;  $ omschrijving    : chr [1:61] "aluminium" "arseen" "barium" "calcium" ...</span>
+<span class="co">#&gt;  $ aquocode        : chr [1:61] "Al" "As" "Ba" "Ca" ...</span>
 <span class="co">#&gt;  $ cas             : chr [1:61] "7429-90-5" "7440-38-2" "7440-39-3" "7440-70-2" ...</span>
 <span class="co">#&gt;  $ eenheid         : chr [1:61] "ug/l" "ug/l" "ug/l" "mg/l" ...</span>
-<span class="co">#&gt;  $ hoedanigheid    : chr [1:61] "nf" "nf" "nf" "nf" ...</span>
-<span class="co">#&gt;  $ bem_apparaat    : chr [1:61] "Gaffophone" "Holophonor" "Baliset" "Harolina" ...</span>
-<span class="co">#&gt;  $ bem_procedure   : chr [1:61] "NEN 2057" "NEN 7060" "NEN 6968" "NEN 9470" ...</span>
-<span class="co">#&gt;  $ waarde_techniek : chr [1:61] "qPCR" "RADOMT-BWHH" "MICTTPT" "AAS-F" ...</span>
-<span class="co">#&gt;  $ waarde_procedure: chr [1:61] "N6494.84" "V6983.06" "N6651.92" "CIW" ...</span>
-<span class="co">#&gt;  $ omschrijving    : chr [1:61] "aluminium" "arseen" "barium" "calcium" ...</span>
+<span class="co">#&gt;  $ bem_apparaat    : chr [1:61] "visisonor" "Baliset" "Holophonor" "Harolina" ...</span>
+<span class="co">#&gt;  $ bem_procedure   : chr [1:61] "NEN 4976" "NEN 1534" "NEN 5330" "NEN 4029" ...</span>
+<span class="co">#&gt;  $ waarde_techniek : chr [1:61] "" "GC-ECD" "MICCOUL" "GC-MS-PT" ...</span>
+<span class="co">#&gt;  $ waarde_procedure: chr [1:61] "N6964+C1.06" "P6266.91" "I12846.12" "D38407-30.07" ...</span>
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">parameter</span><span class="op">)</span>
-<span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 11</span></span>
-<span class="co">#&gt;    qcid naam  aquocode cas       eenheid hoedanigheid bem_apparaat bem_procedure</span>
-<span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">1</span>     1 al    Allu     7429-90-5 ug/l    nf           Gaffophone   NEN 2057     </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">2</span>     2 as    As       7440-38-2 ug/l    nf           Holophonor   NEN 7060     </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">3</span>     3 ba    Ba       7440-39-3 ug/l    nf           Baliset      NEN 6968     </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">4</span>     4 ca    Ca       7440-70-2 mg/l    nf           Harolina     NEN 9470     </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">5</span>     5 cd    Cd       7440-43-9 ug/l    nf           Harolina     NEN 8175     </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">6</span>     6 cl    Cl       16887-00… zoutko… NVT          Baliset      NEN 4830     </span>
-<span class="co">#&gt; <span style="color: #949494;"># … with 3 more variables: waarde_techniek &lt;chr&gt;, waarde_procedure &lt;chr&gt;,</span></span>
-<span class="co">#&gt; <span style="color: #949494;">#   omschrijving &lt;chr&gt;</span></span></code></pre></div>
+<span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 10</span></span>
+<span class="co">#&gt;    qcid parameter omschrijving aquocode cas   eenheid bem_apparaat bem_procedure</span>
+<span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">1</span>     1 Al        aluminium    Al       7429… ug/l    visisonor    NEN 4976     </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">2</span>     2 As        arseen       As       7440… ug/l    Baliset      NEN 1534     </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">3</span>     3 Ba        barium       Ba       7440… ug/l    Holophonor   NEN 5330     </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">4</span>     4 Ca        calcium      Ca       7440… mg/l    Harolina     NEN 4029     </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">5</span>     5 Cd        cadmium      Cd       7440… ug/l    Holophonor   NEN 1419     </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">6</span>     6 Cl        chloride     Cl       1688… mg/l    Gaffophone   NEN 1605     </span>
+<span class="co">#&gt; <span style="color: #949494;"># … with 2 more variables: waarde_techniek &lt;chr&gt;, waarde_procedure &lt;chr&gt;</span></span></code></pre></div>
 <p>Overzicht tabel 5 met meetwaardes</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">metingen</span><span class="op">)</span>
@@ -586,25 +590,32 @@
 <span class="co">#&gt;  $ dag            : num [1:211792] 31 31 31 31 31 31 31 31 31 31 ...</span>
 <span class="co">#&gt;  $ filter         : num [1:211792] 1 1 1 1 1 1 1 1 1 1 ...</span>
 <span class="co">#&gt;  $ putcode        : num [1:211792] 1 1 1 1 1 1 1 1 1 1 ...</span>
-<span class="co">#&gt;  $ parameter      : chr [1:211792] "al" "as" "ba" "ca" ...</span>
 <span class="co">#&gt;  $ detectieteken  : chr [1:211792] "" "" "" "" ...</span>
 <span class="co">#&gt;  $ rapportagegrens: num [1:211792] NA NA NA NA 0.05 NA NA NA 0.5 NA ...</span>
 <span class="co">#&gt;  $ waarde         : num [1:211792] 10 0.6 39 97.65 0.05 ...</span>
+<span class="co">#&gt;  $ parameter      : chr [1:211792] "Al" "As" "Ba" "Ca" ...</span>
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">metingen</span><span class="op">)</span>
 <span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 11</span></span>
-<span class="co">#&gt;    qcid monsterid  jaar maand   dag filter putcode parameter detectieteken</span>
-<span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">1</span>     1         1  <span style="text-decoration: underline;">2</span>014     3    31      1       1 al        <span style="color: #949494;">""</span>           </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">2</span>     2         1  <span style="text-decoration: underline;">2</span>014     3    31      1       1 as        <span style="color: #949494;">""</span>           </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">3</span>     3         1  <span style="text-decoration: underline;">2</span>014     3    31      1       1 ba        <span style="color: #949494;">""</span>           </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">4</span>     4         1  <span style="text-decoration: underline;">2</span>014     3    31      1       1 ca        <span style="color: #949494;">""</span>           </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">5</span>     5         1  <span style="text-decoration: underline;">2</span>014     3    31      1       1 cd        <span style="color: #949494;">"</span>&lt;<span style="color: #949494;">"</span>          </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">6</span>     6         1  <span style="text-decoration: underline;">2</span>014     3    31      1       1 cl        <span style="color: #949494;">""</span>           </span>
-<span class="co">#&gt; <span style="color: #949494;"># … with 2 more variables: rapportagegrens &lt;dbl&gt;, waarde &lt;dbl&gt;</span></span></code></pre></div>
+<span class="co">#&gt;    qcid monsterid  jaar maand   dag filter putcode detectieteken rapportagegrens</span>
+<span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">1</span>     1         1  <span style="text-decoration: underline;">2</span>014     3    31      1       1 <span style="color: #949494;">""</span>                      <span style="color: #BB0000;">NA</span>   </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">2</span>     2         1  <span style="text-decoration: underline;">2</span>014     3    31      1       1 <span style="color: #949494;">""</span>                      <span style="color: #BB0000;">NA</span>   </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">3</span>     3         1  <span style="text-decoration: underline;">2</span>014     3    31      1       1 <span style="color: #949494;">""</span>                      <span style="color: #BB0000;">NA</span>   </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">4</span>     4         1  <span style="text-decoration: underline;">2</span>014     3    31      1       1 <span style="color: #949494;">""</span>                      <span style="color: #BB0000;">NA</span>   </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">5</span>     5         1  <span style="text-decoration: underline;">2</span>014     3    31      1       1 <span style="color: #949494;">"</span>&lt;<span style="color: #949494;">"</span>                      0.05</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">6</span>     6         1  <span style="text-decoration: underline;">2</span>014     3    31      1       1 <span style="color: #949494;">""</span>                      <span style="color: #BB0000;">NA</span>   </span>
+<span class="co">#&gt; <span style="color: #949494;"># … with 2 more variables: waarde &lt;dbl&gt;, parameter &lt;chr&gt;</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
-<h2 id="werking-qc-r-pakket">Werking QC R-pakket<a class="anchor" aria-label="anchor" href="#werking-qc-r-pakket"></a>
+<h2 id="installatie-krwqcprotocol-r-pakket">Installatie KRWQCprotocol R-pakket<a class="anchor" aria-label="anchor" href="#installatie-krwqcprotocol-r-pakket"></a>
+</h2>
+<p>Het KRWQCprotocol wordt beschikbaar gesteld als R pakket. Gebruikers kunnen de functies uit dit pakket gebruiken in hun eigen scripts. Om het pakket te installeren moet vanuit R het volgende commando uitgevoerd worden:</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"jspijker/KRWQCprotocol"</span><span class="op">)</span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="werking-krwqcprotocol-r-pakket">Werking KRWQCprotocol R-pakket<a class="anchor" aria-label="anchor" href="#werking-krwqcprotocol-r-pakket"></a>
 </h2>
 <p>De verschillende QC stappen uit het Protocol kunnen eenvoudig uitgevoerd worden door het aanroepen van de relevante functie (QC0a-QC5). Als invoer van de functie worden de relevante datatabellen meegegeven benodigd voor de testen. In de functie kan met het verbose argument opgegeven worden of de print van tussentijdse output gewenst is door deze op <code>TRUE</code> te zetten. In een aantal gevallen dienen extra invoervariabelen opgegeven te worden. Zie hiervoor de documentatie bij de functies, bijvoorbeeld <code><a href="../reference/QC0a.html">?KRWQCprotocol::QC0a</a></code>.</p>
 <p>In de verschillende QC functies worden de testen uitgevoerd beschreven in het QC Protocol. Als bij deze stappen een afwijking geconstateerd wordt dan krijgt het monster, de parameter of de waarde een concept oordeel toegekend. Deze afwijkingen worden aan het eind van de functie als attribuut meegegeven aan het metingen bestand (<code>d_metingen</code>) en kunnen dus na het runnen van elke test bekeken worden.</p>
@@ -620,35 +631,38 @@
 </h3>
 <p>De stappen en functies onder QC0 worden op reguliere wijze uitgevoerd door het aanroepen van de betreffende functie en benodigde datasets, met uitzondering van QC0c en QC0d zie bovenstaande.</p>
 <p>Voorbeeld voor uitvoeren van QC0a:</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/QC0a.html">QC0a</a></span><span class="op">(</span>d_veld <span class="op">=</span> <span class="va">veld</span>, d_put <span class="op">=</span> <span class="va">put</span>, d_metingen <span class="op">=</span> <span class="va">metingen</span>, verbose <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">x</span> <span class="op">&lt;-</span> <span class="va">metingen</span>
+
+<span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/QC0a.html">QC0a</a></span><span class="op">(</span>d_veld <span class="op">=</span> <span class="va">veld</span>, d_put <span class="op">=</span> <span class="va">put</span>, d_metingen <span class="op">=</span> <span class="va">x</span>, verbose <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
 <span class="co">#&gt; "Er zijn in totaal 10 bemonsterde putlocaties met XY-coordinaten afwijkend van de BRO geregistreerde putcoordinaten."</span>
 <span class="co">#&gt;    putcode  X_val  Y_val  X_BRO  Y_BRO</span>
-<span class="co">#&gt; 1        8 227450 456217 227450 456260</span>
-<span class="co">#&gt; 2       11 242845 441905 242805 441905</span>
-<span class="co">#&gt; 3       97 145365 401775 145325 401775</span>
-<span class="co">#&gt; 4      100 165225 422607 165225 422650</span>
-<span class="co">#&gt; 5      175 215930 551007 215930 551050</span>
-<span class="co">#&gt; 6      190 176490 526350 176450 526350</span>
-<span class="co">#&gt; 7      192 188865 517850 188825 517850</span>
-<span class="co">#&gt; 8      194 190878 507513 190838 507513</span>
-<span class="co">#&gt; 9      199 205950 513482 205950 513525</span>
-<span class="co">#&gt; 10     280 133725 526970 133725 527013</span>
-<span class="co">#&gt; <span style="color: #949494;"># A tibble: 211,792 × 11</span></span>
-<span class="co">#&gt;     qcid monsterid  jaar maand   dag filter putcode parameter detectieteken</span>
-<span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>     1         1  <span style="text-decoration: underline;">2</span>014     3    31      1       1 al        <span style="color: #949494;">""</span>           </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>     2         1  <span style="text-decoration: underline;">2</span>014     3    31      1       1 as        <span style="color: #949494;">""</span>           </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>     3         1  <span style="text-decoration: underline;">2</span>014     3    31      1       1 ba        <span style="color: #949494;">""</span>           </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>     4         1  <span style="text-decoration: underline;">2</span>014     3    31      1       1 ca        <span style="color: #949494;">""</span>           </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>     5         1  <span style="text-decoration: underline;">2</span>014     3    31      1       1 cd        <span style="color: #949494;">"</span>&lt;<span style="color: #949494;">"</span>          </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>     6         1  <span style="text-decoration: underline;">2</span>014     3    31      1       1 cl        <span style="color: #949494;">""</span>           </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>     7         1  <span style="text-decoration: underline;">2</span>014     3    31      1       1 cod_o2     <span style="color: #BB0000;">NA</span>          </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>     8         1  <span style="text-decoration: underline;">2</span>014     3    31      1       1 cr        <span style="color: #949494;">""</span>           </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>     9         1  <span style="text-decoration: underline;">2</span>014     3    31      1       1 cu        <span style="color: #949494;">"</span>&lt;<span style="color: #949494;">"</span>          </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">10</span>    10         1  <span style="text-decoration: underline;">2</span>014     3    31      1       1 doc_c     <span style="color: #949494;">""</span>           </span>
-<span class="co">#&gt; <span style="color: #949494;"># … with 211,782 more rows, and 2 more variables: rapportagegrens &lt;dbl&gt;,</span></span>
-<span class="co">#&gt; <span style="color: #949494;">#   waarde &lt;dbl&gt;</span></span></code></pre></div>
+<span class="co">#&gt; 1       21 226390 567500 226350 567500</span>
+<span class="co">#&gt; 2       28 212490 546675 212450 546675</span>
+<span class="co">#&gt; 3       78  68760 417805  68720 417805</span>
+<span class="co">#&gt; 4       93  85200 446927  85200 446970</span>
+<span class="co">#&gt; 5       94 133875 407482 133875 407525</span>
+<span class="co">#&gt; 6      183 164930 585020 164890 585020</span>
+<span class="co">#&gt; 7      183 164890 584977 164890 585020</span>
+<span class="co">#&gt; 8      206 233340 500225 233300 500225</span>
+<span class="co">#&gt; 9      272 193288 435470 193288 435513</span>
+<span class="co">#&gt; 10     283 125350 521257 125350 521300</span></code></pre></div>
+<p>In het voorbeeld veld data van het LMG zit als test het landgebruik heide. Dit zorgt voor een error in QC0b:</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/try.html" class="external-link">try</a></span><span class="op">(</span>
+<span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/QC0b.html">QC0b</a></span><span class="op">(</span>d_veld <span class="op">=</span> <span class="va">veld</span>, d_put <span class="op">=</span> <span class="va">put</span>, d_metingen <span class="op">=</span> <span class="va">x</span>, verbose <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
+<span class="op">)</span>
+<span class="co">#&gt; Error in QC0b(d_veld = veld, d_put = put, d_metingen = x, verbose = TRUE) : </span>
+<span class="co">#&gt;   Landgebruiksklasse worden niet herkend, zie valideLandgebruiken()</span></code></pre></div>
+<p>Heide is niet opgenomen in de valide landgebruiken en kan daardoor niet worden meegenomen in test QC0b. Voorbeeld voor uitvoeren van QC0b:</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">veld</span> <span class="op">&lt;-</span> <span class="va">veld</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">landgebruik</span> <span class="op">!=</span> <span class="st">"heide"</span><span class="op">)</span>
+<span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/QC0b.html">QC0b</a></span><span class="op">(</span>d_veld <span class="op">=</span> <span class="va">veld</span>, d_put <span class="op">=</span> <span class="va">put</span>, d_metingen <span class="op">=</span> <span class="va">x</span>, verbose <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
+<span class="co">#&gt; [1] "Voor elke putfilter is het landgebruik identiek aan de BRO geregistreerde informatie"</span></code></pre></div>
+<p>Voorbeeld voor uitvoeren van QC0c:</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="../reference/QC0c_create_file.html">QC0c_create_file</a></span><span class="op">(</span><span class="st">"created_files"</span><span class="op">)</span> <span class="co"># -&gt; handmatig invullen en met dezelfde naam opslaan</span>
+<span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/QC0c.html">QC0c</a></span><span class="op">(</span>dir <span class="op">=</span> <span class="st">"created_files"</span>, d_metingen <span class="op">=</span> <span class="va">x</span>, verbose <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="qc1---data-integriteit">QC1 - Data-integriteit<a class="anchor" aria-label="anchor" href="#qc1---data-integriteit"></a>
@@ -665,19 +679,22 @@
 <div class="section level3">
 <h3 id="qc3---plausibiliteit">QC3 - Plausibiliteit<a class="anchor" aria-label="anchor" href="#qc3---plausibiliteit"></a>
 </h3>
-<p>In QC3b wordt getoetst of de putten in de BRO puttenlijst voorkomen. De bedoeling is om d.m.v. een API de puttenlijst uit de BRO automatisch in te laden. Door technische probleme is dit momenteel nog niet mogelijk. Hierdoor is voor QC3b nu een tijdelijke functie opgenomen. Bij deze functie is het op het moment noodzakelijk om handmatig de putten uit het metingen bestand te selecteren welke niet in de BRO voorkomen en de subselectie uit het metingen bestand in te voeren in de functie.</p>
-<p>In QC3c wordt de ionenbalans opgesteld. Het is hierdoor belangrijk om de benodigde parameters de juiste naam te geven. Daarnaast wordt van het volgende uitgegaan:</p>
+<p>In QC3b wordt getoetst of de putten in de BRO puttenlijst voorkomen. De bedoeling is om d.m.v. een API de puttenlijst uit de BRO automatisch in te laden. Door technische problemen is dit momenteel nog niet mogelijk. Hierdoor is voor QC3b nu een tijdelijke functie opgenomen. Bij deze functie is het op het moment noodzakelijk om handmatig de putten uit het metingen bestand te selecteren welke niet in de BRO voorkomen en de subselectie uit het metingen bestand in te voeren in de functie.</p>
+<p>In QC3c wordt de ionenbalans opgesteld. Het is hierdoor belangrijk om de benodigde parameters de juiste naam te geven. In alle QC’s wordt er van uitgegaan dat lab parameters genoteerd zijn als aquoqode (zoals in het parameter bestand beschreven). Daarnaast wordt van het volgende uitgegaan:</p>
 <ul>
-<li>In de meeste gevallen is in de provinciale set hco3 in het lab bepaald, dus de lab waarde gebruiken. Hierdoor ook pH uit het lab gebruiken;</li>
-<li>pH wordt hernoemd naar h;</li>
-<li>no3 en nh4 zijn uitgedrukt in no3_n en nh4_n;</li>
-<li>po4 is uitgedruk in po4_p. Met functie argument <code>add_phosphate</code> kan aangegeven worden of het gewenst is dat po4 uit ptot wordt berekend indien po4 niet bekend is;</li>
+<li><p>In het geval dat de hco3 in het lab is bepaald (zoals in de provinciale set), wordt de lab waarde gebruikt. Dit betekent dat ook pH uit het lab gebruikt moet worden. De standaard waardes voor ph_naam en hco3_naam worden dan gebruikt.</p></li>
+<li><p>In het geval de hco3 in het veld is bepaald (zoals in de LMG set), worden veld waardes gebruikt. In dit geval moet de ph_naam en hco3_naam wel worden gespecificeerd.</p></li>
 </ul>
-<p>In QC3d worden de ec lab en ec veld vergeleken. Benodigde parameternamen zijn ec en ecv. Dit moet voor de functie aangepast worden in de dataset.</p>
-<p>In QC3e wordt de ec berekend aan de hand van de gemeten concentraties. Hiervoor gelden de volgende uitgangspunten: - hco3 lab hernoemd naar hco3, hco3 veld hernoemd naar hco3v; - pH wordt hernoemd naar h en pH veld naar hv; - ec veld hernoemd naar ecv; - no3 en nh4 zijn uitgedrukt in no3_n en nh4_n; - po4 is uitgedruk in po4_p. Met functie argument <code>add_phosphate</code> kan aangegeven worden of het gewenst is dat po4 uit ptot wordt berekend indien po4 niet bekend is; Binnen deze functie wordt de ionenbalans opnieuw opgesteld zodat hco3 geschat kan worden als deze ontbreekt. Vervolgens wordt aan de hand van bepaalde condities bepaald welke methode gebruikt wordt om de ec te berekenen om deze uiteindelijk toe te passen (Stuyfzand 1987b).</p>
-<p>In QC3f wordt de pH lab met pH veld vergeleken. Benodigde parameternamen zijn h en hv. Dit moet voor de functie aangepast worden in de dataset.</p>
-<p>In QC3g wordt de pH met hco3 vergeleken. Aangezien in de meeste gevallen hco3 niet in het veld is bepaald voor de provinciale gegevens, worden nu de lab metingen van beiden vergeleken. Benodigde paramternamen zijn h en hco3.</p>
-<p>In QC3h wordt no3 met nh4 vergeleken. Aangenomen wordt dat beiden uitgedrukt zijn in no3_n en nh4_n. </p>
+<p>Met het voorbeeld metingen bestand uit het LMG wordt QC3c op de volgende manier uitgevoerd:</p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/QC3c.html">QC3c</a></span><span class="op">(</span>d_metingen <span class="op">=</span> <span class="va">x</span>, ph_naam <span class="op">=</span> <span class="st">"h_5__veld"</span>, hco3_naam <span class="op">=</span> <span class="st">"hco3_veld"</span>, verbose <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
+<p>In QC3d worden de ec lab en ec veld vergeleken. Benodigde parameternamen zijn “GELDHD” en <code>geleidendheid_veld_naam</code>. In alle QC’s wordt er van uitgegaan dat lab parameters genoteerd zijn als aquoqode (zoals in parameter bestand) dus in dit geval “GELDHD”.</p>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/QC3d.html">QC3d</a></span><span class="op">(</span>d_metingen <span class="op">=</span> <span class="va">x</span>, d_parameter <span class="op">=</span> <span class="va">parameter</span>, geleidendheid_veld_naam <span class="op">=</span> <span class="st">"ec_5__veld"</span>, verbose <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
+<p>In QC3e wordt de ec berekend aan de hand van de gemeten concentraties. De berekende EC wordt vergeleken met de gemeten EC. Met functie argument <code>add_phosphate</code> kan aangegeven worden of het gewenst is dat PO4 uit ptot wordt berekend indien po4 niet bekend is. Binnen deze functie wordt de ionenbalans opnieuw opgesteld zodat HCO3 geschat kan worden als deze ontbreekt met <code>add_bicarbonate</code>. Vervolgens wordt aan de hand van bepaalde condities bepaald welke methode gebruikt wordt om de EC te berekenen om deze uiteindelijk toe te passen. Net zoals bij QC3c hoeven de variabelen ph_naam, hco3_naam en ec_naam alleen te worden gespecificeerd als niet de standaard lab waardes (in aquocodes) worden gebruikt.</p>
+<p>In QC3f wordt de pH lab met pH veld vergeleken. Benodigde parameternamen zijn “pH” en <code>ph_veld_naam</code>. In alle QC’s wordt er van uitgegaan dat lab parameters genoteerd zijn als aquoqode (zoals in parameter bestand) dus in dit geval “pH”.</p>
+<p>In QC3g wordt de pH met hco3 vergeleken. Aangezien in de meeste gevallen hco3 niet in het veld is bepaald voor de provinciale gegevens, worden nu de lab metingen van beiden vergeleken. Benodigde parameternamen zijn “pH” en “HCO3”.</p>
+<p>In QC3h wordt no3 met nh4 vergeleken. Benodigde parameternamen zijn “NO3” en “NH4”.</p>
 </div>
 <div class="section level3">
 <h3 id="qc4---consistentie">QC4 - Consistentie<a class="anchor" aria-label="anchor" href="#qc4---consistentie"></a>
@@ -685,14 +702,31 @@
 <p>In QC4a worden de metingen uit de te valideren meetronde gecontroleerd of deze consistent zijn met de historische meetreeks. Metingen welke &gt;3.5 sd afwijken worden als afwijkend en twijfelachtig bestempeld. Wanneer een reeks minder dan 3 metingen heeft is de test niet uitvoerbaar. Vervolgens worden op 2 manieren figuren gegenereerd en weggeschreven als attribute aan het metingen bestand om de validatie te kunnen uitvoeren:</p>
 <ul>
 <li>Voor elke parameter worden de metingen log-getransformeerd weergegeven waar afijkende metingen uit de te valideren meetronde gekleurd zijn afgebeeld. Hiermee wordt in één opslag duidelijk hoeveel metingen per parameter afwijken en of er eventueel sprake is van eenheidsfouten of structurele afwijkingen in een meetronde.</li>
-<li>Per twijfelactige meting wordt de gehele reeks geplot tegelijkertijd met eventuele andere putfilters op die locatie. Zou kunnen mogelijke filterwisselingen geidentificeerd worden.</li>
+<li>Per twijfelachtige meting wordt de gehele reeks geplot tegelijkertijd met eventuele andere putfilters op die locatie. Zo kunnen mogelijke filterwisselingen geidentificeerd worden.</li>
 </ul>
-<p>QC4b wordt regulier uitgevoerd met het aanroepen van QC4b() met het metingen bestand als invoer.</p>
+<p>Voorbeeld voor het maken van een pdf met de afbeeldingen van de parameters:</p>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/QC4a.html">QC4a</a></span><span class="op">(</span>d_metingen <span class="op">=</span> <span class="va">x</span>, d_parameter <span class="op">=</span> <span class="va">parameter</span><span class="op">)</span>
+
+<span class="va">x_attr</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">x</span>, <span class="st">"qcout"</span><span class="op">)</span>
+
+<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggsave</a></span><span class="op">(</span>
+  filename <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/getwd.html" class="external-link">getwd</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"/parameters_"</span>, <span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html" class="external-link">Sys.Date</a></span><span class="op">(</span><span class="op">)</span>,<span class="st">".pdf"</span><span class="op">)</span>,
+  plot <span class="op">=</span> <span class="fu">gridExtra</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/gridExtra/man/arrangeGrob.html" class="external-link">marrangeGrob</a></span><span class="op">(</span><span class="va">x_attr</span><span class="op">$</span><span class="va">QC4a</span><span class="op">$</span><span class="va">resultaat</span><span class="op">$</span><span class="va">plot_param</span>, nrow <span class="op">=</span> <span class="fl">1</span>, ncol <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>,
+  width <span class="op">=</span> <span class="fl">15</span>, height <span class="op">=</span> <span class="fl">9</span>
+<span class="op">)</span></code></pre></div>
+<p>QC4b wordt regulier uitgevoerd met het aanroepen van QC4b() met metingen data uit het LMG als voorbeeld. Bij deze stap word getest of de pH van het veld en de pH van het lab niet buiten het meetbereik liggen. De benodigde naam voor pH lab is “pH”. De benodigde naam voor pH veld staat standaard op “pH_veld”, maar kan worden aangepast door een character string in te vullen voor ph_veld_naam. In het geval van het voorbeeld metingen data uit het LMG wordt QC4b op de volgende manier uitgevoerd:</p>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/QC4b.html">QC4b</a></span><span class="op">(</span>d_metingen <span class="op">=</span> <span class="va">x</span>, ph_veld_naam <span class="op">=</span> <span class="st">"h_5__veld"</span>, verbose <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="qc5---qc-status">QC5 - QC Status<a class="anchor" aria-label="anchor" href="#qc5---qc-status"></a>
 </h3>
-<p>In de functie voor QC5 worden de attributes met resultaten van de verschillende tests uit het metingen gehaald en elkaar gevoegd als één dataframe met <code><a href="../reference/collect_result.html">collect_result()</a></code>. Het is hierbij belangrijk dat alle QC-stappen zijn doorlopen en dat voor iedere functie hetzelfde metingen bestand als invoer is gebruikt. In dit geval zijn de resultaten uit de verschillende QC tests als attribute aan één bestand gekoppeld. Met het verkregen dataframe uit <code><a href="../reference/collect_result.html">collect_result()</a></code> kan vervolgens per meting het eindoordeel bepaald worden volgens de regels uit het QC Protocol. Het geautomatiseerd toepassen van deze regels is nog niet beschikbaar binnen deze functie en zal later toegevoegd worden.</p>
+<p>In de functie voor QC5 worden de attributes met resultaten van de verschillende tests uit het metingen bestand gehaald en bij elkaar gevoegd als één dataframe met <code><a href="../reference/collect_result.html">collect_result()</a></code>. Het is hierbij belangrijk dat alle minimaal benodigde QC-stappen (QC0a, QC0c t/m QC0e, QC1f, QC2a t/m QC2c, QC3c t/m QC3h“,”QC4a" en “QC4b”) zijn doorlopen en dat voor iedere functie hetzelfde metingen bestand als invoer is gebruikt. In dit geval zijn de resultaten uit de verschillende QC tests als attribute aan één bestand gekoppeld. Met het verkregen dataframe uit <code><a href="../reference/collect_result.html">collect_result()</a></code> wordt vervolgens per meting het eindoordeel bepaald volgens de regels uit het QC Protocol.</p>
+<p>De overige qc test zijn benodigd voor het volledig doorlopen van het KRWQC protocol, maar het ontbreken ervan is geen technische belemmering voor het uitvoeren van QC5.</p>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">oordeel</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/QC5.html">QC5</a></span><span class="op">(</span>d_metingen <span class="op">=</span> <span class="va">x</span>, verbose <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">oordeel</span><span class="op">)</span></code></pre></div>
 </div>
 </div>
   </div>

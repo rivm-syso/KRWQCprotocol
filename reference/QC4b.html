@@ -59,20 +59,26 @@ pH: 0 - 14 -
 </ul></div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">QC4b</span><span class="op">(</span><span class="va">d_metingen</span>, verbose <span class="op">=</span> <span class="cn">F</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">QC4b</span><span class="op">(</span><span class="va">d_metingen</span>, ph_veld_naam <span class="op">=</span> <span class="st">"pH_veld"</span>, verbose <span class="op">=</span> <span class="cn">F</span><span class="op">)</span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>d_metingen</dt>
 <dd><p>dataframe met metingen</p></dd>
+<dt>ph_veld_naam</dt>
+<dd><p>character string om te gebruiken als pH
+veld. Staat standaard op "pH_veld".</p></dd>
 <dt>verbose</dt>
 <dd><p>of tekstuele output uit script gewenst is (T) of niet (F). Staat
 standaard op F.</p></dd>
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>metingen bestand met verdachte locaties/monsters.</p>
+    <p>metingen bestand met verdachte locaties/monsters.
+De benodigde naam voor pH lab is pH.
+De benodigde naam voor pH veld staat standaard op "pH_veld", maar kan worden
+aangepast door een character string in te vullen voor ph_veld_naam.</p>
     </div>
     <div id="details">
     <h2>Details</h2>

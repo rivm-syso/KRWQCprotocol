@@ -82,8 +82,9 @@ de consistentie van meetwaarden.</p>
   <span class="va">d_metingen</span>,
   <span class="va">d_parameter</span>,
   meetronde <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">d_metingen</span><span class="op">$</span><span class="va">jaar</span><span class="op">)</span>,
-  plt_per_stof <span class="op">=</span> <span class="cn">T</span>,
-  plt_per_reeks <span class="op">=</span> <span class="cn">T</span>,
+  zscore <span class="op">=</span> <span class="fl">3.5</span>,
+  plt <span class="op">=</span> <span class="cn">T</span>,
+  plt_put_reeks <span class="op">=</span> <span class="cn">F</span>,
   verbose <span class="op">=</span> <span class="cn">F</span>
 <span class="op">)</span></code></pre></div>
     </div>
@@ -97,10 +98,14 @@ de consistentie van meetwaarden.</p>
 <dt>meetronde</dt>
 <dd><p>meetjaar welke gevalideerd dient te worden. Staat standaard
 op de laatste meetjaar uit het databestand.</p></dd>
-<dt>plt_per_stof</dt>
-<dd><p>Voeg tijdserie plots per stof toe aan resultaat</p></dd>
-<dt>plt_per_reeks</dt>
-<dd><p>Voeg tijdserie plots per reeks toe aan resultaat</p></dd>
+<dt>zscore</dt>
+<dd><p>z-score waarbij een meeting wordt bestempeld met twijfelachtig.
+staat standaard op 3.5. Alle beschrijvingen zijn gebaseerd op z-score 3.5.</p></dd>
+<dt>plt</dt>
+<dd><p>Voeg tijdserie plots per reeks en stof toe aan resultaat</p></dd>
+<dt>plt_put_reeks</dt>
+<dd><p>Maak plots van alle putten waarbij 1 of meer parameters
+een z-score &gt; 3.5 hebben (vereist plt = T). Staat standaard op F.</p></dd>
 <dt>verbose</dt>
 <dd><p>of tekstuele output uit script gewenst is (T) of niet (F).
 Staat standaard op F.</p></dd>

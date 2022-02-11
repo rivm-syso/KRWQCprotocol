@@ -91,16 +91,16 @@ bijvoorbeeld het gebruik van sumarise of plot functies.</p>
 <span class="r-in"> <span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="QC0a.html">QC0a</a></span><span class="op">(</span>d_veld <span class="op">=</span> <span class="va">veld</span>, d_put <span class="op">=</span> <span class="va">put</span>, d_metingen <span class="op">=</span> <span class="va">metingen</span>, verbose <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> "Er zijn in totaal 10 bemonsterde putlocaties met XY-coordinaten afwijkend van de BRO geregistreerde putcoordinaten."</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    putcode  X_val  Y_val  X_BRO  Y_BRO</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1        8 227450 456217 227450 456260</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2       11 242845 441905 242805 441905</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3       97 145365 401775 145325 401775</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4      100 165225 422607 165225 422650</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5      175 215930 551007 215930 551050</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6      190 176490 526350 176450 526350</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7      192 188865 517850 188825 517850</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 8      194 190878 507513 190838 507513</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 9      199 205950 513482 205950 513525</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10     280 133725 526970 133725 527013</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1       21 226390 567500 226350 567500</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2       28 212490 546675 212450 546675</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3       78  68760 417805  68720 417805</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4       93  85200 446927  85200 446970</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5       94 133875 407482 133875 407525</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6      183 164930 585020 164890 585020</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7      183 164890 584977 164890 585020</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8      206 233340 500225 233300 500225</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9      272 193288 435470 193288 435513</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10     283 125350 521257 125350 521300</span>
 <span class="r-in"> <span class="va">d</span> <span class="op">&lt;-</span> <span class="va">veld</span> <span class="op">%&gt;%</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">landgebruik</span> <span class="op">!=</span> <span class="st">"heide"</span><span class="op">)</span></span>
 <span class="r-in"> <span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="QC0b.html">QC0b</a></span><span class="op">(</span>d_veld <span class="op">=</span> <span class="va">d</span>, d_put <span class="op">=</span> <span class="va">put</span>, d_metingen <span class="op">=</span> <span class="va">x</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span class="r-in"> <span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="QC0f.html">QC0f</a></span><span class="op">(</span>d_veld <span class="op">=</span> <span class="va">veld</span>, d_filter <span class="op">=</span> <span class="va">filter</span>, d_metingen <span class="op">=</span> <span class="va">x</span><span class="op">)</span></span>
@@ -111,15 +111,15 @@ bijvoorbeeld het gebruik van sumarise of plot functies.</p>
 <span class="r-in"> <span class="va">oordeel</span> <span class="op">&lt;-</span> <span class="fu">collect_result</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
 <span class="r-in"> <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">oordeel</span><span class="op">)</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       qcid                QC0a                   QC0f       </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Min.   :     1   onverdacht:210023   onverdacht   :211304  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  1st Qu.: 52949   verdacht  :  1769   twijfelachtig:   488  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  Min.   :     1   onverdacht:210389   onverdacht   :211365  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  1st Qu.: 52949   verdacht  :  1403   twijfelachtig:   427  </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  Median :105896                                             </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  Mean   :105896                                             </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  3rd Qu.:158844                                             </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  Max.   :211792                                             </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>             QC0g                QC1a                QC1b       </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  onverdacht   :211426   onverdacht:197904   onverdacht: 72384  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  twijfelachtig:   366   verdacht  : 13888   verdacht  :139408  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  onverdacht   :211426   onverdacht:201376   onverdacht: 72848  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  twijfelachtig:   366   verdacht  : 10416   verdacht  :138944  </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                                                </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                                                </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                                                </span>

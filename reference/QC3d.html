@@ -54,7 +54,12 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">QC3d</span><span class="op">(</span><span class="va">d_metingen</span>, <span class="va">d_parameter</span>, verbose <span class="op">=</span> <span class="cn">F</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">QC3d</span><span class="op">(</span>
+  <span class="va">d_metingen</span>,
+  <span class="va">d_parameter</span>,
+  geleidendheid_veld_naam <span class="op">=</span> <span class="st">"GELDHD_VELD"</span>,
+  verbose <span class="op">=</span> <span class="cn">F</span>
+<span class="op">)</span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -63,20 +68,25 @@
 <dd><p>dataframe met metingen</p></dd>
 <dt>d_parameter</dt>
 <dd><p>dataframe met parameter informatie</p></dd>
+<dt>geleidendheid_veld_naam</dt>
+<dd><p>character string om te gebruiken als geleidendheid
+veld. Staat standaard op "GELDHD_VELD".</p></dd>
 <dt>verbose</dt>
 <dd><p>of tekstuele output uit script gewenst is (T) of niet (F). Staat
 standaard op F.</p></dd>
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>metingen bestand met verdachte locaties/monsters.</p>
+    <p>metingen bestand met verdachte locaties/monsters.
+De benodigde naam voor ec lab is GELDHD.
+De benodigde naam voor ec veld staat standaard op "GELDHD_VELD", maar kan worden
+aangepast door een character string in te vullen voor geleidendheid_veld_naam.</p>
     </div>
     <div id="details">
     <h2>Details</h2>
     <p>De signaleringswaarde voor monsters is delta-EC &gt; 10 procent.
 Als de delta-EC boven de signaleringswaarde ligt, ken het
 concept QC oordeel twijfelachtig toe aan het monster.</p>
-<p>De benodigde namen voor ec lab en ec veld zijn ec en ecv.</p>
     </div>
 
   </div>
