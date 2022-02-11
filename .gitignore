@@ -5,6 +5,7 @@ inst/doc
 .Rproj.user
 .Rhistory
 *.Rproj
+.RData
 
 # Data/history files
 .RData
@@ -24,3 +25,4 @@ prototype.R
 /Meta/
 ..Rcheck
 docs
+tags

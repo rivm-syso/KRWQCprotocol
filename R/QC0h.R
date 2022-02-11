@@ -39,33 +39,37 @@ QC0h <- function(d_filter, d_metingen, verbose = F) {
   
   # Selecteer alleen redoxparameters
   d <- d_metingen %>%
-    filter(parameter %in% c("no3", "no3_n", "fe", "mn", "so4", "cl")) %>%  #no3_n is in LMG
+    filter(parameter %in% c("NO3", "Fe", "Mn", "SO4", "Cl")) %>%  #no3_n is in LMG
     select(-qcid) %>%
     # zet Redox parameters naar wide format
     pivot_wider(names_from = parameter,
                 values_from = c(detectieteken, rapportagegrens, waarde),
                 names_glue = "{parameter}_{.value}") 
+
+  if(exists("no3_n_waarde", d)){
+    d <- d %>%
+      # reken NO3_N om naar NO3
+      mutate(no3_n_waarde = no3_n_waarde * 4.4268,
+             no3_n_rapportagegrens = no3_n_rapportagegrens * 4.4268)
+  }
   
   # als no3 als no3_n staat, dan vervangen naar NO3 -> geval voor LMG  
-  colnames(d)[grepl("no3_n", colnames(d))] <- paste0("no3_", c("detectieteken", "rapportagegrens", "waarde"))
+  # colnames(d)[grepl("no3_n", colnames(d))] <- paste0("no3_", c("detectieteken", "rapportagegrens", "waarde"))
   
   d <- d %>%
-    # reken NO3_N om naar NO3
-    mutate(no3_waarde = no3_waarde * 4.4268,
-           no3_rapportagegrens = no3_rapportagegrens * 4.4268) %>%
     select(monsterid, jaar, maand, dag, putcode, filter,
-           sort(names(.[8:ncol(.)])))
+           sort(colnames(.)))
   
   # Bepaal redoxklasse voor alle jaren
   d <- d %>%
     # bepaal SO4f
-    mutate(so4f = ((so4_waarde * 19000) / (cl_waarde * 2700)) -1 ) %>%
+    mutate(so4f = ((SO4_waarde * 19000) / (Cl_waarde * 2700)) -1 ) %>%
     mutate(redoxklasse = 
-             ifelse(no3_waarde > 2,
+             ifelse(NO3_waarde > 2,
                     # als NO3 > 2 mg/l
-                    ifelse(fe_waarde < 1,
+                    ifelse(Fe_waarde < 1,
                            # als Fe < 1 mg/l
-                           ifelse(mn_waarde < 0.5,
+                           ifelse(Mn_waarde < 0.5,
                                   # als Mn < 0.5 mg/l
                                   "subox",
                                   # als Mn >= 0.5 mg/l
@@ -139,7 +143,7 @@ QC0h <- function(d_filter, d_metingen, verbose = F) {
         row.names = F, col.names = F)
       print(res %>% select(putcode, filter,
                            redoxklasse_VAL,
-                           redoxklasse_BRO,
+                           redoxklasse_HIS,
                            oordeel))
       
     } else {
@@ -153,28 +157,24 @@ QC0h <- function(d_filter, d_metingen, verbose = F) {
   resultaat_df <- d_metingen %>%
     group_by(monsterid) %>%
     mutate(iden = paste(putcode, filter, jaar, maand, dag, sep = "-")) %>%
-    mutate(oordeel = ifelse(iden %in% (res %>% filter(oordeel == "twijfelachtig") %>% pull(iden)),
-                            "twijfelachtig", 
-                            ifelse(iden %in% (res %>% filter(oordeel == "verdacht") %>% pull(iden)),
-                                   "verdacht", "onverdacht"))) %>%
-    filter(oordeel != "onverdacht") %>%
+    filter(iden %in% res$iden) %>%
     # voeg resultaten test toe
-    left_join(., res %>% select(iden, redoxklasse_VAL, redoxklasse_HIS)) %>%
+    left_join(., res %>% select(iden, redoxklasse_VAL, redoxklasse_HIS, oordeel), by = "iden") %>%
     select(qcid, monsterid, jaar, maand, dag, putcode, filter,
            redoxklasse_VAL, redoxklasse_HIS, oordeel)
   
   # voeg attribute met uitkomsten tests toe aan relevante dataset (d_metingen)
-  twijfel_id <- resultaat_df %>% filter(oordeel == "twijfelachtig") %>% distinct(qcid)
-  verdacht_id <- resultaat_df %>% filter(oordeel == "verdacht") %>% distinct(qcid)
+  twijfel_id <- resultaat_df %>% filter(oordeel == "twijfelachtig") %>% distinct(qcid) %>% pull(qcid)
+  verdacht_id <- resultaat_df %>% filter(oordeel == "verdacht") %>% distinct(qcid) %>% pull(qcid)
   test <- "QC0h"
   
   d_metingen <- qcout_add_oordeel(obj = d_metingen,
                                   test = test,
-                                  oordeel = sort(unique(resultaat_df$oordeel))[1],
+                                  oordeel = "twijfelachtig",
                                   ids = twijfel_id)
   d_metingen <- qcout_add_oordeel(obj = d_metingen,
                                   test = test,
-                                  oordeel = sort(unique(resultaat_df$oordeel))[2],
+                                  oordeel = "verdacht",
                                   ids = verdacht_id)
   d_metingen <- qcout_add_rapportage(obj = d_metingen,
                                      test = test,

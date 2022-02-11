@@ -35,10 +35,10 @@ test_that("QC4a T2", {
              data(parameter)
 
              d1 <- metingen %>%
-                 filter(parameter == "cl" | parameter == "no3_n")
+                 filter(parameter == "Cl" | parameter == "NO3")
 
              d2 <- metingen %>%
-                 filter(parameter == "cl" | parameter == "no3_n") %>%
+                 filter(parameter == "Cl" | parameter == "NO3") %>%
                  mutate(jaar = jaar - 5) %>%
                  bind_rows(d1)
 

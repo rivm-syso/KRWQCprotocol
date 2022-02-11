@@ -30,7 +30,7 @@ QC0g <- function(d_filter, d_metingen, verbose = F) {
 
   hist <- d_metingen %>%
     # verwijder meest recente meting en selecteer chloride
-    dplyr::filter(jaar != max(d_metingen$jaar), parameter == "cl") %>%
+    dplyr::filter(jaar != max(d_metingen$jaar), parameter == "Cl") %>%
     # selecteer voorlaatste 5 metingen
     dplyr::group_by(putcode, filter) %>%
     dplyr::arrange(jaar) %>%
@@ -42,7 +42,7 @@ QC0g <- function(d_filter, d_metingen, verbose = F) {
 
     # watertype huidige meetronde
     huidig <- d_metingen %>%
-        dplyr::filter(jaar == max(d_metingen$jaar), parameter == "cl") %>%
+        dplyr::filter(jaar == max(d_metingen$jaar), parameter == "Cl") %>%
         dplyr::mutate(watertype.val = ifelse(waarde < 300,
                                       "zoet", "brak/zout"))
 

@@ -8,8 +8,9 @@ QC4a(
   d_metingen,
   d_parameter,
   meetronde = max(d_metingen$jaar),
-  plt_per_stof = T,
-  plt_per_reeks = T,
+  zscore = 3.5,
+  plt = T,
+  plt_put_reeks = F,
   verbose = F
 )
 }
@@ -21,9 +22,13 @@ QC4a(
 \item{meetronde}{meetjaar welke gevalideerd dient te worden. Staat standaard
 op de laatste meetjaar uit het databestand.}
 
-\item{plt_per_stof}{Voeg tijdserie plots per stof toe aan resultaat}
+\item{zscore}{z-score waarbij een meeting wordt bestempeld met twijfelachtig.
+staat standaard op 3.5. Alle beschrijvingen zijn gebaseerd op z-score 3.5.}
 
-\item{plt_per_reeks}{Voeg tijdserie plots per reeks toe aan resultaat}
+\item{plt}{Voeg tijdserie plots per reeks en stof toe aan resultaat}
+
+\item{plt_put_reeks}{Maak plots van alle putten waarbij 1 of meer parameters
+een z-score > 3.5 hebben (vereist plt = T). Staat standaard op F.}
 
 \item{verbose}{of tekstuele output uit script gewenst is (T) of niet (F).
 Staat standaard op F.}
