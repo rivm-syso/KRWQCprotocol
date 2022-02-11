@@ -25,7 +25,7 @@ QC1f <- function(d_metingen, verbose = F) {
   # Controle op aanwezigheid negatieve waardes
   resultaat_df <- d_metingen %>%
     # met uitzondering van temperatuur
-    dplyr::filter(parameter != "temperatuur") %>%
+    dplyr::filter(parameter %>% tolower() != "temperatuur") %>%
     dplyr::mutate(oordeel = ifelse(waarde < 0, "verdacht", 
                                    "onverdacht")) %>%
     dplyr::mutate(reden = ifelse(oordeel == "verdacht", 

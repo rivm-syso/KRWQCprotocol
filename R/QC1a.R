@@ -38,7 +38,7 @@ QC1a <- function(d_parameter, d_metingen, verbose = F) {
   # controleer of parameters op de BRO lijst staan
   # hiervoor worden de cas-nummers gebruikt
   niet_in_BRO <- d_parameter %>%
-    dplyr::select(qcid, naam, aquocode, cas) %>%
+    dplyr::select(qcid, parameter, aquocode, cas) %>%
     dplyr::filter(!cas %in% BRO_parameterlijst$casnummer) %>%
     dplyr::mutate(oordeel = "verdacht",
            reden = "parameter komt niet voor in BRO-lijst")
@@ -60,22 +60,14 @@ QC1a <- function(d_parameter, d_metingen, verbose = F) {
     dplyr::left_join(BRO_parameterlijst, by = c("cas" = "casnummer")) %>%
     # Aquocode vergelijken
     dplyr::mutate(oordeel = ifelse(aquocode.x != aquocode.y |
-                            # omschrijving
-                            omschrijving.x != omschrijving.y |    
                             # eenheid
-                            eenheid.x != eenheid.y |    
-                            # hoedanigheid
-                            hoedanigheid.x != hoedanigheid.y,
+                            eenheid.x != eenheid.y ,    
                           "verdacht", "onverdacht")) %>%
     dplyr::filter(oordeel == "verdacht") %>%
     dplyr::rename(aquocode_VAL = aquocode.x,
            aquocode_BRO = aquocode.y,
-           stofnaam_VAL = omschrijving.x,
-           stofnaam_BRO = omschrijving.y,
            eenheid_VAL = eenheid.x,
-           eenheid_BRO = eenheid.y,
-           hoedanigheid_VAL = hoedanigheid.x,
-           hoedanigheid_BRO = hoedanigheid.y)
+           eenheid_BRO = eenheid.y)
 
   rapportageTekst <- paste("Er zijn in totaal", nrow(niet_in_BRO), 
                            "parameters welke niet in de parameterlijst van de BRO staan.",
@@ -97,7 +89,7 @@ QC1a <- function(d_parameter, d_metingen, verbose = F) {
 
   # voeg concept oordeel van afwijkende parameters toe aan de parameters in metingen bestand
   resultaat_df <- d_metingen %>%
-    dplyr::mutate(oordeel = ifelse(parameter %in% res$naam,
+    dplyr::mutate(oordeel = ifelse(parameter %in% res$parameter,
                             "verdacht", "onverdacht")) %>%
     dplyr::filter(oordeel == "verdacht")
   

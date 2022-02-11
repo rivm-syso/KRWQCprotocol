@@ -71,7 +71,7 @@ maand | maand van veldbezoek | numeriek
 dag | dag van veldbezoek | numeriek
 xcoord | x-coördinaat gemeten in het veld, in meters volgens RD | numeriek
 ycoord | y-coördinaat gemeten in het veld, in meters volgens RD | numeriek
-landgebruik | veldobservatie van dominant landgebruik putomgeving | karakter
+landgebruik | veldobservatie van dominant landgebruik putomgeving, volgens BRO | karakter
 okf | diepte onderkant filter t.o.v. maaiveld, in meters | numeriek
 gws_voor | gemeten grondwaterstand voor bepomping filter t.o.v. maaiveld, in meters | numeriek
 gws_na | gemeten grondwaterstand na bepomping filter t.o.v. maaiveld, in meters | numeriek
@@ -108,7 +108,7 @@ Tabel 4 parameterbestand (`d_parameter`) bestaat uit:
 kolomnaam       | inhoud                      | type
 ---------------|-----------------------------|--------
 qcid | rijnummer | numeriek
-naam | stofnaam | karakter 
+parameter | stofnaam | karakter 
 aquocode | aquocode van de betreffende stof | karakter 
 cas | CAS-nummer van de betreffende stof | karakter 
 eenheid | eenheid van de betroffende stof | karakter
@@ -136,6 +136,7 @@ rapportagegrens | geeft de waarde van de rapportagegrens voor de betreffende par
 waarde | de gemeten waarde, waarbij alle waardes positief dienen te zijn | numeriek 
 
 ### Overzicht van de data
+Dit pakket maakt gebruik van test data van het LMG die op bepaalde punten is aangepast om het gedrag van verschillende functies te controleren.
 Voorbeeld bestanden inladen:
 
 ```{r}
@@ -175,7 +176,18 @@ str(metingen)
 head(metingen)
 ```
 
-## Werking QC R-pakket
+## Installatie KRWQCprotocol R-pakket
+
+Het KRWQCprotocol wordt beschikbaar gesteld als R pakket. Gebruikers
+kunnen de functies uit dit pakket gebruiken in hun eigen scripts. Om
+het pakket te installeren moet vanuit R het volgende commando
+uitgevoerd worden:
+
+```{r eval=FALSE}
+remotes::install_github("jspijker/KRWQCprotocol")
+```
+
+## Werking KRWQCprotocol R-pakket
 De verschillende QC stappen uit het Protocol kunnen eenvoudig uitgevoerd worden
 door het aanroepen van de relevante functie (QC0a-QC5). Als invoer van de functie 
 worden de relevante datatabellen meegegeven benodigd voor de testen. In de functie 
@@ -217,7 +229,31 @@ van QC0c en QC0d zie bovenstaande.
 
 Voorbeeld voor uitvoeren van QC0a:
 ```{r}
-QC0a(d_veld = veld, d_put = put, d_metingen = metingen, verbose = TRUE)
+x <- metingen
+
+x <- QC0a(d_veld = veld, d_put = put, d_metingen = x, verbose = TRUE)
+
+```
+In het voorbeeld veld data van het LMG zit als test het landgebruik heide. 
+Dit zorgt voor een error in QC0b:
+```{r}
+try(
+x <- QC0b(d_veld = veld, d_put = put, d_metingen = x, verbose = TRUE)
+)
+```
+Heide is niet opgenomen in de valide landgebruiken en kan daardoor niet worden
+meegenomen in test QC0b.
+Voorbeeld voor uitvoeren van QC0b:
+```{r}
+veld <- veld %>% dplyr::filter(landgebruik != "heide")
+x <- QC0b(d_veld = veld, d_put = put, d_metingen = x, verbose = TRUE)
+
+```
+
+Voorbeeld voor uitvoeren van QC0c:
+```{r eval = FALSE}
+QC0c_create_file("created_files") # -> handmatig invullen en met dezelfde naam opslaan
+x <- QC0c(dir = "created_files", d_metingen = x, verbose = TRUE)
 
 ```
 
@@ -246,48 +282,61 @@ van QC2b en QC2c, zie eerder.
 ### QC3 - Plausibiliteit
 In QC3b wordt getoetst of de putten in de BRO puttenlijst voorkomen. De bedoeling
 is om d.m.v. een API de puttenlijst uit de BRO automatisch in te laden. Door 
-technische probleme is dit momenteel nog niet mogelijk. Hierdoor is voor QC3b 
+technische problemen is dit momenteel nog niet mogelijk. Hierdoor is voor QC3b 
 nu een tijdelijke functie opgenomen. Bij deze functie is het op het moment
 noodzakelijk om handmatig de putten uit het metingen bestand te 
 selecteren welke niet in de BRO voorkomen en de subselectie uit het metingen 
 bestand in te voeren in de functie. 
 
-In QC3c wordt de ionenbalans opgesteld. Het is hierdoor belangrijk om de benodigde parameters de juiste naam te geven. Daarnaast wordt van het volgende uitgegaan:
+In QC3c wordt de ionenbalans opgesteld. Het is hierdoor belangrijk om de benodigde 
+parameters de juiste naam te geven. In alle QC's wordt er van uitgegaan dat lab 
+parameters genoteerd zijn als aquoqode (zoals in het parameter bestand beschreven). 
+Daarnaast wordt van het volgende uitgegaan:
 
-- In de meeste gevallen is in de provinciale set hco3 in het lab bepaald, dus
-de lab waarde gebruiken. Hierdoor ook pH uit het lab gebruiken;
-- pH wordt hernoemd naar h;
-- no3 en nh4 zijn uitgedrukt in no3_n en nh4_n;
-- po4 is uitgedruk in po4_p. Met functie argument `add_phosphate` kan
-aangegeven worden of het gewenst is dat po4 uit ptot wordt berekend indien
-po4 niet bekend is;
+- In het geval dat de hco3 in het lab is bepaald (zoals in de provinciale set), wordt
+de lab waarde gebruikt. Dit betekent dat ook pH uit het lab gebruikt moet worden. De 
+standaard waardes voor ph_naam en hco3_naam worden dan gebruikt. 
+
+- In het geval de hco3 in het veld is bepaald (zoals in de LMG set), worden veld 
+waardes gebruikt. In dit geval moet de ph_naam en hco3_naam wel worden gespecificeerd.
+
+Met het voorbeeld metingen bestand uit het LMG wordt QC3c op de volgende manier 
+uitgevoerd:
+
+```{r eval = FALSE}
+x <- QC3c(d_metingen = x, ph_naam = "h_5__veld", hco3_naam = "hco3_veld", verbose = TRUE)
+
+```
 
 In QC3d worden de ec lab en ec veld vergeleken. Benodigde parameternamen zijn 
-ec en ecv. Dit moet voor de functie aangepast worden in de dataset.
+"GELDHD" en `geleidendheid_veld_naam`. In alle QC's wordt er van uitgegaan dat lab 
+parameters genoteerd zijn als aquoqode (zoals in parameter bestand) dus in dit 
+geval "GELDHD".
 
-In QC3e wordt de ec berekend aan de hand van de gemeten concentraties. Hiervoor
-gelden de volgende uitgangspunten:
-- hco3 lab hernoemd naar hco3, hco3 veld hernoemd naar hco3v;
-- pH wordt hernoemd naar h en pH veld naar hv;
-- ec veld hernoemd naar ecv;
-- no3 en nh4 zijn uitgedrukt in no3_n en nh4_n;
-- po4 is uitgedruk in po4_p. Met functie argument `add_phosphate` kan
-aangegeven worden of het gewenst is dat po4 uit ptot wordt berekend indien
-po4 niet bekend is;
-Binnen deze functie wordt de ionenbalans opnieuw opgesteld zodat hco3 geschat 
-kan worden als deze ontbreekt. Vervolgens wordt aan de hand van bepaalde 
-condities bepaald welke methode gebruikt wordt om de ec te berekenen om deze
-uiteindelijk toe te passen (Stuyfzand 1987b).
+```{r eval = FALSE}
+x <- QC3d(d_metingen = x, d_parameter = parameter, geleidendheid_veld_naam = "ec_5__veld", verbose = TRUE)
+
+```
+
+In QC3e wordt de ec berekend aan de hand van de gemeten concentraties. De berekende
+EC wordt vergeleken met de gemeten EC. Met functie argument `add_phosphate` kan 
+aangegeven worden of het gewenst is dat PO4 uit ptot wordt berekend indien po4 
+niet bekend is. Binnen deze functie wordt de ionenbalans opnieuw opgesteld zodat 
+HCO3 geschat kan worden als deze ontbreekt met `add_bicarbonate`. Vervolgens 
+wordt aan de hand van bepaalde condities bepaald welke methode gebruikt wordt om 
+de EC te berekenen om deze uiteindelijk toe te passen. Net zoals bij QC3c hoeven 
+de variabelen ph_naam, hco3_naam en ec_naam alleen te worden gespecificeerd als 
+niet de standaard lab waardes (in aquocodes) worden gebruikt.
 
 In QC3f wordt de pH lab met pH veld vergeleken. Benodigde parameternamen zijn 
-h en hv. Dit moet voor de functie aangepast worden in de dataset.
+"pH" en `ph_veld_naam`. In alle QC's wordt er van uitgegaan dat lab parameters 
+genoteerd zijn als aquoqode (zoals in parameter bestand) dus in dit geval "pH".
 
 In QC3g wordt de pH met hco3 vergeleken. Aangezien in de meeste gevallen hco3
 niet in het veld is bepaald voor de provinciale gegevens, worden nu de lab
-metingen van beiden vergeleken. Benodigde paramternamen zijn h en hco3.
+metingen van beiden vergeleken. Benodigde parameternamen zijn "pH" en "HCO3".
 
-In QC3h wordt no3 met nh4 vergeleken. Aangenomen wordt dat beiden uitgedrukt
-zijn in no3_n en nh4_n. 
+In QC3h wordt no3 met nh4 vergeleken. Benodigde parameternamen zijn "NO3" en "NH4". 
 
 ### QC4 - Consistentie
 In QC4a worden de metingen uit de te valideren meetronde gecontroleerd of deze
@@ -301,23 +350,54 @@ om de validatie te kunnen uitvoeren:
 afijkende metingen uit de te valideren meetronde gekleurd zijn afgebeeld. Hiermee 
 wordt in één opslag duidelijk hoeveel metingen per parameter afwijken en of er 
 eventueel sprake is van eenheidsfouten of structurele afwijkingen in een meetronde.
-- Per twijfelactige meting wordt de gehele reeks geplot tegelijkertijd met 
-eventuele andere putfilters op die locatie. Zou kunnen mogelijke filterwisselingen
+- Per twijfelachtige meting wordt de gehele reeks geplot tegelijkertijd met 
+eventuele andere putfilters op die locatie. Zo kunnen mogelijke filterwisselingen
 geidentificeerd worden. 
 
-QC4b wordt regulier uitgevoerd met het aanroepen van QC4b() met het metingen
-bestand als invoer.
+Voorbeeld voor het maken van een pdf met de afbeeldingen van de parameters:
+```{r eval = FALSE}
+x <- QC4a(d_metingen = x, d_parameter = parameter)
+
+x_attr <- attr(x, "qcout")
+
+ggsave(
+  filename = paste0(getwd(), "/parameters_", Sys.Date(),".pdf"),
+  plot = gridExtra::marrangeGrob(x_attr$QC4a$resultaat$plot_param, nrow = 1, ncol = 1),
+  width = 15, height = 9
+)
+```
+
+QC4b wordt regulier uitgevoerd met het aanroepen van QC4b() met metingen data uit
+het LMG als voorbeeld. Bij deze stap word getest of de pH van het veld en de pH
+van het lab niet buiten het meetbereik liggen. De benodigde naam voor pH lab is 
+"pH". De benodigde naam voor pH veld staat standaard op "pH_veld", maar kan worden 
+aangepast door een character string in te vullen voor ph_veld_naam. In het geval 
+van het voorbeeld metingen data uit het LMG wordt QC4b op de volgende manier 
+uitgevoerd:
+
+```{r eval = FALSE}
+x <- QC4b(d_metingen = x, ph_veld_naam = "h_5__veld", verbose = TRUE)
+
+```
 
 ### QC5 - QC Status
 In de functie voor QC5 worden de attributes met resultaten van de verschillende
-tests uit het metingen gehaald en elkaar gevoegd als één dataframe met 
-`collect_result()`. Het is hierbij belangrijk dat alle QC-stappen zijn doorlopen
+tests uit het metingen bestand gehaald en bij elkaar gevoegd als één dataframe met 
+`collect_result()`. Het is hierbij belangrijk dat alle minimaal benodigde QC-stappen 
+(QC0a, QC0c t/m QC0e, QC1f, QC2a t/m QC2c, QC3c t/m QC3h", "QC4a" en "QC4b") zijn doorlopen
 en dat voor iedere functie hetzelfde metingen bestand als invoer is gebruikt. 
 In dit geval zijn de resultaten uit de verschillende QC tests als attribute aan
-één bestand gekoppeld. Met het verkregen dataframe uit `collect_result()` kan 
-vervolgens per meting het eindoordeel bepaald worden volgens de regels uit het 
-QC Protocol. Het geautomatiseerd toepassen van deze regels is nog niet beschikbaar
-binnen deze functie en zal later toegevoegd worden. 
+één bestand gekoppeld. Met het verkregen dataframe uit `collect_result()` wordt 
+vervolgens per meting het eindoordeel bepaald volgens de regels uit het 
+QC Protocol.
 
+De overige qc test zijn benodigd voor het volledig doorlopen van het KRWQC protocol,
+maar het ontbreken ervan is geen technische belemmering voor het uitvoeren van QC5.
+
+```{r eval = FALSE}
+oordeel <- QC5(d_metingen = x, verbose = TRUE)
+summary(oordeel)
+
+```
 
 

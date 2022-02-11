@@ -4,18 +4,29 @@
 \alias{QC3d}
 \title{QC3d. Controle EC-veld en EC-lab}
 \usage{
-QC3d(d_metingen, d_parameter, verbose = F)
+QC3d(
+  d_metingen,
+  d_parameter,
+  geleidendheid_veld_naam = "GELDHD_VELD",
+  verbose = F
+)
 }
 \arguments{
 \item{d_metingen}{dataframe met metingen}
 
 \item{d_parameter}{dataframe met parameter informatie}
 
+\item{geleidendheid_veld_naam}{character string om te gebruiken als geleidendheid
+veld. Staat standaard op "GELDHD_VELD".}
+
 \item{verbose}{of tekstuele output uit script gewenst is (T) of niet (F). Staat
 standaard op F.}
 }
 \value{
 metingen bestand met verdachte locaties/monsters.
+De benodigde naam voor ec lab is GELDHD.
+De benodigde naam voor ec veld staat standaard op "GELDHD_VELD", maar kan worden
+aangepast door een character string in te vullen voor geleidendheid_veld_naam.
 }
 \description{
 Vergelijk EC-veld en EC-lab
@@ -24,6 +35,4 @@ Vergelijk EC-veld en EC-lab
 De signaleringswaarde voor monsters is delta-EC > 10 procent.
 Als de delta-EC boven de signaleringswaarde ligt, ken het
 concept QC oordeel twijfelachtig toe aan het monster.
-
-De benodigde namen voor ec lab en ec veld zijn ec en ecv.
 }

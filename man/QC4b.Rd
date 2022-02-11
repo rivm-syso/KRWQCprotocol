@@ -4,16 +4,23 @@
 \alias{QC4b}
 \title{QC4b. Controle technisch waardebereik}
 \usage{
-QC4b(d_metingen, verbose = F)
+QC4b(d_metingen, ph_veld_naam = "pH_veld", verbose = F)
 }
 \arguments{
 \item{d_metingen}{dataframe met metingen}
+
+\item{ph_veld_naam}{character string om te gebruiken als pH
+veld. Staat standaard op "pH_veld".}
 
 \item{verbose}{of tekstuele output uit script gewenst is (T) of niet (F). Staat
 standaard op F.}
 }
 \value{
 metingen bestand met verdachte locaties/monsters.
+
+De benodigde naam voor pH lab is pH.
+De benodigde naam voor pH veld staat standaard op "pH_veld", maar kan worden
+aangepast door een character string in te vullen voor ph_veld_naam.
 }
 \description{
 Controleer of een meting fysisch niet mogelijk is.
