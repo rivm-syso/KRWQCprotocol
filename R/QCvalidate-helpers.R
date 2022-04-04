@@ -160,3 +160,30 @@ valideParamInfo <- function(d) {
 }
   
 
+rowAny <- function(x){
+  rowSums(x) > 0
+}  
+
+qcidNietUitvoerbaar <- function(d, d_metingen, benodigdeKolommen){
+  niet_uitvoerbaar <- d %>% 
+    filter(
+      rowAny(
+        across(
+          .cols = all_of(benodigdeKolommen),
+          .fns = ~ is.na(.x)
+        )
+      )
+    ) %>% mutate(iden = paste(putcode, filter, jaar, maand, dag, sep = "-"))
+  
+  id <- d_metingen %>%
+    group_by(monsterid) %>%
+    mutate(iden = paste(putcode, filter, jaar, maand, dag, sep = "-")) %>%
+    filter(iden %in% niet_uitvoerbaar$iden) %>% 
+    ungroup() %>% 
+    select(qcid, iden)
+  
+  niet_uitvoerbaar <- left_join(niet_uitvoerbaar, id, by = "iden")
+  niet_uitvoerbaar_id <- niet_uitvoerbaar %>% distinct(qcid) %>% pull(qcid)
+  
+  return(niet_uitvoerbaar_id)
+}
