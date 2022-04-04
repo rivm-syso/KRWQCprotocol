@@ -50,6 +50,12 @@ QC0h <- function(d_filter, d_metingen, verbose = F) {
     select(monsterid, jaar, maand, dag, putcode, filter,
            sort(colnames(.)))
   
+  # Rijen met missende waardes op niet uitvoerbaar zetten
+  niet_uitvoerbaar_id <- qcidNietUitvoerbaar(d, d_metingen, c("NO3_waarde", "Fe_waarde", "Mn_waarde", "SO4_waarde", "Cl_waarde"))
+  
+  # Rijen met missende waardes weghalen
+  d <- d %>% drop_na(c("NO3_waarde", "Fe_waarde", "Mn_waarde", "SO4_waarde", "Cl_waarde"))
+  
   # Bepaal redoxklasse voor alle jaren
   d <- d %>%
     # bepaal SO4f
@@ -166,6 +172,10 @@ QC0h <- function(d_filter, d_metingen, verbose = F) {
                                   test = test,
                                   oordeel = "verdacht",
                                   ids = verdacht_id)
+  d_metingen <- qcout_add_oordeel(obj = d_metingen,
+                                  test = test,
+                                  oordeel = "niet uitvoerbaar",
+                                  ids = niet_uitvoerbaar_id)
   d_metingen <- qcout_add_rapportage(obj = d_metingen,
                                      test = test,
                                      tekst = rapportageTekst)
