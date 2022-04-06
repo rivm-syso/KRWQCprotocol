@@ -39,3 +39,19 @@ test_that("QC3e T2 Stuyfzand data ", {
 })
 
 
+
+test_that("QC3e T3", {
+      # test niet uitvoerbaar
+
+      data(metingen)
+      data(veld)
+
+      d <- metingen %>%
+          mutate(waarde = if_else(parameter == "GELDHD", NA_real_, waarde))
+  x <- QC3e(d_metingen = d)
+      x_attr <- attr(x, "qcout")
+      ids <- x_attr[["QC3e"]][["oordeel"]][["niet uitvoerbaar"]]
+      expect_true(length(ids) == nrow(d))
+})
+
+
