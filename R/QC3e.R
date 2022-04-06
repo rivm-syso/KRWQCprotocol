@@ -104,10 +104,10 @@ QC3e <- function(d_metingen,
   }
   
   # Rijen met missende waardes op niet uitvoerbaar zetten
-  niet_uitvoerbaar_id <- qcidNietUitvoerbaar(res, d_metingen, c("xca", "xna", "xmg", "xk", "xcl", "xso4"))
+  niet_uitvoerbaar_id <- qcidNietUitvoerbaar(res, d_metingen, c("xecv", "xca", "xna", "xmg", "xk", "xcl", "xso4"))
   
   # Rijen met missende waardes weghalen
-  res <- res %>% drop_na(c("xca", "xna", "xmg", "xk", "xcl", "xso4"))
+  res <- res %>% drop_na(c("xecv", "xca", "xna", "xmg", "xk", "xcl", "xso4"))
   
   
   # Onderstaande functie BerekenGeleidbaarheid doet 2 dingen:
