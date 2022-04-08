@@ -61,8 +61,8 @@ QC4a <- function(d_metingen, d_parameter,
     dplyr::mutate(n.meetjaar = dplyr::n_distinct(jaar),
                   n.meting = length(waarde),
                   logobs = log(waarde),
-                  loggem = sapply(1:n(), \(i) mean(log(waarde[-i]))),
-                  logsdv = sapply(1:n(), \(i) sd(log(waarde[-i])))) %>%
+                  loggem = sapply(1:n(), function(i) mean(log(waarde[-i]))),
+                  logsdv = sapply(1:n(), function(i) sd(log(waarde[-i])))) %>%
     # bepaal z-score. Indien SD = 0, dan ook z-score = 0
     dplyr::mutate(logz = ifelse(logsdv == 0, 0 ,
                                 (logobs - loggem) / logsdv) ) %>%
