@@ -59,3 +59,19 @@ test_that("QC3f T2", {
   
   
 }) 
+
+test_that("QC3f T3", {
+      # test niet uitvoerbaar
+
+      data(metingen)
+      data(veld)
+
+      d <- metingen %>%
+          mutate(waarde = if_else(parameter == "h_1_veld", NA_real_, waarde))
+      x <- QC3f(d_veld = veld, d_metingen = d, ph_veld_naam = "h_1__veld")
+      x_attr <- attr(x, "qcout")
+      ids3 <- x_attr[["QC3f"]][["oordeel"]][["niet uitvoerbaar"]]
+      expect_true(length(ids3) == nrow(d))
+})
+
+
