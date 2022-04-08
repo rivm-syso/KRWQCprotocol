@@ -39,3 +39,39 @@ test_that("QC3e T2 Stuyfzand data ", {
 })
 
 
+
+test_that("QC3e T3", {
+      # test niet uitvoerbaar
+
+      data(metingen)
+      data(veld)
+
+      v2 <- metingen %>% 
+          filter(monsterid<=20)
+
+      d2_id <- v2 %>%
+          filter(parameter == "Ca") %>%
+          pull(qcid)
+
+      d2 <- v2 %>%
+          mutate(waarde = if_else(qcid == d2_id[1], NA_real_, waarde))
+
+      monster <- metingen %>% 
+          filter(qcid == d2_id[1]) %>%
+          pull(monsterid)
+
+
+      idnum <- d2 %>%
+          filter(monsterid == monster) %>%
+          nrow()
+
+
+      x <- QC3e(d_metingen = d2)
+      x_attr <- attr(x, "qcout")
+      ids <- x_attr[["QC3e"]][["oordeel"]][["niet uitvoerbaar"]]
+
+      expect_true(length(ids) == idnum)
+
+})
+
+

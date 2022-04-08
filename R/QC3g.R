@@ -46,7 +46,7 @@ QC3g <- function(d_metingen, verbose = F) {
   
   # Check of maar 1 voor pH en 1 voor HCO3 beschikbaar zijn
   if(dplyr::n_distinct(d$parameter) < 2) {
-    stop("Geen pH of HCO3 beschikbaar")
+    stop("Geen pH of HCO3 beschikbaar. Gebruik: x <- QC_niet_uitvoerbaar(x, \"QC3g\")")
   }
   if(dplyr::n_distinct(d$parameter) > 2) {
     stop("Meer dan 2 parameters voor pH en HCO3")
@@ -57,7 +57,15 @@ QC3g <- function(d_metingen, verbose = F) {
   res <- d %>%
     dplyr::select(-c(qcid, detectieteken, rapportagegrens)) %>%
     tidyr::pivot_wider(names_from = parameter,
-                       values_from = waarde) %>%
+                       values_from = waarde) 
+  
+  # Rijen met missende waardes op niet uitvoerbaar zetten
+  niet_uitvoerbaar_id <- qcidNietUitvoerbaar(res, d_metingen, c("pH", "HCO3"))
+  
+  # Rijen met missende waardes weghalen
+  res <- res %>% drop_na(c("pH", "HCO3"))
+  
+  res <- res %>% 
     dplyr::mutate(oordeel = ifelse(pH < 5 & HCO3 > 15 |
                                      pH < 5.5 & HCO3 > 50,
                                    "twijfelachtig", "onverdacht"),
@@ -104,6 +112,10 @@ QC3g <- function(d_metingen, verbose = F) {
                                   test = test,
                                   oordeel = "twijfelachtig",
                                   ids = twijfel_id)
+  d_metingen <- qcout_add_oordeel(obj = d_metingen,
+                                  test = test,
+                                  oordeel = "niet uitvoerbaar",
+                                  ids = niet_uitvoerbaar_id)
   d_metingen <- qcout_add_rapportage(obj = d_metingen,
                                      test = test,
                                      tekst = rapportageTekst)

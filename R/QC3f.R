@@ -39,7 +39,7 @@ QC3f <- function(d_veld, d_metingen, ph_veld_naam = "pH_veld", verbose = F) {
   
   # Check of pH veld en lab gegevens beschikbaar zijn
   if(dplyr::n_distinct(d$parameter) < 2) {
-    stop("Geen veld of lab pH aanwezig")
+    stop("Geen veld of lab pH aanwezig. Gebruik: x <- QC_niet_uitvoerbaar(x, \"QC3f\")")
   }
   if(dplyr::n_distinct(d$parameter) > 2) {
     stop("Meer dan 2 parameters voor veld en lab pH")
@@ -49,7 +49,15 @@ QC3f <- function(d_veld, d_metingen, ph_veld_naam = "pH_veld", verbose = F) {
   res <- d %>%
     dplyr::select(-c(qcid, detectieteken, rapportagegrens)) %>%
     tidyr::pivot_wider(names_from = parameter,
-                       values_from = waarde) %>%
+                       values_from = waarde) 
+  
+  # Rijen met missende waardes op niet uitvoerbaar zetten
+  niet_uitvoerbaar_id <- qcidNietUitvoerbaar(res, d_metingen, c("pH", "pH_veld"))
+  
+  # Rijen met missende waardes weghalen
+  res <- res %>% drop_na(c("pH", "pH_veld"))
+  
+  res <- res %>%
     dplyr::mutate(oordeel = ifelse(abs(pH - pH_veld) >= 2,
                                    "twijfelachtig", "onverdacht"),
                   iden = paste(putcode, jaar, maand, dag, sep = "-")) %>%
@@ -90,6 +98,10 @@ QC3f <- function(d_veld, d_metingen, ph_veld_naam = "pH_veld", verbose = F) {
                                   test = test,
                                   oordeel = "twijfelachtig",
                                   ids = twijfel_id)
+  d_metingen <- qcout_add_oordeel(obj = d_metingen,
+                                  test = test,
+                                  oordeel = "niet uitvoerbaar",
+                                  ids = niet_uitvoerbaar_id)
   d_metingen <- qcout_add_rapportage(obj = d_metingen,
                                      test = test,
                                      tekst = rapportageTekst)
