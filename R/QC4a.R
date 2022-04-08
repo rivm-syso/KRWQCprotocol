@@ -61,15 +61,15 @@ QC4a <- function(d_metingen, d_parameter,
     dplyr::mutate(n.meetjaar = dplyr::n_distinct(jaar),
                   n.meting = length(waarde),
                   logobs = log(waarde),
-                  loggem = mean(log(waarde)),
-                  logsdv = sd(log(waarde))) %>%
+                  loggem = sapply(1:n(), function(i) mean(log(waarde[-i]))),
+                  logsdv = sapply(1:n(), function(i) sd(log(waarde[-i])))) %>%
     # bepaal z-score. Indien SD = 0, dan ook z-score = 0
     dplyr::mutate(logz = ifelse(logsdv == 0, 0 ,
                                 (logobs - loggem) / logsdv) ) %>%
     # voeg oordeel toe
     # reeksen met <3 metingen/meetjaren zijn niet uitvoerbaar
     # z-score >3.5 is twijfelachtig
-    dplyr::mutate(oordeel = ifelse(n.meetjaar < 3, "test niet uitvoerbaar",
+    dplyr::mutate(oordeel = ifelse(n.meetjaar < 3, "niet uitvoerbaar",
                             ifelse(n.meetjaar >= 3 & abs(logz) > zscore, "twijfelachtig",
                                    "onverdacht"))) %>%
     # voeg type toe voor plotjes nieuwe en oude meetrondes
@@ -79,10 +79,12 @@ QC4a <- function(d_metingen, d_parameter,
   rapportageTekst <- paste("Er zijn in totaal", 
                            nrow(d %>% dplyr::filter(oordeel == "twijfelachtig")), 
                            "metingen waar de afwijking >", zscore, "standaarddeviaties",
-                           "is t.o.v. de historische meetreeks.")
+                           "is t.o.v. de historische meetreeks en totaal",
+                           nrow(d %>% dplyr::filter(oordeel == "niet uitvoerbaar")),
+                           "metingen waar QC4a niet uitvoerbaar is")
   
   if(verbose) {
-    if(nrow(d %>% dplyr::filter(oordeel == "twijfelachtig")) > 0 ) {
+    if(nrow(d %>% dplyr::filter(oordeel %in% c("twijfelachtig", "niet uitvoerbaar"))) > 0 ) {
       print(rapportageTekst)
       
     } else {
@@ -255,12 +257,21 @@ QC4a <- function(d_metingen, d_parameter,
     dplyr::distinct(qcid) %>%
     dplyr::pull(qcid)
   
+  niet_uitvoerbaar_id <- resultaat_df %>% 
+    dplyr::filter(oordeel == "niet uitvoerbaar") %>% 
+    dplyr::distinct(qcid) %>%
+    dplyr::pull(qcid)
+  
   test <- "QC4a"
   
   d_metingen <- qcout_add_oordeel(obj = d_metingen,
                                   test = test,
                                   oordeel = "twijfelachtig",
                                   ids = twijfel_id)
+  d_metingen <- qcout_add_oordeel(obj = d_metingen,
+                                  test = test,
+                                  oordeel = "niet uitvoerbaar",
+                                  ids = niet_uitvoerbaar_id)
   d_metingen <- qcout_add_rapportage(obj = d_metingen,
                                      test = test,
                                      tekst = rapportageTekst)

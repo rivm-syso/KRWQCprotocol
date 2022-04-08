@@ -1,4 +1,4 @@
-test_that("QC3g", {
+test_that("QC3g T1", {
   
   
   data(metingen)
@@ -22,4 +22,22 @@ test_that("QC3g", {
   
   
   
+})
+
+
+test_that("QC3g T2", {
+              # test niet uitvoerbaar
+
+
+      data(metingen)
+      data(veld)
+
+      d <- metingen %>%
+          mutate(waarde = if_else(parameter == "HCO3", NA_real_, waarde))
+      x <- QC3g(d_metingen = metingen)
+      x_attr <- attr(x, "qcout")
+      ids <- x_attr[["QC3g"]][["oordeel"]][["niet uitvoerbaar"]]
+      expect_true(length(ids) == nrow(d))
+
+
 })

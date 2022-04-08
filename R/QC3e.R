@@ -69,8 +69,10 @@ QC3e <- function(d_metingen,
   res <- d %>%
     # selecteer relevante ionen en pH ook meenemen -> omrekenen naar h30
     dplyr::filter(parameter %in% c(an, cat, "ecv")) %>%
-    # alle NA's op 0 zetten, behalve pH en HCO3
-    dplyr::mutate(waarde_ib = ifelse(!parameter %in% c("h", "hv", "hco3", "hco3v") & is.na(waarde),
+    # alle NA's op 0 zetten, behalve pH, HCO3 en de belangrijkste ionen
+    dplyr::mutate(waarde_ib = ifelse(!parameter %in% c("h", "hv", "hco3", "hco3v",
+                                                       "ca", "na", "mg", "k",
+                                                       "cl", "so4") & is.na(waarde),
                                      0, waarde)) %>%
     # soms staat RG als NA, < of "", eerst NA veranderen in ""
     dplyr::mutate(detectieteken = ifelse(is.na(detectieteken), "", 
@@ -87,7 +89,7 @@ QC3e <- function(d_metingen,
                        names_from = parameter,
                        names_glue = "x{parameter}",
                        values_from = waarde_ib) 
-
+  
   # benodigde kolommen voor Patricks functies voor EC/ionenbalans
   benodigde_col <- 
     c("xal", "xca", "xcl", "xfe", "xhv", "xk", "xmg", "xmn", "xna", 
@@ -100,6 +102,13 @@ QC3e <- function(d_metingen,
     warning(paste("benodigde kolommen ontbreken:",
                   benodigde_col[!benodigde_col %in% names(namen)]))
   }
+  
+  # Rijen met missende waardes op niet uitvoerbaar zetten
+  niet_uitvoerbaar_id <- qcidNietUitvoerbaar(res, d_metingen, c("xecv", "xca", "xna", "xmg", "xk", "xcl", "xso4"))
+  
+  # Rijen met missende waardes weghalen
+  res <- res %>% drop_na(c("xecv", "xca", "xna", "xmg", "xk", "xcl", "xso4"))
+  
   
   # Onderstaande functie BerekenGeleidbaarheid doet 2 dingen:
   # - rekent de concentraties om naar meq/l, stelt de ionenbalans op, voegt
@@ -146,6 +155,10 @@ QC3e <- function(d_metingen,
                                   test = test,
                                   oordeel = "twijfelachtig",
                                   ids = twijfel_id)
+  d_metingen <- qcout_add_oordeel(obj = d_metingen,
+                                  test = test,
+                                  oordeel = "niet uitvoerbaar",
+                                  ids = niet_uitvoerbaar_id)
   d_metingen <- qcout_add_rapportage(obj = d_metingen,
                                      test = test,
                                      tekst = rapportageTekst)

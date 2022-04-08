@@ -32,3 +32,36 @@ test_that("QC0h",{
 
 
 })
+
+test_that("QC0h - niet uitvoerbaar",{
+
+              d <- metingen %>%
+                  mutate(waarde = if_else(parameter == "NO3", NA_real_, waarde ))
+
+              x <- QC0h(d_metingen = metingen, d_filter = filter)
+              x_attr <- attr(x, "qcout")
+              ids1 <- x_attr[["QC0h"]][["oordeel"]][["twijfelachtig"]]
+              ids2 <- x_attr[["QC0h"]][["oordeel"]][["verdacht"]]
+              ids3 <- x_attr[["QC0h"]][["oordeel"]][["niet uitvoerbaar"]]
+              goede_ids <- setdiff(metingen$qcid, c(ids1, ids2, ids3))
+
+              d <- metingen %>%
+                  filter(qcid %in% goede_ids)
+
+              x <- QC0h(d_metingen = d, d_filter = filter)
+              x_attr <- attr(x, "qcout")
+              ids1 <- x_attr[["QC0h"]][["oordeel"]][["twijfelachtig"]]
+              ids2 <- x_attr[["QC0h"]][["oordeel"]][["verdacht"]]
+              ids3 <- x_attr[["QC0h"]][["oordeel"]][["niet uitvoerbaar"]]
+              alle_ids <- c(ids1, ids2, ids3)
+              expect_true(length(alle_ids) == 0)
+
+              d2 <- d %>%
+                  mutate(waarde = if_else(parameter == "NO3", NA_real_, waarde ))
+
+              x <- QC0h(d_metingen = d2, d_filter = filter)
+              x_attr <- attr(x, "qcout")
+              ids3 <- x_attr[["QC0h"]][["oordeel"]][["niet uitvoerbaar"]]
+              expect_true(length(ids3) == nrow(d2))
+
+})
