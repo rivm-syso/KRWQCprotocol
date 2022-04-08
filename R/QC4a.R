@@ -84,7 +84,7 @@ QC4a <- function(d_metingen, d_parameter,
                            "metingen waar QC4a niet uitvoerbaar is")
   
   if(verbose) {
-    if(nrow(d %>% dplyr::filter(oordeel == "twijfelachtig")) > 0 ) {
+    if(nrow(d %>% dplyr::filter(oordeel %in% c("twijfelachtig", "niet uitvoerbaar"))) > 0 ) {
       print(rapportageTekst)
       
     } else {
