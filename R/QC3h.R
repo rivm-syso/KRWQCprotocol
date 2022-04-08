@@ -28,7 +28,7 @@ QC3h <- function(d_metingen, verbose = F) {
 
     # Selecteer alleen NO3 en NH4 uit de dataset
     d <- d_metingen %>%
-        dplyr::filter(stringr::str_detect(parameter, "NO3|NH4")) 
+        dplyr::filter(parameter %in% c("NO3","NH4")) 
     n_params <- unique(d$parameter)
 
     # Check of er nu maar 2 parameters beschikbaar zijn

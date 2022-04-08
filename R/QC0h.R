@@ -45,20 +45,16 @@ QC0h <- function(d_filter, d_metingen, verbose = F) {
     pivot_wider(names_from = parameter,
                 values_from = c(detectieteken, rapportagegrens, waarde),
                 names_glue = "{parameter}_{.value}") 
-
-  if(exists("no3_n_waarde", d)){
-    d <- d %>%
-      # reken NO3_N om naar NO3
-      mutate(no3_n_waarde = no3_n_waarde * 4.4268,
-             no3_n_rapportagegrens = no3_n_rapportagegrens * 4.4268)
-  }
-  
-  # als no3 als no3_n staat, dan vervangen naar NO3 -> geval voor LMG  
-  # colnames(d)[grepl("no3_n", colnames(d))] <- paste0("no3_", c("detectieteken", "rapportagegrens", "waarde"))
   
   d <- d %>%
     select(monsterid, jaar, maand, dag, putcode, filter,
            sort(colnames(.)))
+  
+  # Rijen met missende waardes op niet uitvoerbaar zetten
+  niet_uitvoerbaar_id <- qcidNietUitvoerbaar(d, d_metingen, c("NO3_waarde", "Fe_waarde", "Mn_waarde", "SO4_waarde", "Cl_waarde"))
+  
+  # Rijen met missende waardes weghalen
+  d <- d %>% drop_na(c("NO3_waarde", "Fe_waarde", "Mn_waarde", "SO4_waarde", "Cl_waarde"))
   
   # Bepaal redoxklasse voor alle jaren
   d <- d %>%
@@ -176,6 +172,10 @@ QC0h <- function(d_filter, d_metingen, verbose = F) {
                                   test = test,
                                   oordeel = "verdacht",
                                   ids = verdacht_id)
+  d_metingen <- qcout_add_oordeel(obj = d_metingen,
+                                  test = test,
+                                  oordeel = "niet uitvoerbaar",
+                                  ids = niet_uitvoerbaar_id)
   d_metingen <- qcout_add_rapportage(obj = d_metingen,
                                      test = test,
                                      tekst = rapportageTekst)
