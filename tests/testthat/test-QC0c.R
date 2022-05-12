@@ -9,20 +9,13 @@ test_that("QC0c_create_file", {
               QC0c_create_file(dir=tempdir())
               expect_true(file.exists(file.path(tempdir(),fname)))
               unlink(file.path(tempdir(),fname))
-
-
-
-
-
-
 })
-
 
 
 test_that("QC0c",{
 
-data(metingen)
-data(put)
+              data(metingen)
+              data(put)
               fname <- "QC0c_beschadiging_put.csv"
               QC0c_create_file(dir=tempdir())
 

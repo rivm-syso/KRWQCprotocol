@@ -96,7 +96,7 @@ QC3g <- function(d_metingen, verbose = F) {
     dplyr::mutate(oordeel = ifelse(iden %in% res$iden,
                                    "twijfelachtig", "onverdacht")) %>%
     dplyr::filter(oordeel != "onverdacht") %>%
-    dplyr::left_join(., res %>% dplyr::select(iden, pH, HCO3)) %>%
+    dplyr::left_join(., res %>% dplyr::select(iden, pH, HCO3), by = "iden") %>%
     dplyr::select(qcid, monsterid, jaar, maand, dag, putcode, filter, 
                   pH, HCO3, oordeel)
   
