@@ -71,7 +71,7 @@ QC0e <- function(d_veld, d_filter, d_metingen, fl = 2, verbose = F) {
     mutate(oordeel = ifelse(iden %in% res$iden,
                             "twijfelachtig", "onverdacht")) %>%
     filter(oordeel == "twijfelachtig") %>%
-    left_join(., res %>% select(iden, `onderkant filter_val`, `onderkant filter_BRO`)) %>%
+    left_join(., res %>% select(iden, `onderkant filter_val`, `onderkant filter_BRO`), by = "iden") %>%
     select(qcid, monsterid, jaar, maand, dag, putcode, filter,
            `onderkant filter_val`, `onderkant filter_BRO`, oordeel)
   

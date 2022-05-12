@@ -148,7 +148,7 @@ QC3c <- function(d_metingen, ph_naam = "pH", hco3_naam = "HCO3", verbose = F) {
     dplyr::mutate(oordeel = ifelse(iden %in% res$iden,
                                    "twijfelachtig", "onverdacht")) %>%
     dplyr::filter(oordeel != "onverdacht") %>%
-    dplyr::left_join(., res %>% dplyr::select(iden, `som cat`, `som an`, ib)) 
+    dplyr::left_join(., res %>% dplyr::select(iden, `som cat`, `som an`, ib), by = "iden") 
   
   twijfel_id <- resultaat_df %>% 
     dplyr::filter(oordeel == "twijfelachtig") %>% 
