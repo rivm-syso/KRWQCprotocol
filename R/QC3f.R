@@ -84,7 +84,7 @@ QC3f <- function(d_veld, d_metingen, ph_veld_naam = "pH_veld", verbose = F) {
     dplyr::mutate(oordeel = ifelse(iden %in% res$iden,
                                    "twijfelachtig", "onverdacht")) %>%
     dplyr::filter(oordeel != "onverdacht") %>%
-    dplyr::left_join(., res %>% select(pH, pH_veld, iden)) 
+    dplyr::left_join(., res %>% select(pH, pH_veld, iden), by = "iden") 
   resultaat_df <- resultaat_df[, cols]
   
   twijfel_id <- resultaat_df %>% 
