@@ -11,9 +11,9 @@ test_that("QC4a T1", {
              expect_false(is.null(x_attr[["QC4a"]]))
              expect_true(is.list(x_attr[["QC4a"]][["resultaat"]]))
 
-             ids <- x_attr[["QC1a"]][["oordeel"]][["twijfelachtig"]]
+             ids <- x_attr[["QC4a"]][["oordeel"]][["twijfelachtig"]]
              qcids <- metingen$qcid
-             v1 <- intersect(ids, qcids)
+             v1 <- setdiff(ids, qcids)
              expect_true(length(v1) == 0)
 
              expect_true(nrow(metingen) == nrow(x))
@@ -49,9 +49,9 @@ test_that("QC4a T2", {
              x_attr <- attr(x, "qcout")
              ids <- x_attr[["QC4a"]][["oordeel"]][["twijfelachtig"]]
              qcids <- d2$qcid
-             v1 <- intersect(ids, qcids)
-             expect_true(length(v1) > 0)
-             expect_false(any(v1 != ids))
+             v1 <- setdiff(ids, qcids)
+             expect_true(length(v1) == 0)
+             #expect_false(any(v1 != ids))
              expect_equal(qcid_twijfel, ids)
 
 
