@@ -88,7 +88,7 @@ QC3d <- function(d_metingen, d_parameter, geleidendheid_veld_naam = "GELDHD_VELD
         dplyr::mutate(oordeel = ifelse(iden %in% res$iden,
                                        "twijfelachtig", "onverdacht")) %>%
         dplyr::filter(oordeel != "onverdacht") %>%
-        dplyr::left_join(., res %>% select(GELDHD, GELDHD_VELD, iden)) 
+        dplyr::left_join(., res %>% select(GELDHD, GELDHD_VELD, iden), by = "iden") 
     resultaat_df <- resultaat_df[, cols]
     
     twijfel_id <- resultaat_df %>% 

@@ -32,7 +32,6 @@ test_that("QC3d T2", {
               d <- metingen  %>%
                   mutate(parameter = if_else(parameter == "ec_5__veld",
                                                      "GELDHD_VELD", parameter))
-              cat("T3:\n")
 
               x <- QC3d( d_metingen = d,d_parameter=parameter)
 
