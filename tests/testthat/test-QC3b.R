@@ -4,7 +4,7 @@ test_that("QC3b", {
               data(filter)
               data(metingen)
 
-              x <- QC3b(d_filter = filter, d_metingen = metingen)
+              suppressWarnings(x <- QC3b(d_filter = filter, d_metingen = metingen))
 
               # test if attributes exist
               expect_true(qcout_attrexists(x))
