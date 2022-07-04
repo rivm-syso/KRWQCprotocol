@@ -182,7 +182,7 @@ qcidNietUitvoerbaar <- function(d, d_metingen, benodigdeKolommen){
     ungroup() %>% 
     select(qcid, iden)
   
-  niet_uitvoerbaar <- left_join(niet_uitvoerbaar, id, by = "iden")
+  niet_uitvoerbaar <- left_join(niet_uitvoerbaar, id)
   niet_uitvoerbaar_id <- niet_uitvoerbaar %>% distinct(qcid) %>% pull(qcid)
   
   return(niet_uitvoerbaar_id)

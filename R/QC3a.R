@@ -37,13 +37,27 @@ QC3a <- function(d_veld, d_metingen, verbose = F) {
   res <- d_metingen %>%
     dplyr::select(-c(detectieteken, rapportagegrens, waarde)) %>%
     dplyr::mutate(labdatum = lubridate::make_date(jaar, maand, dag)) %>%
-    dplyr::left_join(., d, by = c("jaar", "filter", "putcode"))  %>%
+    dplyr::left_join(., d, by = c("jaar", "filter", "putcode")) 
+  
+  # Rijen met missende waardes op niet uitvoerbaar zetten
+  niet_uitvoerbaar_id <- qcidNietUitvoerbaar(res, d_metingen, c("labdatum", "velddatum"))
+  
+  res_niet_uitvoerbaar <- res %>% 
+    filter(qcid %in% niet_uitvoerbaar_id) %>% 
+    mutate(oordeel = "niet uitvoerbaar")
+  
+  # Rijen met missende waardes weghalen
+  res <- res %>% drop_na(c("labdatum", "velddatum"))
+  
+  res <- res %>%
     dplyr::mutate(oordeel = ifelse(labdatum < velddatum,
                             "verdacht", "onverdacht")) %>%
     dplyr::filter(oordeel != "onverdacht")
 
   rapportageTekst <- paste("Er zijn in totaal", nrow(res),
-                           "metingen waar de labdatum niet na de velddatum komt")
+                           "metingen waar de labdatum niet na de velddatum komt.",
+                           "Er zijn in totaal", length(niet_uitvoerbaar_id),
+                           "metingen waar de labdatum of de veldatum niet kon worden ingelezen")
 
 
   if(verbose) {
@@ -56,7 +70,7 @@ QC3a <- function(d_veld, d_metingen, verbose = F) {
   }
 
   # voeg attribute met uitkomsten tests toe aan relevante dataset (d_metingen)
-  resultaat_df <- res
+  resultaat_df <- res %>% bind_rows(res_niet_uitvoerbaar)
 
   verdacht_id <- resultaat_df %>%
       dplyr::filter(oordeel == "verdacht") %>%
@@ -68,6 +82,10 @@ QC3a <- function(d_veld, d_metingen, verbose = F) {
                                   test = test,
                                   oordeel = "verdacht",
                                   ids = verdacht_id)
+  d_metingen <- qcout_add_oordeel(obj = d_metingen,
+                                  test = test,
+                                  oordeel = "niet uitvoerbaar",
+                                  ids = niet_uitvoerbaar_id)
   d_metingen <- qcout_add_rapportage(obj = d_metingen,
                                      test = test,
                                      tekst = rapportageTekst)
