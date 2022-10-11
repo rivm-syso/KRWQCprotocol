@@ -109,17 +109,30 @@ QC3e <- function(d_metingen,
   # Rijen met missende waardes weghalen
   res <- res %>% drop_na(c("xecv", "xca", "xna", "xmg", "xk", "xcl", "xso4"))
   
+  # het onderstaande script vervangt het stukje script van 
+  # Onderstaande functie t/m gemeten EC
+  metveldgemiddelden<-res
+  input_groundwaterconductivity<-metveldgemiddelden
+  if (!"myrownames"%in%names(input_groundwaterconductivity)){
+    input_groundwaterconductivity$myrownames<-rownames(input_groundwaterconductivity)
+  }
   
-  # Onderstaande functie BerekenGeleidbaarheid doet 2 dingen:
-  # - rekent de concentraties om naar meq/l, stelt de ionenbalans op, voegt
-  # evt HCO3 en PO4 toe en kent de benodigde methode toe waarmee de EC 
-  # berekend gaat worden (functie MaakKolomMeth)
-  # - berekend vervolgens de geleidbaarheid (EC25) volgens Stuyfzand (1984/7)
+  geleidbaarheid=calculate_conductivity(inputfilename = 'nofile.rda',inputstyle = "broadLMM",outputstyle = "minimal",celcius=25)
+  geleidbaar<-geleidbaarheid %>% select(!starts_with("x"))
+  # overige kolommen weer toevoegen
+  metgeleidbaarheid=merge.data.frame(metveldgemiddelden,geleidbaar,by="myrownames")
+  d<-metgeleidbaarheid
   
-  d <- BerekenGeleidbaarheid(metveldgemiddelden = res, celcius = celcius,
-                             add_bicarbonate = add_bicarbonate, 
-                             add_phosphate = add_phosphate)
-  
+  # # Onderstaande functie BerekenGeleidbaarheid doet 2 dingen:
+  # # - rekent de concentraties om naar meq/l, stelt de ionenbalans op, voegt
+  # # evt HCO3 en PO4 toe en kent de benodigde methode toe waarmee de EC 
+  # # berekend gaat worden (functie MaakKolomMeth)
+  # # - berekend vervolgens de geleidbaarheid (EC25) volgens Stuyfzand (1984/7)
+  # 
+  # d <- BerekenGeleidbaarheid(metveldgemiddelden = res, celcius = celcius,
+  #                            add_bicarbonate = add_bicarbonate, 
+  #                            add_phosphate = add_phosphate)
+  #   # 
   # Nu check op afwijking EC berekend en gemeten EC
   resultaat_df <- d %>%
     # selecteer relevante kolommen
