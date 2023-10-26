@@ -64,7 +64,8 @@ QC3f <- function(d_veld, d_metingen, ph_veld_naam = "pH_veld", verbose = F) {
     dplyr::filter(oordeel != "onverdacht")
   
   rapportageTekst <- paste("Er zijn in totaal", nrow(res), 
-                           "metingen waar pH-lab en pH-veld 1 pH-eenheden of meer afwijken")
+                           "metingen waar pH-lab en pH-veld 1 pH-eenheden of meer afwijken.",
+                           "Controleer de datum (analyse en veld) en historische gegevens van alle afwijkingen")
   
   if(verbose) {
     if(nrow(res) > 0 ) {
