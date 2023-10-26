@@ -4,7 +4,6 @@
 #'
 #' Indien de waarde negatief is, ken het concept
 #' oordeel verdacht toe aan de betreffende parameter(s).
-#' Met uitzondering van de temperatuur
 #' 
 #' @param d_metingen dataframe met metingen
 #' @param verbose of tekstuele output uit script gewenst is (T) of niet (F). Staat
@@ -24,8 +23,6 @@ QC1f <- function(d_metingen, verbose = F) {
   
   # Controle op aanwezigheid negatieve waardes
   resultaat_df <- d_metingen %>%
-    # met uitzondering van temperatuur
-    dplyr::filter(parameter %>% tolower() != "temperatuur") %>%
     dplyr::mutate(oordeel = ifelse(waarde < 0, "verdacht", 
                                    "onverdacht")) %>%
     dplyr::mutate(reden = ifelse(oordeel == "verdacht", 
