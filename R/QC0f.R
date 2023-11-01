@@ -44,7 +44,9 @@ QC0f <- function(d_veld, d_filter, d_metingen, verbose = F) {
   
   rapportageTekst <- paste("Er zijn in totaal", nrow(res), 
                            "bemonsterde putfilters met >50 cm afwijkende filterdieptes",
-                           "t.o.v. de BRO geregistreerde putcoordinaten.")
+                           "t.o.v. de BRO geregistreerde putcoordinaten.",
+                           "Controleer de lengte van deze putfilters.",
+                           "Controleer de registratie in de BRO.")
   
   # Als er een afwijkende filterdiepte is, print deze
   if(verbose) {
