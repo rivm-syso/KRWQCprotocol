@@ -3,7 +3,7 @@
 #' Controle op meetfout in de filterdiepte of aanwezigheid van 
 #' sediment in het filter.
 #' 
-#' Indien de filterdiepte meer dan 10 centimeter afwijkt van de
+#' Indien de filterdiepte meer dan 50 centimeter afwijkt van de
 #' geregistreerde filterdiepte, ken het concept QC oordeel
 #' twijfelachtig toe aan het monster.
 #' 
@@ -35,7 +35,7 @@ QC0f <- function(d_veld, d_filter, d_metingen, verbose = F) {
   # Vergelijk filterdiepte met opzoektabel van aangeleverde BRO data
   res <- merge(d, d_filter %>% dplyr::select(qcid, putcode, filter, diepte_onder), 
                by = c("putcode", "filter")) %>%
-    dplyr::mutate(oordeel = ifelse(abs(okf - diepte_onder) > 0.1,  
+    dplyr::mutate(oordeel = ifelse(abs(okf - diepte_onder) > 0.5,  
                             "twijfelachtig", "onverdacht"),
            iden = paste(putcode, filter, jaar, maand, dag, sep = "-")) %>%
     dplyr::filter(oordeel == "twijfelachtig") %>%
@@ -43,8 +43,10 @@ QC0f <- function(d_veld, d_filter, d_metingen, verbose = F) {
            `onderkant filter_BRO` = diepte_onder)
   
   rapportageTekst <- paste("Er zijn in totaal", nrow(res), 
-                           "bemonsterde putfilters met >10 cm afwijkende filterdieptes",
-                           "t.o.v. de BRO geregistreerde putcoordinaten.")
+                           "bemonsterde putfilters met >50 cm afwijkende filterdieptes",
+                           "t.o.v. de BRO geregistreerde putcoordinaten.",
+                           "Controleer de lengte van deze putfilters.",
+                           "Controleer de registratie in de BRO.")
   
   # Als er een afwijkende filterdiepte is, print deze
   if(verbose) {
