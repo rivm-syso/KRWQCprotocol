@@ -2,7 +2,7 @@
 #'
 #' Vergelijk pH-veld en pH-lab
 #'
-#' De signaleringswaarde voor monsters is delta-pH >= 2 pH-eenheden.
+#' De signaleringswaarde voor monsters is delta-pH >= 1 pH-eenheden.
 #' Als de delta-pH boven de signaleringswaarde ligt, ken het
 #' concept QC oordeel twijfelachtig toe aan het monster.
 #'         
@@ -58,20 +58,21 @@ QC3f <- function(d_veld, d_metingen, ph_veld_naam = "pH_veld", verbose = F) {
   res <- res %>% drop_na(c("pH", "pH_veld"))
   
   res <- res %>%
-    dplyr::mutate(oordeel = ifelse(abs(pH - pH_veld) >= 2,
+    dplyr::mutate(oordeel = ifelse(abs(pH - pH_veld) >= 1,
                                    "twijfelachtig", "onverdacht"),
                   iden = paste(putcode, jaar, maand, dag, sep = "-")) %>%
     dplyr::filter(oordeel != "onverdacht")
   
   rapportageTekst <- paste("Er zijn in totaal", nrow(res), 
-                           "metingen waar pH-lab en pH-veld 2 pH-eenheden of meer afwijken")
+                           "metingen waar pH-lab en pH-veld 1 pH-eenheden of meer afwijken.",
+                           "Controleer de datum (analyse en veld) en historische gegevens van alle afwijkingen")
   
   if(verbose) {
     if(nrow(res) > 0 ) {
       print(rapportageTekst)
       
     } else {
-      print(paste("Er zijn geen metingen waar pH-lab en pH-veld 2 pH-eenheden of meer afwijken"))
+      print(paste("Er zijn geen metingen waar pH-lab en pH-veld 1 pH-eenheden of meer afwijken"))
     }
   }
   
