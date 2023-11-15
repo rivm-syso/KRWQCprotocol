@@ -60,7 +60,7 @@ QC3f <- function(d_veld, d_metingen, ph_veld_naam = "pH_veld", verbose = F) {
   res <- res %>%
     dplyr::mutate(oordeel = ifelse(abs(pH - pH_veld) >= 2,
                                    "twijfelachtig", "onverdacht"),
-                  iden = paste(putcode, jaar, maand, dag, sep = "-")) %>%
+                  iden = paste(putcode, filter, jaar, maand, dag, sep = "-")) %>%
     dplyr::filter(oordeel != "onverdacht")
   
   rapportageTekst <- paste("Er zijn in totaal", nrow(res), 
@@ -80,7 +80,7 @@ QC3f <- function(d_veld, d_metingen, ph_veld_naam = "pH_veld", verbose = F) {
   
   resultaat_df <- d_metingen %>%
     dplyr::group_by(monsterid) %>%
-    dplyr::mutate(iden = paste(putcode, jaar, maand, dag, sep = "-")) %>%
+    dplyr::mutate(iden = paste(putcode, filter, jaar, maand, dag, sep = "-")) %>%
     dplyr::mutate(oordeel = ifelse(iden %in% res$iden,
                                    "twijfelachtig", "onverdacht")) %>%
     dplyr::filter(oordeel != "onverdacht") %>%

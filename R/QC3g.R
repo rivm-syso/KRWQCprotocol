@@ -69,7 +69,7 @@ QC3g <- function(d_metingen, verbose = F) {
     dplyr::mutate(oordeel = ifelse(pH < 5 & HCO3 > 15 |
                                      pH < 5.5 & HCO3 > 50,
                                    "twijfelachtig", "onverdacht"),
-                  iden = paste(putcode, jaar, maand, dag, sep = "-")) %>%
+                  iden = paste(putcode, filter, jaar, maand, dag, sep = "-")) %>%
     dplyr::filter(oordeel != "onverdacht")
   
   rapportageTekst <- paste("Er zijn in totaal", nrow(res), 
@@ -92,7 +92,7 @@ QC3g <- function(d_metingen, verbose = F) {
   # voeg concept oordeel van afwijkende pH-HCO3 relatie toe aan monsters op die locaties in betreffende meetronde
   resultaat_df <- d_metingen %>%
     dplyr::group_by(monsterid) %>%
-    dplyr::mutate(iden = paste(putcode, jaar, maand, dag, sep = "-")) %>%
+    dplyr::mutate(iden = paste(putcode, filter, jaar, maand, dag, sep = "-")) %>%
     dplyr::mutate(oordeel = ifelse(iden %in% res$iden,
                                    "twijfelachtig", "onverdacht")) %>%
     dplyr::filter(oordeel != "onverdacht") %>%
