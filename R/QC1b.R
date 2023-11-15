@@ -38,32 +38,33 @@ QC1b <- function(d_veld, d_parameter, d_metingen, verbose = F) {
     testKolommenMetingen(d_metingen)
 
     # eerst controle op bemonsteringsapparaat en -procedure
-    bemonstering <- rbind(d_veld %>% 
-                          dplyr::filter(!bem_app %in% BRO_bemonsteringsapparaat$waarde) %>%
-                          dplyr::mutate(reden = "bemonsteringsapparatuur wijkt af van BRO"),
-                      d_veld %>%
-                          dplyr::filter(!bem_proc %in% BRO_bemonsteringsprocedure$waarde) %>%
-                          dplyr::mutate(reden = "bemonsteringsprocedure wijkt af van BRO")) %>%
+    bemonstering <- full_join(d_veld %>% 
+                                dplyr::filter(!bem_app %in% BRO_bemonsteringsapparaat$waarde) %>%
+                                dplyr::mutate(reden_apparatuur = "bemonsteringsapparatuur wijkt af van BRO"),
+                              d_veld %>%
+                                dplyr::filter(!bem_proc %in% BRO_bemonsteringsprocedure$waarde) %>%
+                                dplyr::mutate(reden_procedure = "bemonsteringsprocedure wijkt af van BRO")) %>%
    
-    dplyr::select(qcid, putcode, filter, jaar, maand, dag, bem_app, bem_proc, reden)
+    dplyr::select(qcid, putcode, filter, jaar, maand, dag, bem_app, bem_proc, reden_apparatuur, reden_procedure)
 
 # daarna controle op waardebepalingstechniek en -procedure
-waardebepaling <- rbind(d_parameter %>%
-                        dplyr::filter(!waarde_techniek %in% BRO_waardebepalingstechniek$waarde) %>%
-                        dplyr::mutate(reden = "waardebepalingstechniek wijkt af van BRO"), d_parameter %>%
-                        dplyr::filter(!waarde_procedure %in% BRO_waardebepalingsprocedure$waarde) %>%
-                        dplyr::mutate(reden = "waardebepalingsprocedure wijkt af van BRO")) %>%
-                        dplyr::select(qcid, parameter, cas, waarde_techniek, waarde_procedure, reden)
+waardebepaling <- full_join(d_parameter %>%
+                              dplyr::filter(!waarde_techniek %in% BRO_waardebepalingstechniek$waarde) %>%
+                              dplyr::mutate(reden_techniek = "waardebepalingstechniek wijkt af van BRO"), 
+                            d_parameter %>%
+                              dplyr::filter(!waarde_procedure %in% BRO_waardebepalingsprocedure$waarde) %>%
+                              dplyr::mutate(reden_procedure = "waardebepalingsprocedure wijkt af van BRO")) %>%
+  dplyr::select(qcid, parameter, cas, waarde_techniek, waarde_procedure, reden_techniek, reden_procedure)
 
   rapportageTekst <- paste("Er zijn in totaal", 
-                           nrow(bemonstering %>% dplyr::filter(reden == "bemonsteringsapparatuur wijkt af van BRO")), 
+                           nrow(bemonstering %>% dplyr::filter(reden_apparatuur == "bemonsteringsapparatuur wijkt af van BRO")), 
                            "bemonsteringen met afwijkende bemonsteringsapparatuur en",
-                           nrow(bemonstering %>% dplyr::filter(reden == "bemonsteringsprocedure wijkt af van BRO")),
+                           nrow(bemonstering %>% dplyr::filter(reden_procedure == "bemonsteringsprocedure wijkt af van BRO")),
                            "bemonstering met afwijkende bemonsteringsprocedure.",
                            "Daarnaast zijn er",
-                           nrow(waardebepaling %>% dplyr::filter(reden == "waardebepalingstechniek wijkt af van BRO")),
+                           nrow(waardebepaling %>% dplyr::filter(reden_techniek == "waardebepalingstechniek wijkt af van BRO")),
                            "parameters met een afwijkende waardebepalingstechniek en",
-                           nrow(waardebepaling %>% dplyr::filter(reden == "waardebepalingsprocedure wijkt af van BRO")),
+                           nrow(waardebepaling %>% dplyr::filter(reden_procedure == "waardebepalingsprocedure wijkt af van BRO")),
                            "met een afwijkende waardebepalingsprocedure t.o.v. de BRO.")
 
 if(verbose) {
@@ -86,7 +87,7 @@ resultaat_df_meting <- d_metingen %>%
     dplyr::mutate(oordeel = ifelse(iden %in% bemonstering$iden,
                             "verdacht", "onverdacht")) %>%
     dplyr::filter(oordeel == "verdacht") %>%
-    dplyr::left_join(., bemonstering %>% dplyr::select(iden, reden), by = "iden") %>%
+    dplyr::left_join(., bemonstering %>% dplyr::select(iden, reden_apparatuur, reden_procedure), by = "iden") %>%
     dplyr::select(-iden)
 
 # voeg concept oordeel van afwijkende bemonstering toe aan parameters op die locaties in betreffende meetronde
@@ -95,7 +96,7 @@ resultaat_df_waarde <- d_metingen %>%
     dplyr::mutate(oordeel = ifelse(parameter %in% waardebepaling$parameter,
                             "verdacht", "onverdacht")) %>%
     dplyr::filter(oordeel == "verdacht") %>%
-    dplyr::left_join(., waardebepaling %>% dplyr::select(parameter, reden), by = c("parameter" = "parameter"))
+    dplyr::left_join(., waardebepaling %>% dplyr::select(parameter, reden_techniek, reden_procedure), by = "parameter")
 
 # voeg samen om als attribute weg te schrijven
 resultaat_df <- rbind(resultaat_df_meting, resultaat_df_waarde)
