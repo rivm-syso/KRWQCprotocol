@@ -64,7 +64,7 @@ QC3d <- function(d_metingen, d_parameter, geleidendheid_veld_naam = "GELDHD_VELD
         dplyr::mutate(oordeel = ifelse(abs(GELDHD - GELDHD_VELD) > 0.1 * GELDHD |
                                            abs(GELDHD - GELDHD_VELD) > 0.1 * GELDHD_VELD,
                                        "twijfelachtig", "onverdacht"),
-                      iden = paste(putcode, jaar, maand, dag, sep = "-")) %>%
+                      iden = paste(putcode, filter, jaar, maand, dag, sep = "-")) %>%
         dplyr::filter(oordeel != "onverdacht")
     
     rapportageTekst <- paste("Er zijn in totaal", nrow(res), 
@@ -84,7 +84,7 @@ QC3d <- function(d_metingen, d_parameter, geleidendheid_veld_naam = "GELDHD_VELD
     
     resultaat_df <- d_metingen %>%
         dplyr::group_by(monsterid) %>%
-        dplyr::mutate(iden = paste(putcode, jaar, maand, dag, sep = "-")) %>%
+        dplyr::mutate(iden = paste(putcode, filter, jaar, maand, dag, sep = "-")) %>%
         dplyr::mutate(oordeel = ifelse(iden %in% res$iden,
                                        "twijfelachtig", "onverdacht")) %>%
         dplyr::filter(oordeel != "onverdacht") %>%

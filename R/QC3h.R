@@ -52,7 +52,7 @@ QC3h <- function(d_metingen, verbose = F) {
         dplyr::mutate(oordeel = ifelse(NO3 > 0.5 & NH4 > 2 |
                                        NO3 > 0.5 & NH4 > NO3,
                                    "twijfelachtig", "onverdacht"),
-                      iden = paste(putcode, jaar, maand, dag, sep = "-")) %>%
+                      iden = paste(putcode, filter, jaar, maand, dag, sep = "-")) %>%
         dplyr::filter(oordeel != "onverdacht")
 
     rapportageTekst <- paste("Er zijn in totaal", nrow(res), 
@@ -79,7 +79,7 @@ QC3h <- function(d_metingen, verbose = F) {
     resultaat_df <- d_metingen %>%
         dplyr::group_by(monsterid) %>%
         dplyr::filter(parameter%in%n_params) %>%
-        dplyr::mutate(iden = paste(putcode, jaar, maand, dag, sep = "-")) %>%
+        dplyr::mutate(iden = paste(putcode, filter, jaar, maand, dag, sep = "-")) %>%
         dplyr::mutate(oordeel = ifelse(iden %in% res$iden,
                                        "twijfelachtig", "onverdacht")) %>%
         dplyr::filter(oordeel != "onverdacht") %>%
