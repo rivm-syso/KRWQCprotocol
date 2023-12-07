@@ -64,6 +64,7 @@ Tabel 1 veldbestand (`d_veld`) bestaat uit:
 kolomnaam       | inhoud                      | type
 ---------------|-----------------------------|--------
 qcid | rijnummer | numeriek
+monsterid | unieke identificatiecode voor het genomen grondwatermonster | numeriek
 putcode | identificatie putlocatie volgens RGD/BRO? | karakter
 filter | filternummer | numeriek
 jaar | jaar van veldbezoek | numeriek
@@ -124,7 +125,7 @@ Tabel 5 metingenbestand (`d_metingen`) bestaat uit:
 kolomnaam       | inhoud                      | type
 ---------------|-----------------------------|--------
 qcid | rijnummer | numeriek
-monsterID | unieke identificatiecode voor het genomen grondwatermonster | numeriek
+monsterid | unieke identificatiecode voor het genomen grondwatermonster | numeriek
 jaar | jaar van laboratorium of veldanalyse | numeriek
 maand | maand van laboratorium of veldanalyse | numeriek
 dag | dag van laboratorium of veldanalyse | numeriek
