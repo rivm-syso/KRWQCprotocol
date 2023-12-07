@@ -4,7 +4,7 @@
 testKolommenVeld <- function(d) {
   # test of verplichte kolommen aanwezig zijn voor veldtabel
   
-  kolommen_numeriek <- c("qcid", "jaar", "maand", "dag", 
+  kolommen_numeriek <- c("qcid", "monsterid", "jaar", "maand", "dag", 
                          "xcoord", "ycoord", "okf", "gws_voor", "gws_na")  # eventueel nog kolom dag, maand, jaar apart
   kolommen <- c("putcode", "filter", "landgebruik", 
                 "bem_app", "bem_proc",  kolommen_numeriek)
