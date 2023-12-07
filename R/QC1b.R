@@ -45,7 +45,7 @@ QC1b <- function(d_veld, d_parameter, d_metingen, verbose = F) {
                                 dplyr::filter(!bem_proc %in% BRO_bemonsteringsprocedure$waarde) %>%
                                 dplyr::mutate(reden_procedure = "bemonsteringsprocedure wijkt af van BRO")) %>%
    
-    dplyr::select(qcid, putcode, filter, jaar, maand, dag, bem_app, bem_proc, reden_apparatuur, reden_procedure)
+    dplyr::select(qcid, monsterid, putcode, filter, jaar, maand, dag, bem_app, bem_proc, reden_apparatuur, reden_procedure)
 
 # daarna controle op waardebepalingstechniek en -procedure
 waardebepaling <- full_join(d_parameter %>%
@@ -79,11 +79,11 @@ if(verbose) {
 
 # voeg concept oordeel van afwijkende bemonstering toe aan monsters op die locaties in betreffende meetronde
 bemonstering <- bemonstering %>%
-    dplyr::mutate(iden = paste(putcode, filter, jaar, maand, dag, sep = "-"))
+    dplyr::mutate(iden = monsterid)
 
 resultaat_df_meting <- d_metingen %>%
     dplyr::group_by(monsterid) %>%
-    dplyr::mutate(iden = paste(putcode, filter, jaar, maand, dag, sep = "-")) %>%
+    dplyr::mutate(iden = monsterid) %>%
     dplyr::mutate(oordeel = ifelse(iden %in% bemonstering$iden,
                             "verdacht", "onverdacht")) %>%
     dplyr::filter(oordeel == "verdacht") %>%
