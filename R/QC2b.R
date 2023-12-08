@@ -48,7 +48,7 @@ QC2b <- function(dir, d_metingen, verbose = F) {
   
   # Verwijder lege rijen met NA's
   d <- d %>%
-    dplyr::mutate(iden = paste(putcode, filter, jaar, maand, dag, sep = "-")) %>%
+    dplyr::mutate(iden = monsterid) %>%
     dplyr::filter_all(dplyr::all_vars(!is.na(.)))
   
   rapportageTekst <- paste("Er zijn in totaal", nrow(d), 
@@ -72,7 +72,7 @@ QC2b <- function(dir, d_metingen, verbose = F) {
   # voeg concept oordeel van afwijkende putten toe aan monsters op die locaties in betreffende meetronde
   resultaat_df <- d_metingen %>%
     dplyr::group_by(monsterid) %>%
-    dplyr::mutate(iden = paste(putcode, filter, jaar, maand, dag, sep = "-")) %>%
+    dplyr::mutate(iden = monsterid) %>%
     dplyr::mutate(oordeel = ifelse(iden %in% d$iden,
                                    "twijfelachtig", "onverdacht")) %>%
     dplyr::filter(oordeel != "onverdacht") %>%
@@ -138,11 +138,7 @@ QC2b_create_file <- function(dir) {
   
   
   if(!file.exists(file.path(dir, fname))) {
-    d <- data.frame(putcode = "", 
-                    filter = "",
-                    jaar = "",
-                    maand = "",
-                    dag = "",
+    d <- data.frame(monsterid = "", 
                     afwijking_bemonsteringsprocedure = "")
     write.csv(d, file.path(dir, fname))
   }
@@ -153,7 +149,7 @@ QC2b_create_file <- function(dir) {
 testKolommenQC2b <- function(d) {
   # test of verplichte kolommen aanwezig zijn voor CSV tabellen
   
-  kolommen <- c("putcode", "filter", "jaar", "maand", "dag", "afwijking_bemonsteringsprocedure")
+  kolommen <- c("monsterid", "afwijking_bemonsteringsprocedure")
   
   if(length(setdiff(kolommen, names(d))) > 0) {
     stop("kolommen ontbreken of worden niet herkend")
