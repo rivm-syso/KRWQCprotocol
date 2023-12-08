@@ -118,7 +118,7 @@ QC0h <- function(d_filter, d_metingen, verbose = F) {
     mutate(oordeel = ifelse(abs(redoxnr.x - redoxnr.y) == 0, "onverdacht",
                             ifelse(abs(redoxnr.x - redoxnr.y) == 1, "twijfelachtig",
                                    "verdacht")),
-           iden = paste(putcode, filter, jaar, maand, dag, sep = "-")) %>%
+           iden = monsterid) %>%
     filter(oordeel != "onverdacht") %>%
     rename(redoxklasse_VAL = redoxklasse.x,
            redoxklasse_HIS = redoxklasse.y)
@@ -152,7 +152,7 @@ QC0h <- function(d_filter, d_metingen, verbose = F) {
   # voeg concept oordeel van afwijkende putten toe aan monsters op die locaties in betreffende meetronde
   resultaat_df <- d_metingen %>%
     group_by(monsterid) %>%
-    mutate(iden = paste(putcode, filter, jaar, maand, dag, sep = "-")) %>%
+    mutate(iden = monsterid) %>%
     filter(iden %in% res$iden) %>%
     # voeg resultaten test toe
     left_join(., res %>% select(iden, redoxklasse_VAL, redoxklasse_HIS, oordeel), by = "iden") %>%
