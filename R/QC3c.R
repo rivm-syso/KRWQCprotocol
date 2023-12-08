@@ -119,7 +119,7 @@ QC3c <- function(d_metingen, ph_naam = "pH", hco3_naam = "HCO3", verbose = F) {
     # Eventueel nog keuze opnemen?
     dplyr::mutate(oordeel = ifelse(abs(ib) > 10,
                                    "twijfelachtig", "onverdacht"),
-                  iden = paste(putcode, filter, jaar, maand, dag, sep = "-")) %>%
+                  iden = monsterid) %>%
     dplyr::filter(oordeel != "onverdacht") %>%
     dplyr::rename(`som cat` = pos,
                   `som an` = neg) 
@@ -144,7 +144,7 @@ QC3c <- function(d_metingen, ph_naam = "pH", hco3_naam = "HCO3", verbose = F) {
   
   # voeg attribute met uitkomsten tests toe aan relevante dataset (d_metingen)
   resultaat_df <- d_metingen %>%
-    dplyr::mutate(iden = paste(putcode, filter, jaar, maand, dag, sep = "-")) %>%
+    dplyr::mutate(iden = monsterid) %>%
     dplyr::mutate(oordeel = ifelse(iden %in% res$iden,
                                    "twijfelachtig", "onverdacht")) %>%
     dplyr::filter(oordeel != "onverdacht") %>%
