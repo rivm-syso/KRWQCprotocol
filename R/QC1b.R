@@ -45,7 +45,7 @@ QC1b <- function(d_veld, d_parameter, d_metingen, verbose = F) {
                                 dplyr::filter(!bem_proc %in% BRO_bemonsteringsprocedure$waarde) %>%
                                 dplyr::mutate(reden_procedure = "bemonsteringsprocedure wijkt af van BRO")) %>%
    
-    dplyr::select(qcid, monsterid, putcode, filter, jaar, maand, dag, bem_app, bem_proc, reden_apparatuur, reden_procedure)
+    dplyr::select(qcid, monsterid, putcode, filter, bem_app, bem_proc, reden_apparatuur, reden_procedure)
 
 # daarna controle op waardebepalingstechniek en -procedure
 waardebepaling <- full_join(d_parameter %>%
