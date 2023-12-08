@@ -60,7 +60,7 @@ QC3f <- function(d_veld, d_metingen, ph_veld_naam = "pH_veld", verbose = F) {
   res <- res %>%
     dplyr::mutate(oordeel = ifelse(abs(pH - pH_veld) >= 2,
                                    "twijfelachtig", "onverdacht"),
-                  iden = paste(putcode, filter, jaar, maand, dag, sep = "-")) %>%
+                  iden = monsterid) %>%
     dplyr::filter(oordeel != "onverdacht")
   
   rapportageTekst <- paste("Er zijn in totaal", nrow(res), 
@@ -76,16 +76,15 @@ QC3f <- function(d_veld, d_metingen, ph_veld_naam = "pH_veld", verbose = F) {
   }
   
   # voeg attribute met uitkomsten tests toe aan relevante dataset (d_metingen)
-  cols <- c(1:5, 7, 6, 14, 15, 13)
   
   resultaat_df <- d_metingen %>%
     dplyr::group_by(monsterid) %>%
-    dplyr::mutate(iden = paste(putcode, filter, jaar, maand, dag, sep = "-")) %>%
+    dplyr::mutate(iden = monsterid) %>%
     dplyr::mutate(oordeel = ifelse(iden %in% res$iden,
                                    "twijfelachtig", "onverdacht")) %>%
     dplyr::filter(oordeel != "onverdacht") %>%
     dplyr::left_join(., res %>% select(pH, pH_veld, iden)) 
-  resultaat_df <- resultaat_df[, cols]
+  resultaat_df <- resultaat_df %>% select(qcid, monsterid, jaar, maand, dag, putcode, filter, pH, pH_veld, oordeel)
   
   twijfel_id <- resultaat_df %>% 
     dplyr::filter(oordeel == "twijfelachtig") %>% 
