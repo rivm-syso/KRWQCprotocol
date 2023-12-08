@@ -73,10 +73,6 @@ QC3h <- function(d_metingen, verbose = F) {
     }
 
     # voeg concept oordeel van afwijkende NO3-NH4 relatie toe aan monsters op die locaties in betreffende meetronde
-    c(iden, NO3, NH4)
-    c(qcid, monsterid, jaar, maand, dag, putcode, filter, NO3, NH4, oordeel)
-    cols <- c(10, 8, 7)
-    cols2 <- c(1:5, 7, 6, 14, 15, 13)
 
     resultaat_df <- d_metingen %>%
         dplyr::group_by(monsterid) %>%
