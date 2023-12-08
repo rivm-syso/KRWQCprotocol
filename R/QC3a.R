@@ -29,15 +29,14 @@ QC3a <- function(d_veld, d_metingen, verbose = F) {
   testKolommenMetingen(d_metingen)
   
   # creeer velddatum en koppel deze aan metingen bestand 
-  d <- d_veld %>%
-    dplyr::select(putcode, filter, jaar, maand, dag) %>%
-    dplyr::mutate(velddatum = lubridate::make_date(jaar, maand, dag)) %>%
-    dplyr::select(-c(maand, dag))
+  d <- d_veld %>% 
+    mutate(velddatum = lubridate::make_date(jaar, maand, dag)) %>% 
+    select(monsterid, velddatum)
   
   res <- d_metingen %>%
     dplyr::select(-c(detectieteken, rapportagegrens, waarde)) %>%
     dplyr::mutate(labdatum = lubridate::make_date(jaar, maand, dag)) %>%
-    dplyr::left_join(., d, by = c("jaar", "filter", "putcode")) 
+    dplyr::left_join(., d, by = c("monsterid")) 
   
   # Rijen met missende waardes op niet uitvoerbaar zetten
   niet_uitvoerbaar_id <- qcidNietUitvoerbaar(res, d_metingen, c("labdatum", "velddatum"))
