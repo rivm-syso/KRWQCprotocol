@@ -40,7 +40,7 @@ data(put)
 
 
               fouteput <- metingen %>% 
-                  dplyr::select(putcode, filter, jaar, maand, dag ) %>%
+                  dplyr::select(monsterid, putcode, filter, jaar, maand, dag ) %>%
                   dplyr::distinct()
               fouteput <- fouteput[sample(1:nrow(fouteput),size=10),] %>%
                   dplyr::mutate(beschadiging_put="stuk")

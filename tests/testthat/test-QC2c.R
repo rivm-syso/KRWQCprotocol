@@ -38,7 +38,7 @@ test_that("QC2c",{
   
   
   bijzondereput <- metingen %>% 
-    dplyr::select(putcode, filter, jaar, maand, dag ) %>%
+    dplyr::select(monsterid, putcode, filter, jaar, maand, dag ) %>%
     dplyr::distinct()
   bijzondereput <- bijzondereput[sample(1:nrow(bijzondereput),size=10),] %>%
     dplyr::mutate(bijzonderheden="bijzonder")
