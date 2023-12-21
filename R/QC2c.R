@@ -138,7 +138,7 @@ QC2c_create_file <- function(dir) {
   if(!file.exists(file.path(dir, fname))) {
     d <- data.frame(monsterid = "", 
                     bijzonderheden = "")
-    write.csv(d, file.path(dir, fname))
+    write.csv(d, file.path(dir, fname), row.names = FALSE)
   }
 }
 

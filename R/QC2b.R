@@ -140,7 +140,7 @@ QC2b_create_file <- function(dir) {
   if(!file.exists(file.path(dir, fname))) {
     d <- data.frame(monsterid = "", 
                     afwijking_bemonsteringsprocedure = "")
-    write.csv(d, file.path(dir, fname))
+    write.csv(d, file.path(dir, fname), row.names = FALSE)
   }
 }
 

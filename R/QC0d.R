@@ -138,7 +138,7 @@ QC0d_create_file <- function(dir) {
   if(!file.exists(file.path(dir, fname))) {
     d <- data.frame(monsterid = "", 
                     afdekking_put = "")
-    write.csv(d, file.path(dir, fname))
+    write.csv(d, file.path(dir, fname), row.names = FALSE)
   }
 }
 
