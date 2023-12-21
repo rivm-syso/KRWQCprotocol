@@ -1,8 +1,4 @@
-test_that("multiplication works", {
-  expect_equal(2 * 2, 4)
-})
-
-test_that("QC0b", {
+test_that("QC0b T1", {
 
               data(veld)
               data(put)
@@ -10,6 +6,16 @@ test_that("QC0b", {
 
               # error because we have 'heide' as landuse in the data
               expect_error(QC0b(d_veld=veld,d_put=put,d_metingen=metingen,verbose=TRUE))
+
+})
+
+
+
+test_that("QC0b T2", {
+
+              data(veld)
+              data(put)
+              data(metingen)
 
               d <- veld %>% dplyr::filter(landgebruik!="heide")
               x <- QC0b(d_veld=d,d_put=put,d_metingen=metingen,verbose=FALSE)
@@ -29,6 +35,14 @@ test_that("QC0b", {
                expect_false(any(v1!=ids))
 
               expect_true(nrow(metingen) == nrow(x))
+
+})
+
+test_that("QC0b T2", {
+
+              data(veld)
+              data(put)
+              data(metingen)
 
                # verwissel paar landgebruiksgegevens in veld tabel
                ids <- veld %>% dplyr::filter(landgebruik=="grasland") %>%dplyr::pull(qcid)
