@@ -26,7 +26,7 @@ Controle op meetfout in de filterdiepte of aanwezigheid van
 sediment in het filter.
 }
 \details{
-Indien de filterdiepte meer dan 10 centimeter afwijkt van de
+Indien de filterdiepte meer dan 50 centimeter afwijkt van de
 geregistreerde filterdiepte, ken het concept QC oordeel
 twijfelachtig toe aan het monster.
 }

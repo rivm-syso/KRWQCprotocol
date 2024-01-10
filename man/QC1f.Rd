@@ -22,5 +22,5 @@ Controle op aanwezigheid van negatieve waarden
 \details{
 Indien de waarde negatief is, ken het concept
 oordeel verdacht toe aan de betreffende parameter(s).
-Met uitzondering van de temperatuur
+Met uitzondering van Redoxpotentiaal
 }
