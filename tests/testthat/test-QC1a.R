@@ -11,8 +11,10 @@ test_that("QC1a", {
               # test if attributes exist
               expect_true(qcout_attrexists(x))
               x_attr <- attr(x, "qcout")
+
               expect_false(is.null(x_attr[["QC1a"]]))
               expect_true(is.list(x_attr[["QC1a"]][["resultaat"]]))
+              expect_equal(length(x_attr[["QC1a"]][["oordeel"]][["verdacht"]]), 0)
 
               # refiddle some parameters, change aquocode
 
@@ -25,10 +27,11 @@ test_that("QC1a", {
               ids <- x_attr[["QC1a"]][["oordeel"]][["verdacht"]]
               qcids <- metingen$qcid
               v1 <- intersect(ids, qcids)
+
               expect_true(length(v1) > 0)
               expect_false(any(v1 != ids))
-
               expect_true(nrow(metingen) == nrow(x))
+              expect_true(length(x_attr[["QC1a"]][["oordeel"]][["verdacht"]])> 0)
 
 
 })

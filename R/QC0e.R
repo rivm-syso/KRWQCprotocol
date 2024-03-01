@@ -31,7 +31,7 @@ QC0e <- function(d_veld, d_filter, d_metingen, fl = 2, verbose = F) {
   
   # Selecteer alleen putcode, filter, datum, okf
   d <- d_veld %>%
-    select(putcode, filter, maand, dag, jaar, okf) 
+    select(monsterid, putcode, filter, okf) 
   
   # Vergelijk filterdiepte met opzoektabel van aangeleverde BRO data
   # Nu genomen dat okf zowel niet ondieper als dieper mag liggen. Wijkt af van protocol!
@@ -39,7 +39,7 @@ QC0e <- function(d_veld, d_filter, d_metingen, fl = 2, verbose = F) {
                by = c("putcode", "filter")) %>%
     mutate(oordeel = ifelse(abs(okf - diepte_onder) > 0.5 * fl,  
                             "verdacht", "onverdacht"),
-           iden = paste(putcode, filter, jaar, maand, dag, sep = "-")) %>%
+           iden = monsterid) %>%
     filter(oordeel == "verdacht") %>%
     rename(`onderkant filter_val` = okf,
            `onderkant filter_BRO` = diepte_onder)
@@ -67,7 +67,7 @@ QC0e <- function(d_veld, d_filter, d_metingen, fl = 2, verbose = F) {
   # voeg concept oordeel van afwijkende putten toe aan monsters op die locaties in betreffende meetronde
   resultaat_df <- d_metingen %>%
     group_by(monsterid) %>%
-    mutate(iden = paste(putcode, filter, jaar, maand, dag, sep = "-")) %>%
+    mutate(iden = monsterid) %>%
     mutate(oordeel = ifelse(iden %in% res$iden,
                             "twijfelachtig", "onverdacht")) %>%
     filter(oordeel == "twijfelachtig") %>%

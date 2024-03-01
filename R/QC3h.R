@@ -52,7 +52,7 @@ QC3h <- function(d_metingen, verbose = F) {
         dplyr::mutate(oordeel = ifelse(NO3 > 0.5 & NH4 > 2 |
                                        NO3 > 0.5 & NH4 > NO3,
                                    "twijfelachtig", "onverdacht"),
-                      iden = paste(putcode, jaar, maand, dag, sep = "-")) %>%
+                      iden = monsterid) %>%
         dplyr::filter(oordeel != "onverdacht")
 
     rapportageTekst <- paste("Er zijn in totaal", nrow(res), 
@@ -73,18 +73,16 @@ QC3h <- function(d_metingen, verbose = F) {
     }
 
     # voeg concept oordeel van afwijkende NO3-NH4 relatie toe aan monsters op die locaties in betreffende meetronde
-    cols <- c(10, 8, 7)
-    cols2 <- c(1:5, 7, 6, 14, 15, 13)
 
     resultaat_df <- d_metingen %>%
         dplyr::group_by(monsterid) %>%
         dplyr::filter(parameter%in%n_params) %>%
-        dplyr::mutate(iden = paste(putcode, jaar, maand, dag, sep = "-")) %>%
+        dplyr::mutate(iden = monsterid) %>%
         dplyr::mutate(oordeel = ifelse(iden %in% res$iden,
                                        "twijfelachtig", "onverdacht")) %>%
         dplyr::filter(oordeel != "onverdacht") %>%
-        dplyr::left_join(., res[, cols], by="iden") 
-    resultaat_df <- resultaat_df[, cols2]
+        dplyr::left_join(., res %>% select(iden, NO3, NH4), by="iden") 
+    resultaat_df <- resultaat_df %>% select(qcid, monsterid, jaar, maand, dag, putcode, filter, NO3, NH4, oordeel)
 
     # voeg attribute met uitkomsten tests toe aan relevante dataset (d_metingen)
     twijfel_id <- resultaat_df %>% 

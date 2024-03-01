@@ -61,7 +61,7 @@ QC4b <- function(d_metingen, ph_veld_naam = "pH_veld", verbose = F) {
   res <- d %>%
     dplyr::mutate(oordeel = ifelse(waarde < 0 | waarde > 14,
                                    "verdacht", "onverdacht"),
-           iden = paste(putcode, jaar, maand, dag, sep = "-")) %>%
+           iden = paste(putcode, filter, jaar, maand, dag, sep = "-")) %>%
     dplyr::filter(oordeel != "onverdacht")
   
   rapportageTekst <- paste("Er zijn in totaal", nrow(res), 
@@ -80,7 +80,7 @@ QC4b <- function(d_metingen, ph_veld_naam = "pH_veld", verbose = F) {
   # voeg attribute met uitkomsten tests toe aan relevante dataset (d_metingen)
   resultaat_df <- d_metingen %>%
     dplyr::group_by(parameter) %>%
-    dplyr::mutate(iden = paste(putcode, jaar, maand, dag, sep = "-")) %>%
+    dplyr::mutate(iden = paste(putcode, filter, jaar, maand, dag, sep = "-")) %>%
     dplyr::mutate(oordeel = ifelse(iden %in% res$iden,
                                    "verdacht", "onverdacht")) %>%
     dplyr::filter(oordeel != "onverdacht") 

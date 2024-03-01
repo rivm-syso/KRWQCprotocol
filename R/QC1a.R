@@ -57,6 +57,7 @@ QC1a <- function(d_parameter, d_metingen, verbose = F) {
   # dit gebeurt alleen voor de parameters welke wél obv CASnr gekoppelt konden worden
   res <- d_parameter %>%
     dplyr::filter(cas %in% BRO_parameterlijst$casnummer) %>%
+    dplyr::filter(cas != "NVT") %>%
     dplyr::left_join(BRO_parameterlijst, by = c("cas" = "casnummer")) %>%
     # Aquocode vergelijken
     dplyr::mutate(oordeel = ifelse(aquocode.x != aquocode.y |

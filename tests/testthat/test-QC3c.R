@@ -32,7 +32,8 @@ test_that("QC3c T3", {
       data(veld)
 
       d <- metingen %>%
-          mutate(waarde = if_else(parameter == "Cl", NA_real_, waarde))
+          mutate(waarde = if_else(parameter == "Cl", NA_real_, waarde),
+                 detectieteken = if_else(parameter == "Cl", NA_character_, detectieteken))
   x <- QC3c(d_metingen = d)
       x_attr <- attr(x, "qcout")
       ids <- x_attr[["QC3c"]][["oordeel"]][["niet uitvoerbaar"]]

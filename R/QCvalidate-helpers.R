@@ -4,7 +4,7 @@
 testKolommenVeld <- function(d) {
   # test of verplichte kolommen aanwezig zijn voor veldtabel
   
-  kolommen_numeriek <- c("qcid", "jaar", "maand", "dag", 
+  kolommen_numeriek <- c("qcid", "monsterid", "jaar", "maand", "dag", 
                          "xcoord", "ycoord", "okf", "gws_voor", "gws_na")  # eventueel nog kolom dag, maand, jaar apart
   kolommen <- c("putcode", "filter", "landgebruik", 
                 "bem_app", "bem_proc",  kolommen_numeriek)
@@ -173,17 +173,11 @@ qcidNietUitvoerbaar <- function(d, d_metingen, benodigdeKolommen){
           .fns = ~ is.na(.x)
         )
       )
-    ) %>% mutate(iden = paste(putcode, filter, jaar, maand, dag, sep = "-"))
+    )
   
-  id <- d_metingen %>%
-    group_by(monsterid) %>%
-    mutate(iden = paste(putcode, filter, jaar, maand, dag, sep = "-")) %>%
-    filter(iden %in% niet_uitvoerbaar$iden) %>% 
-    ungroup() %>% 
-    select(qcid, iden)
-  
-  niet_uitvoerbaar <- left_join(niet_uitvoerbaar, id)
-  niet_uitvoerbaar_id <- niet_uitvoerbaar %>% distinct(qcid) %>% pull(qcid)
+  niet_uitvoerbaar_id <- d_metingen %>%
+    filter(monsterid %in% niet_uitvoerbaar$monsterid) %>% 
+    pull(qcid)
   
   return(niet_uitvoerbaar_id)
 }

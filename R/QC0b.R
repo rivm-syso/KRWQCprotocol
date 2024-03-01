@@ -40,7 +40,7 @@ QC0b <- function(d_veld, d_put, d_metingen, verbose = F) {
   
   # Selecteer alleen putcode, jaar, landgebruik 
   d <- d_veld %>%
-    dplyr::select(putcode, jaar, maand, dag, landgebruik) 
+    dplyr::select(monsterid, putcode, landgebruik) 
   
   # Bestaan de opgegeven landgebruiken uit de juiste klassen?
   if(nrow(v1<-d %>% dplyr::filter(!landgebruik %in% valideLandgebruiken())) > 0) {
@@ -51,7 +51,7 @@ QC0b <- function(d_veld, d_put, d_metingen, verbose = F) {
   res <- merge(d, d_put %>% dplyr::select(putcode, landgebruik), by = "putcode") %>%
     dplyr::mutate(oordeel = ifelse(landgebruik.x != landgebruik.y, 
                             "twijfelachtig", "onverdacht"),
-           iden = paste(putcode, jaar, maand, dag, sep = "-")) %>%
+           iden = monsterid) %>%
     dplyr::filter(oordeel == "twijfelachtig") %>%
     dplyr::rename(landgebruik_val = landgebruik.x,
            landgebruik_BRO = landgebruik.y)
@@ -77,7 +77,7 @@ QC0b <- function(d_veld, d_put, d_metingen, verbose = F) {
   # voeg concept oordeel van afwijkende putten toe aan monsters op die locaties in betreffende meetronde
   resultaat_df <- d_metingen %>%
     dplyr::group_by(monsterid) %>%
-    dplyr::mutate(iden = paste(putcode, jaar, maand, dag, sep = "-")) %>%
+    dplyr::mutate(iden = monsterid) %>%
     dplyr::mutate(oordeel = ifelse(iden %in% res$iden,
                             "twijfelachtig", "onverdacht")) %>%
     dplyr::filter(oordeel == "twijfelachtig") %>%

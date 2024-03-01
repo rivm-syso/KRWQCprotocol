@@ -24,7 +24,7 @@ metingen bestand met verdachte locaties/monsters.
 Vergelijk pH-veld en pH-lab
 }
 \details{
-De signaleringswaarde voor monsters is delta-pH >= 2 pH-eenheden.
+De signaleringswaarde voor monsters is delta-pH >= 1 pH-eenheden.
 Als de delta-pH boven de signaleringswaarde ligt, ken het
 concept QC oordeel twijfelachtig toe aan het monster.
 }
