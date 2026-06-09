@@ -270,7 +270,7 @@ MaakKolomMeth<-function(metveldgemiddelden=dataframeuitLeesData,celcius=celcius,
   # nu staan er nog nullen in z$po4
   if (add_phosphate){
     # als z$po4=0 dan gebruiken we zm$xptot
-    z[z$po4==0,'po4']=3*zm[zm$xpo4==0,'xptot']/94.9712
+    z[z$po4==0,'po4']=3*zm[zm$xpo4==0,'xptot']/30.97
   }
   
   # alles omgezet van zm naar z behalve xecv
