@@ -142,15 +142,15 @@ QC4c <- function(d_metingen,
     dplyr::filter(oordeel != "onverdacht") %>%
     dplyr::left_join(., d %>% dplyr::select(monsterid, pos, neg, ib, xecv, ec25, percentageverschil_xecv_ec25), by = "monsterid")
   
-  rapportageTekst <- paste("Er zijn in totaal klopt niet", nrow(resultaat_df), 
-                           "metingen waar EC-veld en berekende EC 10% of meer afwijken")
+  rapportageTekst <- paste("Er zijn in totaal", resultaat_df %>% distinct(monsterid) %>% nrow(), 
+                           "monsters waar EC-veld en berekende EC 10% of meer afwijken")
   
   if(verbose) {
     if(nrow(resultaat_df) > 0 ) {
       print(rapportageTekst)
       
     } else {
-      print(paste("Er zijn geen metingen waar EC-veld en berekende EC 10% of meer afwijken"))
+      print(paste("Er zijn geen monsters waar EC-veld en berekende EC 10% of meer afwijken"))
     }
   }
   
