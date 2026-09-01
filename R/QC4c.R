@@ -45,12 +45,17 @@ QC4c <- function(d_metingen,
   
   # aanpassen van opgegeven namen hco3 & ph & EC naar hco3 & hv & ecv. 
   # Dat zijn de drie namen die gebruikt worden in de berekengeleidbaarheid functie
-  d <- d %>%
-    mutate(parameter = str_replace(parameter, ec_naam, "ecv")) %>%
-    mutate(parameter = str_replace(parameter, hco3_naam, "hco3v")) %>%
-    mutate(parameter = str_replace(parameter, ph_naam, "hv"))
-
-
+  d <- d %>% 
+    dplyr::mutate(
+      parameter = dplyr::case_match(
+        parameter,
+        ec_naam ~ "ecv",
+        hco3_naam ~ "hco3v",
+        ph_naam ~ "hv",
+        .default = parameter
+      )
+    )
+  
   # gegevens apart zetten om later qcid weer toe te voegen
   id <- d %>%
     dplyr::filter(parameter == "ecv") %>%
@@ -77,9 +82,9 @@ QC4c <- function(d_metingen,
     # soms staat RG als NA, < of "", eerst NA veranderen in ""
     dplyr::mutate(detectieteken = ifelse(is.na(detectieteken), "", 
                                          detectieteken)) %>%
-    # waardes <RG niet meenemen maar op 0 zetten 
-    dplyr::mutate(waarde_ib = ifelse(!parameter %in% c("h", "hv") & detectieteken != "",
-                                     0, waarde_ib)) %>%
+    # # waardes <RG niet meenemen maar op 0 zetten 
+    # dplyr::mutate(waarde_ib = ifelse(!parameter %in% c("h", "hv") & detectieteken != "",
+    #                                  0, waarde_ib)) %>%
     # als geen pH bekend is, dan is de pH 7 
     dplyr::mutate(waarde_ib = ifelse(parameter %in% c("h", "hv") & is.na(waarde),
                                      7, waarde_ib)) %>%
@@ -106,6 +111,12 @@ QC4c <- function(d_metingen,
   # Rijen met missende waardes op niet uitvoerbaar zetten
   niet_uitvoerbaar_id <- qcidNietUitvoerbaar(res, d_metingen, c("xecv", "xca", "xna", "xmg", "xk", "xcl", "xso4"))
   
+  # Monsterid niet uitvoerbaar
+  monsterid_niet_uitvoerbaar <- d %>% 
+    filter(qcid %in% niet_uitvoerbaar_id) %>% 
+    pull(monsterid) %>% 
+    unique()
+  
   # Rijen met missende waardes weghalen
   res <- res %>% drop_na(c("xecv", "xca", "xna", "xmg", "xk", "xcl", "xso4"))
   
@@ -120,30 +131,26 @@ QC4c <- function(d_metingen,
                              add_bicarbonate = add_bicarbonate, 
                              add_phosphate = add_phosphate)
   
-  # Nu check op afwijking EC berekend en gemeten EC
-  resultaat_df <- d %>%
-    # selecteer relevante kolommen
-    dplyr::select(monsterid, jaar, maand, dag, putcode, filter, 
-                  pos, neg, ib, xecv, ec25, percentageverschil_xecv_ec25) %>%
-    # selecteer afwijkingen >10%
-    dplyr::filter(abs(percentageverschil_xecv_ec25) > 10) %>%
-    # ken oordeel twijfelachtig toe
-    dplyr::mutate(oordeel = "twijfelachtig") %>%
-    # qcid weer toevoegen aan afwijkende EC waardes om weg te schrijven
-    dplyr::left_join(., id, 
-                     by = c("monsterid", "jaar", "maand", "dag", "putcode", "filter")) %>%
-    select(qcid, monsterid, jaar, maand, dag, putcode, filter, pos, neg, ib,
-           xecv, ec25, percentageverschil_xecv_ec25, oordeel)
+  d <- d %>% dplyr::filter(abs(percentageverschil_xecv_ec25) > 10)
   
-  rapportageTekst <- paste("Er zijn in totaal", nrow(resultaat_df), 
-                           "metingen waar EC-veld en berekende EC 10% of meer afwijken")
+  # Nu check op afwijking EC berekend en gemeten EC
+  resultaat_df <- d_metingen %>%
+    dplyr::mutate(oordeel = case_match(monsterid, 
+                                       d$monsterid ~ "twijfelachtig",
+                                       monsterid_niet_uitvoerbaar ~ "niet uitvoerbaar",
+                                       .default = "onverdacht")) %>%
+    dplyr::filter(oordeel != "onverdacht") %>%
+    dplyr::left_join(., d %>% dplyr::select(monsterid, pos, neg, ib, xecv, ec25, percentageverschil_xecv_ec25), by = "monsterid")
+  
+  rapportageTekst <- paste("Er zijn in totaal", resultaat_df %>% distinct(monsterid) %>% nrow(), 
+                           "monsters waar EC-veld en berekende EC 10% of meer afwijken")
   
   if(verbose) {
     if(nrow(resultaat_df) > 0 ) {
       print(rapportageTekst)
       
     } else {
-      print(paste("Er zijn geen metingen waar EC-veld en berekende EC 10% of meer afwijken"))
+      print(paste("Er zijn geen monsters waar EC-veld en berekende EC 10% of meer afwijken"))
     }
   }
   
@@ -257,7 +264,7 @@ MaakKolomMeth<-function(metveldgemiddelden=dataframeuitLeesData,celcius=celcius,
   z$al=0.003 * zm$xal/26.98
   z$zn=0.002*zm$xzn/65.39
   
-  z$po4=3*zm$xpo4/30.97
+  z$po4=3*zm$xpo4/94.9712
   # z bevat geen NAs in plaats daarvan nullen
   
   # nu staan er nog nullen in z$po4
@@ -269,7 +276,7 @@ MaakKolomMeth<-function(metveldgemiddelden=dataframeuitLeesData,celcius=celcius,
   # alles omgezet van zm naar z behalve xecv
   
   #  ionbalans
-  z$pos=z$al+z$ca+0.6*z$fe+z$k+z$mg+z$mn+z$nh4+z$na+z$zn+z$h3o
+  z$pos=z$al+z$ca+z$fe+z$k+z$mg+z$mn+z$nh4+z$na+z$zn+z$h3o
   z$neg=z$cl+z$hco3+z$no3+z$so4+z$co3+z$po4
   # wanneer overal nullen staan dan wordt de pH 7 en z$h3o = 0.0001
   z$ib=100*(z$pos-z$neg)/(z$pos+z$neg)
@@ -471,6 +478,7 @@ Rossum<-function(z=dataframeuitMaakKolomMeth){
   if(!any(names(b) == "al")) {
   b <- cbind(b, al = rep(0, nrow(b)))
   }
+  b$al=0
   b$g0an =86*b$co3+44.5*b$hco3+79.8*b$so4+76.3*b$cl+71.4*b$no3
   b$g0kat=59.5*b$ca+53.1*b$mg+50.1*b$na+73.5*b$k+349*b$h3o+73.5*b$nh4+54*b$fe+78*b$al
   b$zan =(4*(b$co3+b$so4)+b$cl+b$hco3+b$no3)  /(2*(b$co3+b$so4)+b$cl+b$hco3+b$no3)
@@ -567,13 +575,13 @@ BerekenGeleidbaarheid<-function(metveldgemiddelden=metveldgemiddelden,celcius=25
   h[myrows,'pxecv']=2^-log10(h[myrows,'xecv'])
   h[myrows,'pec25']=2^-log10(h[myrows,'ec25'])
   h$prinslabel=(h$xecv*(1+h$pxecv)<h$ec25*(1-h$pec25))|(h$xecv*(1-h$pxecv)>h$ec25*(1+h$pec25))
-  h$percentageverschil_xecv_ec25=100*(h$xecv-h$ec25)/h$ec25
+  h$percentageverschil_xecv_ec25=200*(h$xecv-h$ec25)/(h$xecv+h$ec25)
 
   metallegeleidbaarheid=h
   mycols=c(names(metveldgemiddelden),'cl','so4','no3','na','k','ca','mg','po4','hco3','xhco3e','pos','neg',
             'ib','percentageverschil_xecv_ec25','ec25','prinslabel','meth','ec25_xecv_sr')
   metgeleidbaarheid=h[,mycols]
 #  save(metgeleidbaarheid,file='metgeleidbaarheid.rda')
-  return(metgeleidbaarheid)
+  return(metallegeleidbaarheid)
 }
 

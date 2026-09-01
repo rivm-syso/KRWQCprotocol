@@ -2,7 +2,7 @@
 #'
 #' Vergelijk pH-veld en pH-lab
 #'
-#' De signaleringswaarde voor monsters is delta-pH >= 1 pH-eenheden.
+#' De signaleringswaarde voor monsters is delta-pH >= 0.5 pH-eenheden.
 #' Als de delta-pH boven de signaleringswaarde ligt, ken het
 #' concept QC oordeel twijfelachtig toe aan het monster.
 #'         
@@ -25,17 +25,17 @@ QC4e <- function(d_veld, d_metingen, ph_veld_naam = "pH_veld", verbose = F) {
   testKolommenVeld(d_veld)
   testKolommenMetingen(d_metingen)
   
-  # pH naam aanpassen alleen voor LMG
+  # Selecteer pH veld en lab gegevens en pH naam aanpassen
   d <- d_metingen
-  d <- d %>%  mutate(
-    parameter = case_when(parameter == ph_veld_naam ~ "pH_veld",
-                          TRUE ~ parameter)
-  )
-  
-  # selecteer pH veld en lab gegevens
-  # afhankelijk van de dataset kan dit 'pH' of 'zuurgraad' zijn
-  d <- d %>%
-    dplyr::filter(parameter %in% c("pH", "pH_veld"))
+  d <- d %>% 
+    dplyr::filter(parameter %in% c("pH", ph_veld_naam)) %>% 
+    dplyr::mutate(
+      parameter = dplyr::case_match(
+        parameter,
+        ph_veld_naam ~ "pH_veld",
+        .default = parameter
+      )
+    )
   
   # Check of pH veld en lab gegevens beschikbaar zijn
   if(dplyr::n_distinct(d$parameter) < 2) {
@@ -58,21 +58,26 @@ QC4e <- function(d_veld, d_metingen, ph_veld_naam = "pH_veld", verbose = F) {
   res <- res %>% drop_na(c("pH", "pH_veld"))
   
   res <- res %>%
-    dplyr::mutate(oordeel = ifelse(abs(pH - pH_veld) >= 1,
+    dplyr::mutate(absoluut_verschil_pH = abs(pH - pH_veld),
+                  oordeel = ifelse(absoluut_verschil_pH >= .5,
                                    "twijfelachtig", "onverdacht"),
                   iden = monsterid) %>%
     dplyr::filter(oordeel != "onverdacht")
   
   rapportageTekst <- paste("Er zijn in totaal", nrow(res), 
-                           "metingen waar pH-lab en pH-veld 1 pH-eenheden of meer afwijken.",
+                           "metingen waar pH-lab en pH-veld 0.5 pH-eenheden of meer afwijken.",
                            "Controleer de datum (analyse en veld) en historische gegevens van alle afwijkingen")
   
   if(verbose) {
     if(nrow(res) > 0 ) {
       print(rapportageTekst)
       
+      res %>% 
+        dplyr::select(monsterid, putcode, filter, jaar, pH, pH_veld, absoluut_verschil_pH) %>% 
+        print()
+      
     } else {
-      print(paste("Er zijn geen metingen waar pH-lab en pH-veld 1 pH-eenheden of meer afwijken"))
+      print(paste("Er zijn geen metingen waar pH-lab en pH-veld 0.5 pH-eenheden of meer afwijken"))
     }
   }
   
@@ -84,8 +89,8 @@ QC4e <- function(d_veld, d_metingen, ph_veld_naam = "pH_veld", verbose = F) {
     dplyr::mutate(oordeel = ifelse(iden %in% res$iden,
                                    "twijfelachtig", "onverdacht")) %>%
     dplyr::filter(oordeel != "onverdacht") %>%
-    dplyr::left_join(., res %>% select(pH, pH_veld, iden)) 
-  resultaat_df <- resultaat_df %>% select(qcid, monsterid, jaar, maand, dag, putcode, filter, pH, pH_veld, oordeel)
+    dplyr::left_join(., res %>% select(pH, pH_veld, absoluut_verschil_pH, iden)) 
+  resultaat_df <- resultaat_df %>% select(qcid, monsterid, jaar, maand, dag, putcode, filter, pH, pH_veld, absoluut_verschil_pH, oordeel)
   
   twijfel_id <- resultaat_df %>% 
     dplyr::filter(oordeel == "twijfelachtig") %>% 

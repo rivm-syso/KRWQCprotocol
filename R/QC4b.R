@@ -31,9 +31,14 @@ QC4b <- function(d_metingen, d_parameter, geleidendheid_veld_naam = "GELDHD_VELD
     
     # pH en HCO3 naam aanpassen alleen voor LMG
     d <- d_metingen
-    d <- d %>%  mutate(
-        parameter = ifelse(parameter == geleidendheid_veld_naam, "GELDHD_VELD", parameter)
-    )
+    d <- d %>% 
+      dplyr::mutate(
+        parameter = dplyr::case_match(
+          parameter,
+          geleidendheid_veld_naam ~ "GELDHD_VELD",
+          .default = parameter
+        )
+      )
     
     # selecteer EC veld en lab gegevens
     d <- d %>%
@@ -61,8 +66,8 @@ QC4b <- function(d_metingen, d_parameter, geleidendheid_veld_naam = "GELDHD_VELD
         dplyr::select(-c(qcid, detectieteken, rapportagegrens)) %>%
         tidyr::pivot_wider(names_from = parameter,
                            values_from = waarde) %>%
-        dplyr::mutate(oordeel = ifelse(abs(GELDHD - GELDHD_VELD) > 0.1 * GELDHD |
-                                           abs(GELDHD - GELDHD_VELD) > 0.1 * GELDHD_VELD,
+        dplyr::mutate(percentageverschil = 200*(GELDHD_VELD-GELDHD)/(GELDHD_VELD+GELDHD),
+                      oordeel = ifelse(abs(percentageverschil) > 10,
                                        "twijfelachtig", "onverdacht"),
                       iden = monsterid) %>%
         dplyr::filter(oordeel != "onverdacht")
@@ -87,8 +92,8 @@ QC4b <- function(d_metingen, d_parameter, geleidendheid_veld_naam = "GELDHD_VELD
         dplyr::mutate(oordeel = ifelse(iden %in% res$iden,
                                        "twijfelachtig", "onverdacht")) %>%
         dplyr::filter(oordeel != "onverdacht") %>%
-        dplyr::left_join(., res %>% select(GELDHD, GELDHD_VELD, iden)) 
-    resultaat_df <- resultaat_df %>% select(qcid, monsterid, jaar, maand, dag, putcode, filter, GELDHD, GELDHD_VELD, oordeel)
+        dplyr::left_join(., res %>% select(GELDHD, GELDHD_VELD, percentageverschil, iden)) 
+    resultaat_df <- resultaat_df %>% select(qcid, monsterid, jaar, maand, dag, putcode, filter, GELDHD, GELDHD_VELD, percentageverschil, oordeel)
     
     twijfel_id <- resultaat_df %>% 
         dplyr::filter(oordeel == "twijfelachtig") %>% 
@@ -98,7 +103,7 @@ QC4b <- function(d_metingen, d_parameter, geleidendheid_veld_naam = "GELDHD_VELD
     
     d_metingen <- qcout_add_oordeel(obj = d_metingen,
                                     test = test,
-                                    oordeel = unique(resultaat_df$oordeel)[1],
+                                    oordeel = "twijfelachtig",
                                     ids = twijfel_id)
     d_metingen <- qcout_add_rapportage(obj = d_metingen,
                                        test = test,
