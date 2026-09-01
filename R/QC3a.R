@@ -19,13 +19,15 @@
 #' @param d_parameter dataframe met parameter informatie
 #' @param meetronde meetjaar welke gevalideerd dient te worden. Staat standaard
 #' op de laatste meetjaar uit het databestand.
-#' @param zscore z-score waarbij een meeting wordt bestempeld met twijfelachtig.
+#' @param zscore z-score waarbij een meting wordt bestempeld met twijfelachtig.
 #' staat standaard op 3.5. Alle beschrijvingen zijn gebaseerd op z-score 3.5.
 #' @param plt Voeg tijdserie plots per reeks en stof toe aan resultaat
 #' @param plt_put_reeks Maak plots van alle putten waarbij 1 of meer parameters
 #' een z-score > 3.5 hebben (vereist plt = T). Staat standaard op F. 
 #' @param verbose of tekstuele output uit script gewenst is (T) of niet (F). 
 #' Staat standaard op F.
+#' @param obs_in_zscore Wil je de betreffende meting meenemen bij het 
+#' berekenen van de z-score? Staat standaard op F.
 #'
 #' @return metingen bestand met verdachte locaties/monsters. 
 #'
@@ -40,6 +42,7 @@ QC3a <- function(d_metingen, d_parameter,
                  zscore = 3.5,
                  hco3_veld_naam = NA,
                  plt = T, plt_put_reeks = F,
+                 obs_in_zscore = F,
                  verbose = F) {
   
   # Check datasets op kolommen en unieke informatie
@@ -68,8 +71,17 @@ QC3a <- function(d_metingen, d_parameter,
     dplyr::mutate(n.meetjaar = dplyr::n_distinct(jaar),
                   n.meting = length(waarde),
                   logobs = log(waarde),
-                  loggem = sapply(1:n(), function(i) mean(log(waarde[-i]), na.rm = TRUE)),
-                  logsdv = sapply(1:n(), function(i) sd(log(waarde[-i]), na.rm = TRUE))) %>%
+                  loggem = if (obs_in_zscore){
+                    mean(logobs, na.rm = T)
+                    } else {
+                      sapply(1:n(), function(i) mean(log(waarde[-i]), na.rm = TRUE))
+                    },
+                  logsdv = if (obs_in_zscore) {
+                    sd(logobs, na.rm = T)
+                    } else {
+                      sapply(1:n(), function(i) sd(log(waarde[-i]), na.rm = TRUE))
+                    }
+    ) %>% 
     # bepaal z-score. Indien SD = 0, dan ook z-score = 0
     dplyr::mutate(logz = ifelse(logsdv == 0, 0 ,
                                 (logobs - loggem) / logsdv) ) %>%
