@@ -63,9 +63,9 @@ QC4a <- function(d_metingen, ph_naam = "pH", hco3_naam = "HCO3", verbose = F) {
     # soms staat RG als NA, < of "", eerst NA veranderen in ""
     dplyr::mutate(detectieteken = ifelse(is.na(detectieteken), "", 
                                          detectieteken)) %>%
-    # waardes <RG niet meenemen maar op 0 zetten 
-    dplyr::mutate(waarde_ib = ifelse(parameter != "pH" & detectieteken != "",
-                                     0, waarde_ib)) %>%
+    # # waardes <RG niet meenemen maar op 0 zetten 
+    # dplyr::mutate(waarde_ib = ifelse(parameter != "pH" & detectieteken != "",
+    #                                  0, waarde_ib)) %>%
     # als geen pH bekend is, dan is de pH 7 
     dplyr::mutate(waarde_ib = ifelse(parameter == "pH" & is.na(waarde),
                                      7, waarde_ib)) %>%
@@ -78,6 +78,12 @@ QC4a <- function(d_metingen, ph_naam = "pH", hco3_naam = "HCO3", verbose = F) {
   
   # Rijen met missende waardes op niet uitvoerbaar zetten
   niet_uitvoerbaar_id <- qcidNietUitvoerbaar(res, d_metingen, c("Ca_meq", "Na_meq", "Mg_meq", "K_meq", "Cl_meq", "SO4_meq"))
+  
+  # Monsterid niet uitvoerbaar
+  monsterid_niet_uitvoerbaar <- d %>% 
+    filter(qcid %in% niet_uitvoerbaar_id) %>% 
+    pull(monsterid) %>% 
+    unique()
   
   # Rijen met missende waardes weghalen
   res <- res %>% drop_na(c("Ca_meq", "Na_meq", "Mg_meq", "K_meq", "Cl_meq", "SO4_meq"))
@@ -109,7 +115,7 @@ QC4a <- function(d_metingen, ph_naam = "pH", hco3_naam = "HCO3", verbose = F) {
   
   # bereken ionenbalans
   res <- res %>%
-    dplyr::mutate(pos = Al_meq + Ca_meq + 0.6*Fe_meq + K_meq + Mg_meq + Mn_meq + NH4_meq + Na_meq + Zn_meq + H3O_meq,
+    dplyr::mutate(pos = Al_meq + Ca_meq + Fe_meq + K_meq + Mg_meq + Mn_meq + NH4_meq + Na_meq + Zn_meq + H3O_meq,
                   neg = Cl_meq + HCO3_meq + NO3_meq + SO4_meq + CO3_meq + PO4_meq) %>%
     dplyr::mutate(ib = round(100 * (pos - neg) / (pos + neg), digits = 2)) %>%
     # markeer afwijkingen
@@ -145,10 +151,14 @@ QC4a <- function(d_metingen, ph_naam = "pH", hco3_naam = "HCO3", verbose = F) {
   # voeg attribute met uitkomsten tests toe aan relevante dataset (d_metingen)
   resultaat_df <- d_metingen %>%
     dplyr::mutate(iden = monsterid) %>%
-    dplyr::mutate(oordeel = ifelse(iden %in% res$iden,
-                                   "twijfelachtig", "onverdacht")) %>%
+    dplyr::mutate(oordeel = case_match(iden, 
+                                       res$iden ~ "twijfelachtig",
+                                       monsterid_niet_uitvoerbaar ~ "niet uitvoerbaar",
+                                       .default = "onverdacht")) %>%
     dplyr::filter(oordeel != "onverdacht") %>%
-    dplyr::left_join(., res %>% dplyr::select(iden, `som cat`, `som an`, ib), by = "iden") 
+    dplyr::left_join(., res %>% dplyr::select(iden, ib,
+                                              `som cat`, Al_meq, Ca_meq, Fe_meq, K_meq, Mg_meq, Mn_meq, NH4_meq, Na_meq, Zn_meq, H3O_meq,
+                                              `som an`, Cl_meq, HCO3_meq, NO3_meq, SO4_meq, CO3_meq, PO4_meq), by = "iden") 
   
   twijfel_id <- resultaat_df %>% 
     dplyr::filter(oordeel == "twijfelachtig") %>% 

@@ -22,34 +22,34 @@
 #' @export
 #'
 
-QC4f <- function(d_metingen, verbose = F) {
+QC4f <- function(d_metingen, ph_veld_naam = NA, hco3_veld_naam = NA, verbose = F) {
   
   # Test of relevante kolommen aanwezig zijn
   # deze hulpfuncties staan in utils, deze eerst nu nog runnen.
   testKolommenMetingen(d_metingen)
   
-  # pH naam aanpassen alleen voor LMG
-  # d <- d_metingen %>%
-  #   dplyr::filter(parameter != "hco3")
-  # d$parameter <- d$parameter %>%
-  #   dplyr::recode("h_5__veld" = "hv",
-  #                 # bij LMG wordt HCO3 in het veld bepaald, 
-  #                 # maar nu vergelijken met pH lab dus andere naam
-  #                 "hco3_veld" = "hco3",
-  #                 .default = d$parameter)
-  
-  # In de meeste gevallen wordt HCO3 niet in het veld bepaald bij provincies, 
-  # maar in het lab. Dus HCO3 (lab) vergelijken met pH-lab
   d <- d_metingen
+  
+  # Filter te gebruiken data
   d <- d %>%
-    dplyr::filter(parameter %in% c("pH", "HCO3")) 
+    dplyr::filter(parameter %in% c("pH", "HCO3", ph_veld_naam, hco3_veld_naam)) %>% 
+    tidyr::drop_na(parameter) %>% 
+    dplyr::mutate(
+      parameter = dplyr::case_match(
+        parameter,
+        ph_veld_naam ~ "pH_veld",
+        hco3_veld_naam ~ "HCO3_veld",
+        .default = parameter
+      )
+    )
   
   # Check of maar 1 voor pH en 1 voor HCO3 beschikbaar zijn
-  if(dplyr::n_distinct(d$parameter) < 2) {
+  unique_params <- d$parameter %>% unique()
+  any_ph <- unique_params %in% c("pH", "pH_veld") %>% any()
+  any_hco3 <- unique_params %in% c("HCO3", "HCO3_veld") %>% any()
+  
+  if(all(any_ph, any_hco3) == FALSE) {
     stop("Geen pH of HCO3 beschikbaar. Gebruik: x <- QC_niet_uitvoerbaar(x, \"QC4f\")")
-  }
-  if(dplyr::n_distinct(d$parameter) > 2) {
-    stop("Meer dan 2 parameters voor pH en HCO3")
   }
   
   # Vergelijk pH lab HCO3 lab
@@ -59,15 +59,40 @@ QC4f <- function(d_metingen, verbose = F) {
     tidyr::pivot_wider(names_from = parameter,
                        values_from = waarde) 
   
+  # Eventueel ontbrekende kolommen toevoegen
+  params <- c("pH", "pH_veld", "HCO3", "HCO3_veld")
+  res[params[!(params %in% colnames(res))]] <- NA
+  
+  # Na waardes van pH en HCO3 waar ofwel lab of welmeting aanwezig is op -9999 zetten
+  # Als een van beide aanwezig is kan de test worden uitgevoerd. Anders gaat qcidNietUitvoerbaar niet goed
+  res <- res %>% mutate(
+    pH_veld = case_when(is.na(pH_veld) & !is.na(pH) ~ -9999,
+                        TRUE ~ pH_veld),
+    HCO3_veld = case_when(is.na(HCO3_veld) & !is.na(HCO3) ~ -9999,
+                          TRUE ~ HCO3_veld),
+    pH = case_when(is.na(pH) & !is.na(pH_veld) ~ -9999,
+                   TRUE ~ pH),
+    HCO3 = case_when(is.na(HCO3) & !is.na(HCO3_veld) ~ -9999,
+                     TRUE ~ HCO3)
+  )
+  
   # Rijen met missende waardes op niet uitvoerbaar zetten
   niet_uitvoerbaar_id <- qcidNietUitvoerbaar(res, d_metingen, c("pH", "HCO3"))
   
   # Rijen met missende waardes weghalen
   res <- res %>% drop_na(c("pH", "HCO3"))
   
+  # Terugzetten NA waardes
+  res <- res %>% mutate(
+    across(all_of(params), ~ case_match(.x,
+                                        -9999 ~ NA,
+                                        .default = .x)))
+  
+  # Controle verhouding pH HCO3
   res <- res %>% 
-    dplyr::mutate(oordeel = ifelse(pH < 5 & HCO3 > 15 |
-                                     pH < 5.5 & HCO3 > 50,
+    rowwise() %>% 
+    dplyr::mutate(oordeel = ifelse(min(pH, pH_veld, na.rm = TRUE) < 5 & max(HCO3, HCO3_veld, na.rm = TRUE) > 15 |
+                                     min(pH, pH_veld, na.rm = TRUE) < 5.5 & max(HCO3, HCO3_veld, na.rm = TRUE) > 50,
                                    "twijfelachtig", "onverdacht"),
                   iden = monsterid) %>%
     dplyr::filter(oordeel != "onverdacht")
@@ -96,9 +121,9 @@ QC4f <- function(d_metingen, verbose = F) {
     dplyr::mutate(oordeel = ifelse(iden %in% res$iden,
                                    "twijfelachtig", "onverdacht")) %>%
     dplyr::filter(oordeel != "onverdacht") %>%
-    dplyr::left_join(., res %>% dplyr::select(iden, pH, HCO3), by = "iden") %>%
+    dplyr::left_join(., res %>% dplyr::select(iden, pH, pH_veld, HCO3, HCO3_veld), by = "iden") %>%
     dplyr::select(qcid, monsterid, jaar, maand, dag, putcode, filter, 
-                  pH, HCO3, oordeel)
+                  pH, pH_veld, HCO3, HCO3_veld, oordeel)
   
   # voeg attribute met uitkomsten tests toe aan relevante dataset (d_metingen)
   twijfel_id <- resultaat_df %>% 
