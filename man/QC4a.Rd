@@ -2,53 +2,35 @@
 % Please edit documentation in R/QC4a.R
 \name{QC4a}
 \alias{QC4a}
-\title{QC4a. Controle consistentie metingen met historische gegevens}
+\title{QC4a. Controle ionenbalans}
 \usage{
-QC4a(
-  d_metingen,
-  d_parameter,
-  meetronde = max(d_metingen$jaar),
-  zscore = 3.5,
-  plt = T,
-  plt_put_reeks = F,
-  verbose = F
-)
+QC4a(d_metingen, ph_naam = "pH", hco3_naam = "HCO3", verbose = F)
 }
 \arguments{
 \item{d_metingen}{dataframe met metingen}
 
-\item{d_parameter}{dataframe met parameter informatie}
+\item{ph_naam}{character string om te gebruiken als pH. Staat standaard
+op "pH". Enkel in het geval dat HCO3 in het veld is gemeten vul hier de naam van
+de ph veld parameter in.}
 
-\item{meetronde}{meetjaar welke gevalideerd dient te worden. Staat standaard
-op de laatste meetjaar uit het databestand.}
+\item{hco3_naam}{character string om te gebruiken als HCO3. Staat standaard
+op "HCO3". Enkel in het geval dat HCO3 in het veld is gemeten vul hier de naam van
+de hco3 veld parameter in.}
 
-\item{zscore}{z-score waarbij een meeting wordt bestempeld met twijfelachtig.
-staat standaard op 3.5. Alle beschrijvingen zijn gebaseerd op z-score 3.5.}
-
-\item{plt}{Voeg tijdserie plots per reeks en stof toe aan resultaat}
-
-\item{plt_put_reeks}{Maak plots van alle putten waarbij 1 of meer parameters
-een z-score > 3.5 hebben (vereist plt = T). Staat standaard op F.}
-
-\item{verbose}{of tekstuele output uit script gewenst is (T) of niet (F).
-Staat standaard op F.}
+\item{verbose}{of tekstuele output uit script gewenst is (T) of niet (F). Staat
+standaard op F.}
 }
 \value{
 metingen bestand met verdachte locaties/monsters.
 }
 \description{
-Beoordeling waarschijnlijk meting op basis van consistentie
-met historische gegevens.
-
-Per putfilter wordt voor elke parameter een vergelijking met het
-verleden gemaakt. Dit kan worden gedaan voor ieder meetjaar, indien er
-voldoende voorgaande metingen ter beschikking zijn. De consistentie van
-metingen met de historische meetwaarden wordt in standaardafwijking
-uitgedrukt. Een visuele inspectie vindt plaats voor de metingen met een
-standaardafwijking van >3.5 ten opzichte van de historische meetreeks. Van
-de metingen die na visuele inspectie als afwijkend van de tijdreeks worden
-beoordeeld, ken het concept QC oordeel twijfelachtig toe aan de betreffende
-parameter.
-Zie bijlage II van het QC protocol voor de methodiek ter beoordeling van
-de consistentie van meetwaarden.
+Controle en berekening van de ionenbalans (IB)
+op monsterniveau
+}
+\details{
+Bereken de ionenbalans volgens de methode in
+Bijlage II van het QC Protocol. De signaleringswaarde
+voor monsters is IB >10\%. Als de ionenbalans
+boven de signaleringswaarde ligt, ken het concept
+QC oordeel twijfelachtig toe aan het monster.
 }

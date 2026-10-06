@@ -2,33 +2,27 @@
 % Please edit documentation in R/QC1b.R
 \name{QC1b}
 \alias{QC1b}
-\title{QC1b. Controle apparaat, techniek en procedure BRO}
+\title{QC1b. Controle registratie putfilter in de BRO}
 \usage{
-QC1b(d_veld, d_parameter, d_metingen, verbose = F)
+QC1b(d_filter, d_metingen, verbose = F)
 }
 \arguments{
-\item{d_veld}{dataframe met veldwaarnemingen}
+\item{d_filter}{dataframe met putfilter informatie}
 
-\item{d_parameter}{dataframe met parameter informatie}
-
-\item{d_metingen}{dataframe met metingen}
+\item{d_metingen}{metingen bestand met monster ID's om bij afwijkingen in de
+putcode een oordeel toe te kennen.}
 
 \item{verbose}{of tekstuele output uit script gewenst is (T) of niet (F). Staat
 standaard op F.}
 }
 \value{
-het metingen bestand met attribute van test resultaten. In de kolom
-\code{oordeel} blijkt of de locatie/monster 'onverdacht' of 'verdacht' is.
+metingen bestand met verdachte locaties/monsters.
 }
 \description{
-Controle op bemonsteringsapparaat, bemonsteringsprocedure,
-waardebepalingstechniek en waardebepalingsprocedure
-
-Controleer of de bemonstering en labbepaling conform de BRO is gedaan.
+Controleer of de betreffende putfilter is opgenomen in de BRO.
 }
 \details{
-Indien het bemonsteringsapparaat of de -procedure afwijkt van de BRO,
-ken het concept QC oordeel verdacht toe aan het monster.
-Indien de waardebepalingstechniek of -procedure afwijkt van de BRO,
-ken het concept QC oordeel verdacht toe aan de betreffende parameters.
+Ga na of het BRO-ID van het putfilter voorkomt in de lijst met
+BRO-gerigistreerde putfilters. Als deze niet hierin voorkomt, ken
+het concept oordeel verdacht toe aan het monster.
 }

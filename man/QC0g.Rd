@@ -2,30 +2,27 @@
 % Please edit documentation in R/QC0g.R
 \name{QC0g}
 \alias{QC0g}
-\title{QC0g. Controle zoet-zout grondwater}
+\title{QC0g. Controle redoxklasse grondwater}
 \usage{
 QC0g(d_filter, d_metingen, verbose = F)
 }
 \arguments{
-\item{d_filter}{dataframe met putcode en watertype vastgesteld}
+\item{d_filter}{dataframe met putcode, watertype en redoxklasses}
 
-\item{d_metingen}{metingen uit de nieuwe meetronde met chloride concentraties}
+\item{d_metingen}{metingen uit de nieuwe meetronde}
 
-\item{verbose}{of tekstuele output uit script gewenst is (T) of niet (F). Staat
-standaard op F.}
+\item{verbose}{of tekstuele output uit script gewenst is (T) of niet (F).
+Staat standaard op F.}
 }
 \value{
 metingen bestand met verdachte locaties/monsters.
 }
 \description{
-Controle op de chloridegegevens en of er sprake is van
-eenheidsfouten.
+Controle op fouten in de redoxparameters
 
-Controleer of de samenstelling van het grondwater is veranderd
-van zoet (<300 mg/l Cl) naar brak/zout (>300 mg/l Cl) of vice
-versa. Vergelijk de laatst gemeten Cl concentratie uit het invoerbestand
-met de gemiddelde Cl concentratie over de voorlaatste 5 metingen (of het
-gemiddelde over alle voorgaande Cl metingen indien minder
-dan 5 metingen aanwezig zijn). Is de samenstelling veranderd,
-ken het concept QC oordeel twijfelachtig toe aan het monster.
+Controleer of de redoxklasse (bepaald volgens werkwijze in
+Bijlage II QC Protocol) overeenkomt met de redoxklasse uit
+het bronbestand. Wijkt de redoxklasse 1 klasse af, ken het QC oordeel
+twijfelachtig toe aan het monster. Wijkt de redoxklasse meer
+dan 1 klasse af, ken het QC oordeel verdacht toe.
 }

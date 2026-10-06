@@ -28,13 +28,13 @@ QC2a <- function(d_veld, d_metingen, verbose = F) {
   
   # Controle op grondwaterstanden voor en na het voorpompen
   res <- d_veld %>%
-    dplyr::select(qcid, putcode, filter, jaar, maand, dag, 
+    dplyr::select(qcid, monsterid, putcode, filter, 
            gws_voor, gws_na) %>%
     dplyr::mutate(oordeel = ifelse(gws_na - gws_voor > 0 & gws_na - gws_voor < 0.1,
                             "twijfelachtig",
                             ifelse(gws_na - gws_voor >= 0.1, 
                                    "verdacht", "onverdacht")),
-           iden = paste(putcode, filter, jaar, maand, dag, sep = "-")) %>%
+           iden = monsterid) %>%
     dplyr::mutate(reden = ifelse(oordeel == "twijfelachtig", "gws na voorpompen is <10 cm hoger",
                           ifelse(oordeel == "verdacht", "gws na voorpompen is >10 cm hoger", ""))) %>%
     dplyr::filter(oordeel != "onverdacht")
@@ -56,7 +56,7 @@ QC2a <- function(d_veld, d_metingen, verbose = F) {
 
   # voeg attribute met uitkomsten tests toe aan relevante dataset (d_metingen)
   resultaat_df <- d_metingen %>%
-    dplyr::mutate(iden = paste(putcode, filter, jaar, maand, dag, sep = "-")) %>%
+    dplyr::mutate(iden = monsterid) %>%
     dplyr::filter(iden %in% res$iden) %>%
     dplyr::left_join(., res %>% dplyr::select(iden, gws_voor, gws_na, oordeel, reden), by = "iden") %>%
     dplyr::select(-iden)

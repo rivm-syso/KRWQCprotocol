@@ -1,19 +1,19 @@
-test_that("QC3e T1", {
+test_that("QC4c T1", {
               # Test default values
 
               data(metingen)
               data(parameter)
               #example data contains multiple EC measurements
 
-              x <- QC3e(d_metingen = metingen)
+              x <- QC4c(d_metingen = metingen)
 
               # test if attributes exist
               expect_true(qcout_attrexists(x))
               x_attr <- attr(x, "qcout")
-              expect_false(is.null(x_attr[["QC3e"]]))
-              expect_true(is.list(x_attr[["QC3e"]][["resultaat"]]))
+              expect_false(is.null(x_attr[["QC4c"]]))
+              expect_true(is.list(x_attr[["QC4c"]][["resultaat"]]))
 
-              ids <- x_attr[["QC3e"]][["oordeel"]][["twijfelachtig"]]
+              ids <- x_attr[["QC4c"]][["oordeel"]][["twijfelachtig"]]
               qcids <- metingen$qcid
               v1 <- intersect(ids, qcids)
               expect_true(length(v1) > 0)
@@ -25,7 +25,7 @@ test_that("QC3e T1", {
 })
 
 
-test_that("QC3e T2 Stuyfzand data ", {
+test_that("QC4c T2 Stuyfzand data ", {
 
               st31 <- stuyfzandtable31 %>%
                   mutate(al = 0, fe = 0, mn = 0) %>%
@@ -40,7 +40,7 @@ test_that("QC3e T2 Stuyfzand data ", {
 
 
 
-test_that("QC3e T3", {
+test_that("QC4c T3", {
       # test niet uitvoerbaar
 
       data(metingen)
@@ -66,9 +66,9 @@ test_that("QC3e T3", {
           nrow()
 
 
-      x <- QC3e(d_metingen = d2)
+      x <- QC4c(d_metingen = d2)
       x_attr <- attr(x, "qcout")
-      ids <- x_attr[["QC3e"]][["oordeel"]][["niet uitvoerbaar"]]
+      ids <- x_attr[["QC4c"]][["oordeel"]][["niet uitvoerbaar"]]
 
       expect_true(length(ids) == idnum)
 

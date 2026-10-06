@@ -1,265 +1,168 @@
-#' QC4a. Controle consistentie metingen met historische gegevens
+#' QC4a. Controle ionenbalans
 #'
-#' Beoordeling waarschijnlijk meting op basis van consistentie
-#' met historische gegevens. 
+#' Controle en berekening van de ionenbalans (IB)
+#' op monsterniveau
+#'
+#' Bereken de ionenbalans volgens de methode in 
+#' Bijlage II van het QC Protocol. De signaleringswaarde
+#' voor monsters is IB >10%. Als de ionenbalans
+#' boven de signaleringswaarde ligt, ken het concept
+#' QC oordeel twijfelachtig toe aan het monster.  
 #'      
-#' Per putfilter wordt voor elke parameter een vergelijking met het 
-#' verleden gemaakt. Dit kan worden gedaan voor ieder meetjaar, indien er 
-#' voldoende voorgaande metingen ter beschikking zijn. De consistentie van 
-#' metingen met de historische meetwaarden wordt in standaardafwijking 
-#' uitgedrukt. Een visuele inspectie vindt plaats voor de metingen met een
-#' standaardafwijking van >3.5 ten opzichte van de historische meetreeks. Van
-#' de metingen die na visuele inspectie als afwijkend van de tijdreeks worden
-#' beoordeeld, ken het concept QC oordeel twijfelachtig toe aan de betreffende
-#' parameter. 
-#' Zie bijlage II van het QC protocol voor de methodiek ter beoordeling van
-#' de consistentie van meetwaarden.       
-#'                       
 #' @param d_metingen dataframe met metingen
-#' @param d_parameter dataframe met parameter informatie
-#' @param meetronde meetjaar welke gevalideerd dient te worden. Staat standaard
-#' op de laatste meetjaar uit het databestand.
-#' @param zscore z-score waarbij een meeting wordt bestempeld met twijfelachtig.
-#' staat standaard op 3.5. Alle beschrijvingen zijn gebaseerd op z-score 3.5.
-#' @param plt Voeg tijdserie plots per reeks en stof toe aan resultaat
-#' @param plt_put_reeks Maak plots van alle putten waarbij 1 of meer parameters
-#' een z-score > 3.5 hebben (vereist plt = T). Staat standaard op F. 
-#' @param verbose of tekstuele output uit script gewenst is (T) of niet (F). 
-#' Staat standaard op F.
+#' @param ph_naam character string om te gebruiken als pH. Staat standaard
+#' op "pH". Enkel in het geval dat HCO3 in het veld is gemeten vul hier de naam van 
+#' de ph veld parameter in.
+#' @param hco3_naam character string om te gebruiken als HCO3. Staat standaard
+#' op "HCO3". Enkel in het geval dat HCO3 in het veld is gemeten vul hier de naam van
+#' de hco3 veld parameter in.
+#' @param verbose of tekstuele output uit script gewenst is (T) of niet (F). Staat
+#' standaard op F.
 #'
 #' @return metingen bestand met verdachte locaties/monsters. 
-#'
-#' @importFrom stringr str_detect
 #'
 #' @export
 #'
 
 
-QC4a <- function(d_metingen, d_parameter, 
-                 meetronde = max(d_metingen$jaar), 
-                 zscore = 3.5,
-                 plt = T, plt_put_reeks = F,
-                 verbose = F) {
+QC4a <- function(d_metingen, ph_naam = "pH", hco3_naam = "HCO3", verbose = F) {
   
   # Check datasets op kolommen en unieke informatie
   testKolommenMetingen(d_metingen)
   
-  # Berekenen statistieken per reeks
-  d <- d_metingen %>%
-    # alleen labmetingen meenemen -> Aantal veldmetingen hebben waarde 0
-    # wat mis gaat met log berekening
-    dplyr::filter(!stringr::str_detect(parameter, "veld")) %>%
-    # waardes 0 niet meenemen
-    dplyr::mutate(waarde = ifelse(waarde == 0, NA, waarde)) %>%
-    # verwijder NA's uit waarde kolom
-    tidyr::drop_na(waarde) %>%
-    # waarde <RG aanpassen naar 0.5 * RG. Geen ROS regressie
-    dplyr::mutate(waarde = ifelse(detectieteken == "<",
-                                  0.5 * waarde, waarde)) %>%
-    dplyr::group_by(putcode, filter, parameter) %>%
-    # bereken gemiddelde en sd per reeks voor lognormale verdeling
-    dplyr::mutate(n.meetjaar = dplyr::n_distinct(jaar),
-                  n.meting = length(waarde),
-                  logobs = log(waarde),
-                  loggem = sapply(1:n(), function(i) mean(log(waarde[-i]))),
-                  logsdv = sapply(1:n(), function(i) sd(log(waarde[-i])))) %>%
-    # bepaal z-score. Indien SD = 0, dan ook z-score = 0
-    dplyr::mutate(logz = ifelse(logsdv == 0, 0 ,
-                                (logobs - loggem) / logsdv) ) %>%
-    # voeg oordeel toe
-    # reeksen met <3 metingen/meetjaren zijn niet uitvoerbaar
-    # z-score >3.5 is twijfelachtig
-    dplyr::mutate(oordeel = ifelse(n.meetjaar < 3, "niet uitvoerbaar",
-                            ifelse(n.meetjaar >= 3 & abs(logz) > zscore, "twijfelachtig",
-                                   "onverdacht"))) %>%
-    # voeg type toe voor plotjes nieuwe en oude meetrondes
-    dplyr::mutate(type = ifelse(jaar == meetronde, "nieuw", "oud")) %>%
-    dplyr::ungroup()
+  # pH en HCO3 naam aanpassen alleen voor LMG
+  d <- d_metingen
+  #d <- d %>%  mutate(
+  #  parameter = case_when(parameter == ph_veld_naam ~ "pH_veld",
+  #                        TRUE ~ parameter)
+  #)
   
-  rapportageTekst <- paste("Er zijn in totaal", 
-                           nrow(d %>% dplyr::filter(oordeel == "twijfelachtig")), 
-                           "metingen waar de afwijking >", zscore, "standaarddeviaties",
-                           "is t.o.v. de historische meetreeks en totaal",
-                           nrow(d %>% dplyr::filter(oordeel == "niet uitvoerbaar")),
-                           "metingen waar QC4a niet uitvoerbaar is")
+  #d$parameter <- d$parameter %>%
+  #  recode("h_5__veld" = "hv",
+  #         "hco3_veld" = "hco3v",
+  #         "nh4_n" = "nh4",
+  #         "no3_n" = "no3",
+  #         "po4_p" = "po4",
+  #         .default = d$parameter)
+  
+  # selecteer relevante ionen om mee te nemen
+  an <- c("Cl", hco3_naam, "NO3", "SO4", "CO3", "PO4")
+  cat <- c("Al", "Ca", "Fe", "K", "Mg", "Mn", "NH4", "Na", "Zn", ph_naam)
+  
+  res <- d %>%
+    # pH ook meenemen -> omrekenen naar h3o
+    dplyr::filter(parameter %in% c(an, cat)) %>%
+    # parameter namen naar niet veld variant zodat de rest van de berekeningen niet aangepast hoeft te worden
+    mutate(parameter = case_when(parameter == ph_naam ~ "pH",
+                                 parameter == hco3_naam ~ "HCO3",
+                                 TRUE ~ parameter)) %>% 
+    # alle NA's op 0 zetten, behalve pH en de belangrijkste ionen
+    dplyr::mutate(waarde_ib = ifelse(!parameter %in% c("pH", "Ca", "Na", "Mg", "K", 
+                                                       "Cl", "SO4") & is.na(waarde),
+                                     0, waarde)) %>%
+    # soms staat RG als NA, < of "", eerst NA veranderen in ""
+    dplyr::mutate(detectieteken = ifelse(is.na(detectieteken), "", 
+                                         detectieteken)) %>%
+    # # waardes <RG niet meenemen maar op 0 zetten 
+    # dplyr::mutate(waarde_ib = ifelse(parameter != "pH" & detectieteken != "",
+    #                                  0, waarde_ib)) %>%
+    # als geen pH bekend is, dan is de pH 7 
+    dplyr::mutate(waarde_ib = ifelse(parameter == "pH" & is.na(waarde),
+                                     7, waarde_ib)) %>%
+    #  zet kolommen naar wide format
+    dplyr::select(-c(qcid, detectieteken, rapportagegrens, waarde)) %>%
+    tidyr::pivot_wider(., 
+                       names_from = parameter,
+                       names_glue = "{parameter}_meq",
+                       values_from = waarde_ib) 
+  
+  # Rijen met missende waardes op niet uitvoerbaar zetten
+  niet_uitvoerbaar_id <- qcidNietUitvoerbaar(res, d_metingen, c("Ca_meq", "Na_meq", "Mg_meq", "K_meq", "Cl_meq", "SO4_meq"))
+  
+  # Monsterid niet uitvoerbaar
+  monsterid_niet_uitvoerbaar <- d %>% 
+    filter(qcid %in% niet_uitvoerbaar_id) %>% 
+    pull(monsterid) %>% 
+    unique()
+  
+  # Rijen met missende waardes weghalen
+  res <- res %>% drop_na(c("Ca_meq", "Na_meq", "Mg_meq", "K_meq", "Cl_meq", "SO4_meq"))
+  
+  
+  # reken om naar meq/l volgens BRO
+  # Al is in microgram
+  res$Al_meq <- 0.003 * res$Al_meq / 26.98
+  res$Ca_meq <- 2 * res$Ca_meq / 40.08
+  res$Cl_meq <- res$Cl_meq / 35.453
+  # Fe is in microgram
+  res$Fe_meq <- 0.002 * res$Fe_meq / 55.85
+  # pH omrekenen naar mili-equivalent dus maal 1000
+  res$H3O_meq <- 1000 * 10^-res$pH_meq
+  res$K_meq <- res$K_meq / 39.102
+  res$Mg_meq <- 2 * res$Mg_meq / 24.31
+  # Mn is in microgram
+  res$Mn_meq <- 0.002 * res$Mn_meq / 54.94
+  res$NH4_meq <- res$NH4_meq / 18.0383
+  res$NO3_meq <- res$NO3_meq / 62.0049
+  res$Na_meq <- res$Na_meq / 22.9898
+  res$PO4_meq <- 3 * res$PO4_meq / 94.9712
+  res$SO4_meq <- 2 * res$SO4_meq / 96.062
+  # Zn is in microgram
+  res$Zn_meq <- 0.002 * res$Zn_meq / 65.39
+  res$HCO3_meq <- res$HCO3_meq / 61.0168
+  res$CO3_meq <- 2 * res$CO3_meq / 60.0168
+
+  
+  # bereken ionenbalans
+  res <- res %>%
+    dplyr::mutate(pos = Al_meq + Ca_meq + Fe_meq + K_meq + Mg_meq + Mn_meq + NH4_meq + Na_meq + Zn_meq + H3O_meq,
+                  neg = Cl_meq + HCO3_meq + NO3_meq + SO4_meq + CO3_meq + PO4_meq) %>%
+    dplyr::mutate(ib = round(100 * (pos - neg) / (pos + neg), digits = 2)) %>%
+    # markeer afwijkingen
+    # voor oligominerale of geconcentreerde watermonsters (bijv. met SOM kationen < 2.0
+    # of > 8.0 meq/l) mag een hogere signaleringswaarde van IB worden gehanteerd. Dit
+    # ter beoordeling van de validerende instantie. 
+    # Eventueel nog keuze opnemen?
+    dplyr::mutate(oordeel = ifelse(abs(ib) > 10,
+                                   "twijfelachtig", "onverdacht"),
+                  iden = monsterid) %>%
+    dplyr::filter(oordeel != "onverdacht") %>%
+    dplyr::rename(`som cat` = pos,
+                  `som an` = neg) 
+  
+  # rapportagetekst
+  rapportageTekst <- paste("Er zijn in totaal", nrow(res), 
+                           "monsters waarbij het verschil in ionenbalans",
+                           "groter dan 10% is.", "Bij", nrow(res %>% 
+                                                               dplyr::filter(ib > 10)),
+                           "monsters is de ionenbalans sterk positief (>10%) en bij",
+                           nrow(res %>% 
+                                  dplyr::filter(ib < -10)), "monsters sterk negatief (< -10%).")
   
   if(verbose) {
-    if(nrow(d %>% dplyr::filter(oordeel %in% c("twijfelachtig", "niet uitvoerbaar"))) > 0 ) {
+    if(nrow(res) > 0 ) {
       print(rapportageTekst)
       
     } else {
-      print(paste("Er zijn geen metingen waar de afwijking >", zscore,
-                  "standaarddeviaties is."))
-    }
-  }
-  
-  ## Visualiseren per stof voor historie ##
-  plot_list_param = list()
-  if(plt) {
-    
-    d <- d %>%
-      dplyr::group_by(parameter) %>%
-      dplyr::mutate(xrank = dplyr::dense_rank(loggem)) %>%
-      # kleur punten
-      dplyr::mutate(kleur = dplyr::case_when(
-        type == "oud" ~ "grey90",
-        abs(logz) <= 2 ~ "grey70",
-        abs(logz) > 3.5 ~ "black",
-        abs(logz) > 3 ~ "red3",
-        abs(logz) > 2.5 ~ "orange",
-        abs(logz) > 2 ~ "green",
-        # eventueel nog vreemd water kleuren? -> SS >100
-        ),
-        kleur = factor(kleur,
-                       levels = c("grey90", "grey70", "green", 
-                                  "orange", "red3", "black"),
-                       ordered = TRUE)) %>%
-      # definieer printvolgorde zodat meest afwijkende punten altijd 
-      # bovenaan worden geplot
-      dplyr::mutate(printvolgorde = dplyr::case_when(
-        kleur == "grey90" ~ 1,
-        kleur == "grey70" ~ 2,
-        kleur == "green" ~ 3,
-        kleur == "orange" ~ 4,
-        kleur == "red3" ~ 5,
-        kleur == "black" ~ 6))
-    
-    # plot
-    col <- c("grey90", "grey70", "green", "orange", "red3", "black")
-    names(col) <- c("grey90", "grey70", "green", "orange", "red3", "black")
-    
-    # maak figuren per parameter en voeg samen in een list
-    for(i in unique(d$parameter)) {
-      
-      res <- d %>%
-        dplyr::filter(parameter == i) 
-        # eventueel nog alleen de parameters selecteren
-        # welke in gekozen meetronde ook bemonsterd zijn om te plotten?
-      
-      # deze code later in aparte functie plaatsen?
-      plot <- ggplot2::ggplot() +
-        # historische data als punten
-        ggplot2::geom_point(data = res %>% dplyr::filter(type == "oud"),
-                   ggplot2::aes(x = xrank,
-                       y = logobs,
-                       group = xrank,
-                       color = kleur),
-                   shape = 1, size = 0.3) +
-        # plot nieuwe data als punten
-        ggplot2::geom_point(data = res %>% dplyr::filter(type == "nieuw") %>%
-                              dplyr::arrange(printvolgorde),
-                   ggplot2::aes(x = xrank,
-                       y = logobs,
-                       color = kleur),
-                   shape = 0, size = 1) +
-        # kleuren van punten
-        ggplot2::scale_color_manual(name = "",
-                           values = col,
-                           labels = c("hist. meting",
-                                      "<2 sd",
-                                      "<2.5 sd",
-                                      "<3 sd",
-                                      "<3.5 sd",
-                                      ">3.5 sd")) +
-        ggplot2::theme_bw() +
-        # assen 
-        ggplot2::xlab("filters in rangorde") +
-        ggplot2::ylab(paste0("10log (", unique(res$parameter), ")")) +
-        ggplot2::ggtitle(paste(unique(res$parameter), meetronde)) +
-        ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
-      
-      plot_list_param[[i]] <- plot
-    }
-  }
-    
-  
-  ## Visualiseren reeks niveau ##
-  # alleen voor de reeksen waar een meting >3.5 sd afwijkt
-  afwijking <- d %>%
-    # bij een afwijking wil je beide filters visualiseren 
-    # ipv alleen het filter waar de afwijking zit
-    # zodat evt filter verwisselingen bekeken kunnen worden
-    # dus alleen putcode en parameter koppelen
-    dplyr::mutate(reeks = paste(parameter, putcode, sep = "-")) %>%
-    dplyr::filter(oordeel == "twijfelachtig")
-  
-  plot_list_reeks <- list()
-  if(nrow(afwijking) > 0) {
-    
-    res <- d %>%
-      dplyr::mutate(putfilter = paste(putcode, filter, sep = "-"),
-                    reeks = paste(parameter, putcode, sep = "-")) %>%
-      # voeg eenheid toe voor plot as
-      dplyr::mutate(eenheid = d_parameter[match(parameter, d_parameter$parameter), "eenheid"]) %>%
-      # selecteer reeksen met meting >3.5 sd
-      dplyr::filter(if (plt_put_reeks) putcode %in% afwijking$putcode 
-                    else reeks %in% afwijking$reeks)
-      
-      # test set voor figuren op reeks niveau voor beide filters
-      # res <- d %>%
-      #   # waardes <RG als RG plotten ivm 0.5 *RG?
-      #   # mutate(waarde = ifelse(detectieteken == "<",
-      #   #                        waarde * 2, waarde)) %>%
-      #   mutate(putfilter = paste(putcode, filter, sep = "-"),
-      #          reeks = paste(parameter, putcode, sep = "-")) %>%
-      #   # voeg eenheid toe voor plot as
-      #   mutate(eenheid = d_parameter[match(parameter, d_parameter$naam), 5]) %>%
-      #   # selecteer reeksen met meting >3.5 sd
-      #   filter(putcode == 1, parameter == "al") %>%
-      #   mutate(oordeel = ifelse(filter == 1 & jaar == 2019,
-      #                           "twijfelachtig", oordeel))
-      #   filter(putcode == 296, parameter == "ca") %>%
-      #   mutate(oordeel = ifelse(filter == 1 & jaar == 2019,
-      #                           "twijfelachtig", oordeel))
-      
-    for(i in unique(res$reeks)) {
-      
-      dat <- res %>%
-        filter(reeks == i) %>%
-        mutate(detectieteken = ifelse(detectieteken == "",
-                                      "> RG", "< RG"))
-      
-      plot <- ggplot2::ggplot() +
-        ggplot2::geom_point(data = dat, 
-                   ggplot2::aes(x = jaar,
-                       y = waarde,
-                       color = putfilter,
-                       shape = detectieteken)) +
-        ggplot2::geom_point(data = dat %>% dplyr::filter(oordeel == "twijfelachtig"),
-                   ggplot2::aes(x = jaar,
-                       y = waarde,
-                       shape = oordeel),
-                   shape = 13, size = 4, stroke = 0.4) +
-        ggplot2::theme_bw() +
-        ggplot2::scale_shape_manual(values = c(16, 1)) + 
-        # assen 
-        ggplot2::labs(title = paste(unique(dat$parameter), meetronde),
-                      subtitle = paste("gemarkeerde meting is >", zscore, "sd en",
-                              "metingen <RG = 0,5*RG")) +
-        ggplot2::xlab("") +
-        ggplot2::ylab(paste0(unique(dat$parameter), " [", unique(dat$eenheid), "]")) +
-        ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5),
-                       plot.subtitle = ggplot2::element_text(hjust = 0.5))
-        
-      plot_list_reeks[[i]] <- plot
-      
+      print(paste("Bij alle monsters is het verschil in ionenbalans <10%"))
     }
   }
   
   # voeg attribute met uitkomsten tests toe aan relevante dataset (d_metingen)
-  # zowel afwijkingende dataset metingen als de plots
-  resultaat_df <- d %>%
-    dplyr::select(-c("type", "xrank", "kleur", "printvolgorde")) %>%
-    dplyr::filter(oordeel != "onverdacht")
-
+  resultaat_df <- d_metingen %>%
+    dplyr::mutate(iden = monsterid) %>%
+    dplyr::mutate(oordeel = case_match(iden, 
+                                       res$iden ~ "twijfelachtig",
+                                       monsterid_niet_uitvoerbaar ~ "niet uitvoerbaar",
+                                       .default = "onverdacht")) %>%
+    dplyr::filter(oordeel != "onverdacht") %>%
+    dplyr::left_join(., res %>% dplyr::select(iden, ib,
+                                              `som cat`, Al_meq, Ca_meq, Fe_meq, K_meq, Mg_meq, Mn_meq, NH4_meq, Na_meq, Zn_meq, H3O_meq,
+                                              `som an`, Cl_meq, HCO3_meq, NO3_meq, SO4_meq, CO3_meq, PO4_meq), by = "iden") 
+  
   twijfel_id <- resultaat_df %>% 
     dplyr::filter(oordeel == "twijfelachtig") %>% 
-    dplyr::distinct(qcid) %>%
-    dplyr::pull(qcid)
-  
-  niet_uitvoerbaar_id <- resultaat_df %>% 
-    dplyr::filter(oordeel == "niet uitvoerbaar") %>% 
-    dplyr::distinct(qcid) %>%
+    dplyr::distinct(qcid) %>% 
     dplyr::pull(qcid)
   
   test <- "QC4a"
@@ -275,16 +178,10 @@ QC4a <- function(d_metingen, d_parameter,
   d_metingen <- qcout_add_rapportage(obj = d_metingen,
                                      test = test,
                                      tekst = rapportageTekst)
-  # voeg twijfelachtige metingen toe
-  # voeg figuren per parameter toe
-  # voeg figuren afwijkende metingen per reeks toe
   d_metingen <- qcout_add_resultaat(obj = d_metingen,
                                     test = test,
-                                    resultaat = list(tabel = resultaat_df,
-                                                     plot_param = plot_list_param,
-                                                     plot_reeks = plot_list_reeks))
-
+                                    resultaat = resultaat_df)
+  
   return(d_metingen)
   
 }
-

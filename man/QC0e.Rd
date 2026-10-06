@@ -2,9 +2,9 @@
 % Please edit documentation in R/QC0e.R
 \name{QC0e}
 \alias{QC0e}
-\title{QC0e. Controle filter}
+\title{QC0e. Controle filter en filterdiepte}
 \usage{
-QC0e(d_veld, d_filter, d_metingen, fl = 2, verbose = F)
+QC0e(d_veld, d_filter, d_metingen, verbose = F)
 }
 \arguments{
 \item{d_veld}{dataframe met putcode en filterdiepte waargenomen in het veld
@@ -15,9 +15,6 @@ voor het bemonsterde jaar X.}
 \item{d_metingen}{metingen bestand met monster ID's om bij verkeerde filterbemonstering
 te kunnen markeren.}
 
-\item{fl}{filterlengte. Meestal is dit 1-2 meter. Standaard ingevuld is
-nu 2 meter, maar dit kan aangepast worden met deze parameter.}
-
 \item{verbose}{of tekstuele output uit script gewenst is (T) of niet (F). Staat
 standaard op F.}
 }
@@ -25,10 +22,10 @@ standaard op F.}
 metingen bestand met verdachte locaties/monsters.
 }
 \description{
-Controle op bemonstering van het juiste filter.
+Controle op bemonstering van het juiste filter, op de meetfout in de filterdiepte
+of de aanwezigheid van sediment in het filter.
 }
 \details{
-Als de diepte onderkant filter (okf) meer dan de helft van de
-filterlengte (meestal 1-2 meter) afwijkt dan in de BRO
-geregistreerde diepte, markeer de waarde als verdacht.
+Als de diepte onderkant filter (okf) meer dan 50 centimeter afwijkt dan in de BRO
+geregistreerde diepte, markeer de waarde als twijfelachtig.
 }

@@ -1,4 +1,4 @@
-test_that("QC3f T1", {
+test_that("QC4e T1", {
   # test with 'default' LMG parameter
   
   data(metingen)
@@ -6,16 +6,16 @@ test_that("QC3f T1", {
   
   d <- metingen
   
-  x <- QC3f(d_veld = veld, d_metingen = d, ph_veld_naam = "h_1__veld")
+  x <- QC4e(d_veld = veld, d_metingen = d, ph_veld_naam = "h_1__veld")
   
   # test if attributes exist
   expect_true(qcout_attrexists(x))
   x_attr <- attr(x, "qcout")
-  expect_false(is.null(x_attr[["QC3f"]]))
-  expect_true(is.list(x_attr[["QC3f"]][["resultaat"]]))
+  expect_false(is.null(x_attr[["QC4e"]]))
+  expect_true(is.list(x_attr[["QC4e"]][["resultaat"]]))
   
   
-  ids <- x_attr[["QC3f"]][["oordeel"]][["twijfelachtig"]]
+  ids <- x_attr[["QC4e"]][["oordeel"]][["twijfelachtig"]]
   qcids <- metingen$qcid
   v1 <- intersect(ids, qcids)
   expect_true(length(v1) == 0)
@@ -27,7 +27,7 @@ test_that("QC3f T1", {
   
 }) 
 
-test_that("QC3f T2", {
+test_that("QC4e T2", {
   # test with default value voor ph_veld_naam.
   
   data(metingen)
@@ -39,16 +39,16 @@ test_that("QC3f T2", {
                           TRUE ~ parameter)
   )
   
-  x <- QC3f(d_veld = veld, d_metingen = d)
+  x <- QC4e(d_veld = veld, d_metingen = d)
   
   # test if attributes exist
   expect_true(qcout_attrexists(x))
   x_attr <- attr(x, "qcout")
-  expect_false(is.null(x_attr[["QC3f"]]))
-  expect_true(is.list(x_attr[["QC3f"]][["resultaat"]]))
+  expect_false(is.null(x_attr[["QC4e"]]))
+  expect_true(is.list(x_attr[["QC4e"]][["resultaat"]]))
   
   
-  ids <- x_attr[["QC3f"]][["oordeel"]][["twijfelachtig"]]
+  ids <- x_attr[["QC4e"]][["oordeel"]][["twijfelachtig"]]
   qcids <- metingen$qcid
   v1 <- intersect(ids, qcids)
   expect_true(length(v1) == 0)
@@ -60,7 +60,7 @@ test_that("QC3f T2", {
   
 }) 
 
-test_that("QC3f T3", {
+test_that("QC4e T3", {
       # test niet uitvoerbaar
 
       data(metingen)
@@ -68,9 +68,9 @@ test_that("QC3f T3", {
 
       d <- metingen %>%
           mutate(waarde = if_else(parameter == "h_1_veld", NA_real_, waarde))
-      x <- QC3f(d_veld = veld, d_metingen = d, ph_veld_naam = "h_1__veld")
+      x <- QC4e(d_veld = veld, d_metingen = d, ph_veld_naam = "h_1__veld")
       x_attr <- attr(x, "qcout")
-      ids3 <- x_attr[["QC3f"]][["oordeel"]][["niet uitvoerbaar"]]
+      ids3 <- x_attr[["QC4e"]][["oordeel"]][["niet uitvoerbaar"]]
       expect_true(length(ids3) == nrow(d))
 })
 

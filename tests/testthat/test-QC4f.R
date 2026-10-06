@@ -1,18 +1,18 @@
-test_that("QC3g T1", {
+test_that("QC4f T1", {
   
   
   data(metingen)
   
-  x <- QC3g(d_metingen = metingen)
+  x <- QC4f(d_metingen = metingen)
   
   # test if attributes exist
   expect_true(qcout_attrexists(x))
   x_attr <- attr(x, "qcout")
-  expect_false(is.null(x_attr[["QC3g"]]))
-  expect_true(is.list(x_attr[["QC3g"]][["resultaat"]]))
+  expect_false(is.null(x_attr[["QC4f"]]))
+  expect_true(is.list(x_attr[["QC4f"]][["resultaat"]]))
   
   
-  ids <- x_attr[["QC3g"]][["oordeel"]][["twijfelachtig"]]
+  ids <- x_attr[["QC4f"]][["oordeel"]][["twijfelachtig"]]
   qcids <- metingen$qcid
   v1 <- intersect(ids, qcids)
   expect_true(length(v1) == 0)
@@ -25,7 +25,7 @@ test_that("QC3g T1", {
 })
 
 
-test_that("QC3g T2", {
+test_that("QC4f T2", {
               # test niet uitvoerbaar
 
 
@@ -34,9 +34,9 @@ test_that("QC3g T2", {
 
       d <- metingen %>%
           mutate(waarde = if_else(parameter == "HCO3", NA_real_, waarde))
-      x <- QC3g(d_metingen = metingen)
+      x <- QC4f(d_metingen = d)
       x_attr <- attr(x, "qcout")
-      ids <- x_attr[["QC3g"]][["oordeel"]][["niet uitvoerbaar"]]
+      ids <- x_attr[["QC4f"]][["oordeel"]][["niet uitvoerbaar"]]
       expect_true(length(ids) == nrow(d))
 
 

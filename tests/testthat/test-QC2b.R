@@ -38,7 +38,7 @@ test_that("QC2b",{
   
   
   afwijkend_bemp <- metingen %>% 
-    dplyr::select(putcode, filter, jaar, maand, dag ) %>%
+    dplyr::select(monsterid, putcode, filter, jaar, maand, dag ) %>%
     dplyr::distinct()
   afwijkend_bemp <- afwijkend_bemp[sample(1:nrow(afwijkend_bemp),size=10),] %>%
     dplyr::mutate(afwijking_bemonsteringsprocedure="afwijkend")

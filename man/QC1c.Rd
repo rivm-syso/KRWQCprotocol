@@ -2,26 +2,32 @@
 % Please edit documentation in R/QC1c.R
 \name{QC1c}
 \alias{QC1c}
-\title{QC1c. Controle rapportagegrens}
+\title{QC1c. Controle parameterlijst BRO}
 \usage{
-QC1c(d_metingen, verbose = F)
+QC1c(d_parameter, d_metingen, verbose = F)
 }
 \arguments{
+\item{d_parameter}{dataframe met putcode, watertype en redoxklasses}
+
 \item{d_metingen}{dataframe met metingen}
 
 \item{verbose}{of tekstuele output uit script gewenst is (T) of niet (F).
 Staat standaard op F.}
 }
 \value{
-het metingen bestand met attribute van test resultaten. In de kolom
-\code{oordeel} blijkt of de locatie/monster 'onverdacht' of 'verdacht' is.
+metingen bestand met verdachte locaties/monsters.
 }
 \description{
-Controle op aanwezigheid rapportagegrens en detectiesymbool
+Controle op ID, aquocode, CASnummer, omschrijving,
+eenheid en hoedanigheid.
 }
 \details{
-Indien de rapportagegrens voor een parameter ontbreekt, ken het
-concept oordeel verdacht toe aan de betreffende parameter.
-Indien waardes <rapportagegrens geen detectiesymbool bevatten,
-ken het concept oordeel verdacht toe aan de betreffende parameter.
+Controleer of de identificatiekenmerken van de individuele
+metingen overeenkomen met de parameterlijst BRO. In geval van
+afwijken, ken het concept QC oordeel verdacht toe aan de betreffende
+parameters.
+
+Indien een parameter niet op de parameterlijst BRO aanwezig is, dan
+dient deze te worden aangevraagd via de servicedesk BRO. De parameterlijst
+wordt hiermee uitgebreid wanneer het een legitieme, nieuwe parameter betreft.
 }

@@ -2,35 +2,37 @@
 % Please edit documentation in R/QC4b.R
 \name{QC4b}
 \alias{QC4b}
-\title{QC4b. Controle technisch waardebereik}
+\title{QC4b. Controle EC-veld en EC-lab}
 \usage{
-QC4b(d_metingen, ph_veld_naam = "pH_veld", verbose = F)
+QC4b(
+  d_metingen,
+  d_parameter,
+  geleidendheid_veld_naam = "GELDHD_VELD",
+  verbose = F
+)
 }
 \arguments{
 \item{d_metingen}{dataframe met metingen}
 
-\item{ph_veld_naam}{character string om te gebruiken als pH
-veld. Staat standaard op "pH_veld".}
+\item{d_parameter}{dataframe met parameter informatie}
+
+\item{geleidendheid_veld_naam}{character string om te gebruiken als geleidendheid
+veld. Staat standaard op "GELDHD_VELD".}
 
 \item{verbose}{of tekstuele output uit script gewenst is (T) of niet (F). Staat
 standaard op F.}
 }
 \value{
 metingen bestand met verdachte locaties/monsters.
-
-De benodigde naam voor pH lab is pH.
-De benodigde naam voor pH veld staat standaard op "pH_veld", maar kan worden
-aangepast door een character string in te vullen voor ph_veld_naam.
+De benodigde naam voor ec lab is GELDHD.
+De benodigde naam voor ec veld staat standaard op "GELDHD_VELD", maar kan worden
+aangepast door een character string in te vullen voor geleidendheid_veld_naam.
 }
 \description{
-Controleer of een meting fysisch niet mogelijk is.
-
-Parameters met een fysisch waardebereik:
-\itemize{
-\item pH: 0 - 14 \link{-}
-}
+Vergelijk EC-veld en EC-lab
 }
 \details{
-Indien de meetwaarde buiten het fysisch waardebereik valt, ken
-de betreffende parameter het concept QC oordeel verdacht toe.
+De signaleringswaarde voor monsters is delta-EC > 10 procent.
+Als de delta-EC boven de signaleringswaarde ligt, ken het
+concept QC oordeel twijfelachtig toe aan het monster.
 }

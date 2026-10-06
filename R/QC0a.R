@@ -47,7 +47,7 @@ QC0a <- function(d_veld, d_put, d_metingen, verbose = F) {
 
   # Selecteer alleen putnummer, jaar, xy 
   d <- d_veld %>%
-    dplyr::select(putcode, jaar, maand, dag, xcoord, ycoord) 
+    dplyr::select(monsterid, putcode, xcoord, ycoord) 
   
   # Vergelijk coordinaten met opzoektabel van aangeleverde BRO data (d_put)
   res <- merge(d, d_put %>% dplyr::select(putcode, xcoord, ycoord), by = "putcode") %>%
@@ -55,7 +55,7 @@ QC0a <- function(d_veld, d_put, d_metingen, verbose = F) {
                             "verdacht",
                             ifelse(ycoord.x - ycoord.y > 20 | ycoord.y - ycoord.x > 20,
                                    "verdacht", "onverdacht")),
-           iden = paste(putcode, jaar, maand, dag, sep = "-")) %>%
+           iden = monsterid) %>%
     dplyr::filter(oordeel == "verdacht") %>%
     dplyr::rename(X_val = xcoord.x,
            Y_val = ycoord.x,
@@ -85,7 +85,7 @@ QC0a <- function(d_veld, d_put, d_metingen, verbose = F) {
   # voeg concept oordeel van afwijkende putten toe aan monsters op die locaties in betreffende meetronde
   resultaat_df <- d_metingen %>%
     dplyr::group_by(monsterid) %>%
-    dplyr::mutate(iden = paste(putcode, jaar, maand, dag, sep = "-")) %>%
+    dplyr::mutate(iden = monsterid) %>%
     dplyr::mutate(oordeel = ifelse(iden %in% res$iden,
                             "verdacht", "onverdacht")) %>%
     dplyr::filter(oordeel == "verdacht") %>%
