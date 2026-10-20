@@ -2,18 +2,14 @@
 % Please edit documentation in R/QC0f.R
 \name{QC0f}
 \alias{QC0f}
-\title{QC0f. Controle filterdiepte}
+\title{QC0f. Controle zoet-zout grondwater}
 \usage{
-QC0f(d_veld, d_filter, d_metingen, verbose = F)
+QC0f(d_filter, d_metingen, verbose = F)
 }
 \arguments{
-\item{d_veld}{dataframe met putcode en filterdiepte waargenomen in het veld
-voor het bemonsterde jaar X.}
+\item{d_filter}{dataframe met putcode en watertype vastgesteld}
 
-\item{d_filter}{BRO geregisteerde metadata behorende bij de put of putcode.}
-
-\item{d_metingen}{metingen bestand met monster ID's om bij verkeerde filterbemonstering
-te kunnen markeren.}
+\item{d_metingen}{metingen uit de nieuwe meetronde met chloride concentraties}
 
 \item{verbose}{of tekstuele output uit script gewenst is (T) of niet (F). Staat
 standaard op F.}
@@ -22,11 +18,14 @@ standaard op F.}
 metingen bestand met verdachte locaties/monsters.
 }
 \description{
-Controle op meetfout in de filterdiepte of aanwezigheid van
-sediment in het filter.
-}
-\details{
-Indien de filterdiepte meer dan 10 centimeter afwijkt van de
-geregistreerde filterdiepte, ken het concept QC oordeel
-twijfelachtig toe aan het monster.
+Controle op de chloridegegevens en of er sprake is van
+eenheidsfouten.
+
+Controleer of de samenstelling van het grondwater is veranderd
+van zoet (<300 mg/l Cl) naar brak/zout (>300 mg/l Cl) of vice
+versa. Vergelijk de laatst gemeten Cl concentratie uit het invoerbestand
+met de gemiddelde Cl concentratie over de voorlaatste 5 metingen (of het
+gemiddelde over alle voorgaande Cl metingen indien minder
+dan 5 metingen aanwezig zijn). Is de samenstelling veranderd,
+ken het concept QC oordeel twijfelachtig toe aan het monster.
 }

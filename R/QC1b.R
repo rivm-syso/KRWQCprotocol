@@ -1,124 +1,84 @@
-
-#' QC1b. Controle apparaat, techniek en procedure BRO
+#' QC1b. Controle registratie putfilter in de BRO
 #'
-#' Controle op bemonsteringsapparaat, bemonsteringsprocedure,
-#' waardebepalingstechniek en waardebepalingsprocedure
-#'    
-#' Controleer of de bemonstering en labbepaling conform de BRO is gedaan.
-#'
-#' Indien het bemonsteringsapparaat of de -procedure afwijkt van de BRO, 
-#' ken het concept QC oordeel verdacht toe aan het monster.
-#' Indien de waardebepalingstechniek of -procedure afwijkt van de BRO,
-#' ken het concept QC oordeel verdacht toe aan de betreffende parameters. 
+#' Controleer of de betreffende putfilter is opgenomen in de BRO. 
 #' 
-#' @param d_veld dataframe met veldwaarnemingen
-#' @param d_parameter dataframe met parameter informatie      
-#' @param d_metingen dataframe met metingen
+#' Ga na of het BRO-ID van het putfilter voorkomt in de lijst met 
+#' BRO-gerigistreerde putfilters. Als deze niet hierin voorkomt, ken
+#' het concept oordeel verdacht toe aan het monster.
+#'
+#' @param d_filter dataframe met putfilter informatie
+#' @param d_metingen metingen bestand met monster ID's om bij afwijkingen in de
+#' putcode een oordeel toe te kennen.
 #' @param verbose of tekstuele output uit script gewenst is (T) of niet (F). Staat
 #' standaard op F.
 #'
-#' @return het metingen bestand met attribute van test resultaten. In de kolom
-#' `oordeel` blijkt of de locatie/monster 'onverdacht' of 'verdacht' is.
+#'
+#' @return metingen bestand met verdachte locaties/monsters. 
+#' 
 #'
 #' @export
 #'
 
-
-QC1b <- function(d_veld, d_parameter, d_metingen, verbose = F) {
-
-    # laad opzoektabellen uit de BRO
-    data(BRO_bemonsteringsapparaat)
-    data(BRO_bemonsteringsprocedure)
-    data(BRO_waardebepalingstechniek)
-    data(BRO_waardebepalingsprocedure)
-
-    # Check datasets op kolommen en unieke informatie
-    testKolommenParameter(d_parameter)
-    valideParamInfo(d_parameter)
-    testKolommenMetingen(d_metingen)
-
-    # eerst controle op bemonsteringsapparaat en -procedure
-    bemonstering <- rbind(d_veld %>% 
-                          dplyr::filter(!bem_app %in% BRO_bemonsteringsapparaat$waarde) %>%
-                          dplyr::mutate(reden = "bemonsteringsapparatuur wijkt af van BRO"),
-                      d_veld %>%
-                          dplyr::filter(!bem_proc %in% BRO_bemonsteringsprocedure$waarde) %>%
-                          dplyr::mutate(reden = "bemonsteringsprocedure wijkt af van BRO")) %>%
-   
-    dplyr::select(qcid, putcode, filter, jaar, maand, dag, bem_app, bem_proc, reden)
-
-# daarna controle op waardebepalingstechniek en -procedure
-waardebepaling <- rbind(d_parameter %>%
-                        dplyr::filter(!waarde_techniek %in% BRO_waardebepalingstechniek$waarde) %>%
-                        dplyr::mutate(reden = "waardebepalingstechniek wijkt af van BRO"), d_parameter %>%
-                        dplyr::filter(!waarde_procedure %in% BRO_waardebepalingsprocedure$waarde) %>%
-                        dplyr::mutate(reden = "waardebepalingsprocedure wijkt af van BRO")) %>%
-                        dplyr::select(qcid, parameter, cas, waarde_techniek, waarde_procedure, reden)
-
-  rapportageTekst <- paste("Er zijn in totaal", 
-                           nrow(bemonstering %>% dplyr::filter(reden == "bemonsteringsapparatuur wijkt af van BRO")), 
-                           "bemonsteringen met afwijkende bemonsteringsapparatuur en",
-                           nrow(bemonstering %>% dplyr::filter(reden == "bemonsteringsprocedure wijkt af van BRO")),
-                           "bemonstering met afwijkende bemonsteringsprocedure.",
-                           "Daarnaast zijn er",
-                           nrow(waardebepaling %>% dplyr::filter(reden == "waardebepalingstechniek wijkt af van BRO")),
-                           "parameters met een afwijkende waardebepalingstechniek en",
-                           nrow(waardebepaling %>% dplyr::filter(reden == "waardebepalingsprocedure wijkt af van BRO")),
-                           "met een afwijkende waardebepalingsprocedure t.o.v. de BRO.")
-
-if(verbose) {
-    if(nrow(bemonstering) > 0 | nrow(waardebepaling) > 0) {
-        print(rapportageTekst)
-
+QC1b <- function(d_filter, d_metingen, verbose = F) {
+  
+  warning(paste0("Dit is een tijdelijke functie waarbij handmatige ",
+                 "input vereist is van putcodes welke niet in de ", 
+                 "BRO puttenlijst voorkomen, zie de handleiding."))
+  
+  # Test of relevante kolommen aanwezig zijn
+  testKolommenFilter(d_filter)
+  testKolommenMetingen(d_metingen)
+  
+  # voeg kolom oordeel toe
+  # alle putfilters uit d_filter zijn nu al verdacht doordat tijdelijk
+  # handmatige subselectie buiten de functie heeft plaatsgevonden 
+  res <- d_filter %>%
+    dplyr::mutate(oordeel = "verdacht") %>%
+    dplyr::mutate(iden = paste(putcode, filter, sep = "-"))
+  
+  rapportageTekst <- paste("Er zijn in totaal", nrow(res), 
+                           "putfilters welke BRO-ID's niet geregistreerd",
+                           "zijn in de BRO.")
+  
+  # Als printen gewenst is (T)
+  # Print preview van afwijkende XY-coordinaten 
+  if(verbose) {
+    if(nrow(res) > 0) {
+      write.table(
+        rapportageTekst,
+        row.names = F, col.names = F)
+      print(res %>% select(putcode, filter, bro_id))
+      
     } else {
-        print(paste("Alle bemonsteringapparaten en -procedures",
-                    "en waardebepalingstechnieken en -procedures zijn conform de BRO"))
+      print("Elke putfilter is met BRO-ID geregisteerd in de BRO.")
     }
-}
-
-# voeg concept oordeel van afwijkende bemonstering toe aan monsters op die locaties in betreffende meetronde
-bemonstering <- bemonstering %>%
-    dplyr::mutate(iden = paste(putcode, filter, jaar, maand, dag, sep = "-"))
-
-resultaat_df_meting <- d_metingen %>%
+  }
+  
+  # voeg concept oordeel van afwijkende putfilters toe aan monsters op die 
+  # locaties in betreffende meetronde
+  resultaat_df <- d_metingen %>%
     dplyr::group_by(monsterid) %>%
-    dplyr::mutate(iden = paste(putcode, filter, jaar, maand, dag, sep = "-")) %>%
-    dplyr::mutate(oordeel = ifelse(iden %in% bemonstering$iden,
-                            "verdacht", "onverdacht")) %>%
+    dplyr::mutate(iden = paste(putcode, filter, sep = "-")) %>%
+    dplyr::mutate(oordeel = ifelse(iden %in% res$iden,
+                                   "verdacht", "onverdacht")) %>%
     dplyr::filter(oordeel == "verdacht") %>%
-    dplyr::left_join(., bemonstering %>% dplyr::select(iden, reden), by = "iden") %>%
     dplyr::select(-iden)
-
-# voeg concept oordeel van afwijkende bemonstering toe aan parameters op die locaties in betreffende meetronde
-resultaat_df_waarde <- d_metingen %>%
-    dplyr::group_by(parameter) %>%
-    dplyr::mutate(oordeel = ifelse(parameter %in% waardebepaling$parameter,
-                            "verdacht", "onverdacht")) %>%
-    dplyr::filter(oordeel == "verdacht") %>%
-    dplyr::left_join(., waardebepaling %>% dplyr::select(parameter, reden), by = c("parameter" = "parameter"))
-
-# voeg samen om als attribute weg te schrijven
-resultaat_df <- rbind(resultaat_df_meting, resultaat_df_waarde)
-
-# voeg attribute met uitkomsten tests toe aan relevante dataset (d_metingen)
-verdacht_id <- resultaat_df %>% 
-    dplyr::filter(oordeel == "verdacht") %>% 
-    dplyr::distinct(qcid) %>%
-    dplyr::pull(qcid)
-
-test <- "QC1b"
-
-d_metingen <- qcout_add_oordeel(obj = d_metingen,
-                                test = test,
-                                oordeel = "verdacht",
-                                ids = verdacht_id)
-d_metingen <- qcout_add_rapportage(obj = d_metingen,
-                                   test = test,
-                                   tekst = rapportageTekst)
-d_metingen <- qcout_add_resultaat(obj = d_metingen,
+  
+  # voeg attribute met uitkomsten tests toe aan relevante dataset (d_metingen)
+  verdacht_id <- resultaat_df$qcid
+  test <- "QC1b"
+  
+  d_metingen <- qcout_add_oordeel(obj = d_metingen,
                                   test = test,
-                                  resultaat = resultaat_df)
-
-return(d_metingen)
+                                  oordeel = "verdacht",
+                                  ids = verdacht_id)
+  d_metingen <- qcout_add_rapportage(obj = d_metingen,
+                                     test = test,
+                                     tekst = rapportageTekst)
+  d_metingen <- qcout_add_resultaat(obj = d_metingen,
+                                    test = test,
+                                    resultaat = resultaat_df)
+  
+  return(d_metingen)
 }
 

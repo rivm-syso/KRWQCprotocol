@@ -2,25 +2,26 @@
 % Please edit documentation in R/QC1e.R
 \name{QC1e}
 \alias{QC1e}
-\title{QC1e. Controle ontbreken analysegegevens}
+\title{QC1e. Controle rapportagegrens}
 \usage{
 QC1e(d_metingen, verbose = F)
 }
 \arguments{
 \item{d_metingen}{dataframe met metingen}
 
-\item{verbose}{of tekstuele output uit script gewenst is (T) of niet (F). Staat
-standaard op F.}
+\item{verbose}{of tekstuele output uit script gewenst is (T) of niet (F).
+Staat standaard op F.}
 }
 \value{
 het metingen bestand met attribute van test resultaten. In de kolom
 \code{oordeel} blijkt of de locatie/monster 'onverdacht' of 'verdacht' is.
 }
 \description{
-Controle op aanwezigheid van analysegegevens voor alle genomen monsters
+Controle op aanwezigheid rapportagegrens en detectiesymbool
 }
 \details{
-Controleer of ieder monster in het bestand meetwaarden bevat van de
-parameters die zijn uitgevraagd bij het laboratorium. Indien dit niet
-het geval is, ken het concept oordeel ontbrekend toe aan het monster.
+Indien de rapportagegrens voor een parameter ontbreekt, ken het
+concept oordeel verdacht toe aan de betreffende parameter.
+Indien waardes <rapportagegrens geen detectiesymbool bevatten,
+ken het concept oordeel verdacht toe aan de betreffende parameter.
 }

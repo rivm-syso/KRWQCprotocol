@@ -2,32 +2,33 @@
 % Please edit documentation in R/QC1a.R
 \name{QC1a}
 \alias{QC1a}
-\title{QC1a. Controle parameterlijst BRO}
+\title{QC1a. Controle datum veldonderzoek voor labanalyse}
 \usage{
-QC1a(d_parameter, d_metingen, verbose = F)
+QC1a(d_veld, d_metingen, verbose = F)
 }
 \arguments{
-\item{d_parameter}{dataframe met putcode, watertype en redoxklasses}
+\item{d_veld}{dataframe met veldobservaties}
 
 \item{d_metingen}{dataframe met metingen}
 
-\item{verbose}{of tekstuele output uit script gewenst is (T) of niet (F).
-Staat standaard op F.}
+\item{verbose}{of tekstuele output uit script gewenst is (T) of niet (F). Staat
+standaard op F.}
 }
 \value{
 metingen bestand met verdachte locaties/monsters.
 }
 \description{
-Controle op ID, aquocode, CASnummer, omschrijving,
-eenheid en hoedanigheid.
+Controle op de plausibiliteit van de waarden van datum
+veldonderzoek en datum labanalyse
 }
 \details{
-Controleer of de identificatiekenmerken van de individuele
-metingen overeenkomen met de parameterlijst BRO. In geval van
-afwijken, ken het concept QC oordeel verdacht toe aan de betreffende
-parameters.
-
-Indien een parameter niet op de parameterlijst BRO aanwezig is, dan
-dient deze te worden aangevraagd via de servicedesk BRO. De parameterlijst
-wordt hiermee uitgebreid wanneer het een legitieme, nieuwe parameter betreft.
+Ga na of de datum labanalyse na datum veldonderzoek ligt.
+Indien dit niet het geval is, ken het concept oordeel
+verdacht toe aan:
+\itemize{
+\item het gehele monster (in geval van afwijkingen bij meerdere
+parameters), of
+\item de betreffende parameter (in geval van afwijking bij
+1 parameter)
+}
 }

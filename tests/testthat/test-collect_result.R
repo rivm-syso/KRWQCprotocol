@@ -4,7 +4,7 @@ test_that("collect_result", {
               qctest <- list()
               test_results <- 1:10
               qcids <- 20
-              tests <- c("QC1a", "QC2a", "QC3a")
+              tests <- c("QC1c", "QC2a", "QC1a")
               x <- data.frame(qcid = 1:qcids, v1 = rnorm(qcids), v2 = rnorm(qcids))
               for (i in tests) {
                   qctest[[i]] <- list("oordeel" = list("verdacht" = test_results))
